@@ -6,6 +6,10 @@
   <title>Module 2: Elliptic Curves over ℝ</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="lib/katex/katex.min.css">
+  <style>
+    #c-curve { cursor: grab; touch-action: none; display: block; width: 100%; }
+    #c-curve:active { cursor: grabbing; }
+  </style>
 </head>
 <body>
 <div class="container">
@@ -39,11 +43,11 @@
     </div>
   </div>
 
-  <div id="disc-info" class="note" style="margin-top:0"></div>
+  <div id="disc-info" class="note" style="margin-top:0">Loading properties...</div>
 
   <div class="canvas-wrap">
     <canvas id="c-curve"></canvas>
-    <span class="canvas-label">Tap two points on the curve</span>
+    <span class="canvas-label">Drag points P and Q along the curve</span>
   </div>
 
   <h2>2.2 — The Group Law: Point Addition</h2>
@@ -54,9 +58,70 @@
   </ol>
   <p>When $P = Q$, use the tangent line instead (point doubling).</p>
 
-  <p><strong>Tap two points</strong> on the curve above to see point addition in action. The first tap selects $P$ (red), the second selects $Q$ (blue), then the construction draws automatically.</p>
+  <p><strong>Drag the points</strong> on the curve above to see point addition in action. Notice what happens when the points get closer together, or when they align vertically.</p>
 
-  <div id="add-info" class="note success" style="display:none"></div>
+  <div id="add-info" class="note success">Loading interactive constructor...</div>
+
+  <h2>2.2b — The Algebra of Point Addition</h2>
+  <p>To calculate $P + Q$ algebraically, we don't add the coordinates together. Instead, we translate the geometric steps (finding the secant line and its third intersection) into algebraic formulas. Let $P = (x_1, y_1)$ and $Q = (x_2, y_2)$.</p>
+
+  <p><strong>Step 1: Find the slope ($m$) of the line.</strong></p>
+  <ul>
+    <li>If $P \neq Q$ (Point Addition): We just use the standard slope formula.
+        <div class="math-block">$$m = \frac{y_2 - y_1}{x_2 - x_1}$$</div>
+    </li>
+    <li>If $P = Q$ (Point Doubling): The points are the same, so we need the tangent line. We find this using implicit differentiation of $y^2 = x^3 + ax + b$.
+        <div class="math-block">$$m = \frac{3x_1^2 + a}{2y_1}$$</div>
+    </li>
+  </ul>
+
+  <p><strong>Step 2: Find the $x$-coordinate of the new point.</strong></p>
+  <p>If we substitute our line equation $y = m(x - x_1) + y_1$ into our curve equation, we get a messy cubic polynomial. However, a brilliant algebra trick (Vieta's formulas) tells us that the sum of the three roots ($x_1, x_2, x_3$) must equal $m^2$. Therefore, finding the third $x$-coordinate is simply:</p>
+  <div class="math-block">$$x_3 = m^2 - x_1 - x_2$$</div>
+
+  <p><strong>Step 3: Find the $y$-coordinate and reflect.</strong></p>
+  <p>We find the $y$-coordinate of the third intersection ($R$) by plugging $x_3$ back into the line equation. Finally, to get $P+Q$, we reflect it across the $x$-axis by flipping the sign:</p>
+  <div class="math-block">$$y_3 = m(x_1 - x_3) - y_1$$</div>
+
+  <details class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: The Unrolled Algebra of Point Addition</summary>
+    <div style="margin-top: 15px;">
+      <p>When we write the code for $P + Q$, we usually calculate the slope ($m$) as an intermediate variable. But what does the pure mathematical function look like if we unroll it completely in terms of our input coordinates $(x_1, y_1)$ and $(x_2, y_2)$?</p>
+      
+      <p>Assume $P \neq Q$ and the points do not form a vertical line. </p>
+
+      <p><strong>1. The Explicit Slope:</strong><br>
+      The slope of the secant line passing through $P$ and $Q$ is:</p>
+      <div class="math-block">$$m = \frac{y_2 - y_1}{x_2 - x_1}$$</div>
+
+      <p><strong>2. The Explicit $x_3$:</strong><br>
+      Vieta's formulas tell us that the sum of the three roots $(x_1 + x_2 + x_3)$ equals $m^2$. Solving for $x_3$ and substituting our explicit slope gives:</p>
+      <div class="math-block">$$x_3 = \left( \frac{y_2 - y_1}{x_2 - x_1} \right)^2 - x_1 - x_2$$</div>
+
+      <p><strong>3. The Intersection $y_R$:</strong><br>
+      The point intersects the curve on our secant line $y - y_1 = m(x - x_1)$. So, the $y$-coordinate of the intersection point ($R$) is:</p>
+      <div class="math-block">$$y_R = \left( \frac{y_2 - y_1}{x_2 - x_1} \right) (x_3 - x_1) + y_1$$</div>
+
+      <p><strong>4. The Final Reflection $y_3$:</strong><br>
+      To get $P + Q$, we must reflect $R$ across the $x$-axis, meaning $y_3 = -y_R$. This gives us:</p>
+      <div class="math-block">$$y_3 = -\left[ \left( \frac{y_2 - y_1}{x_2 - x_1} \right) (x_3 - x_1) + y_1 \right]$$</div>
+      <p>Distributing the negative sign and flipping $(x_3 - x_1)$ to $(x_1 - x_3)$ to absorb it:</p>
+      <div class="math-block">$$y_3 = \left( \frac{y_2 - y_1}{x_2 - x_1} \right) (x_1 - x_3) - y_1$$</div>
+
+      <p><strong>5. The "Monster" Equation:</strong><br>
+      Finally, let's plug our massive explicit $x_3$ definition into the $(x_1 - x_3)$ part of the $y_3$ equation:</p>
+      <div class="math-block">$$y_3 = \left( \frac{y_2 - y_1}{x_2 - x_1} \right) \left[ x_1 - \left( \left( \frac{y_2 - y_1}{x_2 - x_1} \right)^2 - x_1 - x_2 \right) \right] - y_1$$</div>
+      
+      <p>Simplify by combining the $x_1$ terms inside the bracket:</p>
+      <div class="math-block">$$y_3 = \left( \frac{y_2 - y_1}{x_2 - x_1} \right) \left[ 2x_1 + x_2 - \left( \frac{y_2 - y_1}{x_2 - x_1} \right)^2 \right] - y_1$$</div>
+
+      <p>This rational function is exactly what the geometric operation of "drawing a line and flipping the point" is evaluating under the hood!</p>
+    </div>
+  </details>
+
+  <div class="note">
+    <strong>Check the math:</strong> Next time you drag $P$ and $Q$ on the graph, look at the coordinates in the green box. You'll see they exactly follow these polynomial rules, ensuring the resulting point is always perfectly locked onto the curve!
+  </div>
 
   <h2>2.3 — Special Cases</h2>
   <p>Try these parameter values to see important curve shapes:</p>
@@ -83,143 +148,169 @@
 <script src="js/plot2d.js"></script>
 <script src="js/interactive.js"></script>
 <script>
-(function() {
+document.addEventListener('DOMContentLoaded', function() {
   'use strict';
+  
+  try {
+    var canvas = document.getElementById('c-curve');
+    if (!canvas) throw new Error("Canvas element not found.");
+    if (typeof UI === 'undefined') throw new Error("UI library (interactive.js) did not load.");
+    if (typeof Plot2D === 'undefined') throw new Error("Plot2D library (plot2d.js) did not load.");
 
-  var canvas = document.getElementById('c-curve');
-  var dpr = UI.fitCanvas(canvas, 0.85);
-  var plot = new Plot2D(canvas, {xMin: -4, xMax: 4, yMin: -5, yMax: 5});
+    var dpr = UI.fitCanvas(canvas, 0.85);
+    var plot = new Plot2D(canvas, {xMin: -4, xMax: 4, yMin: -5, yMax: 5});
 
-  var a = -1, b = 1;
-  var points = []; // clicked points on curve
-  var hoverPt = null;
+    var a = -1, b = 1;
+    var points = [[-1, 1], [0, 1]]; 
+    var draggingIdx = -1;
 
-  function disc() { return -16 * (4*a*a*a + 27*b*b); }
+    function disc() { return -16 * (4*a*a*a + 27*b*b); }
 
-  function updateDisc() {
-    var d = disc();
-    var el = document.getElementById('disc-info');
-    if (Math.abs(d) < 0.5) {
-      el.className = 'note warn';
-      el.innerHTML = '<strong>Warning:</strong> Δ ≈ ' + d.toFixed(1) + ' — curve is singular (degenerate)!';
-    } else {
-      el.className = 'note';
-      el.innerHTML = 'Δ = ' + d.toFixed(1) + (d > 0 ? ' — one connected component' : ' — two connected components');
-    }
-  }
-
-  function draw() {
-    plot.w = canvas.width; plot.h = canvas.height;
-    plot.clear();
-    plot.drawGrid();
-
-    // Draw curve
-    plot.plotImplicit(function(x, y) {
-      return y*y - x*x*x - a*x - b;
-    }, '#e94560', 2.5);
-
-    // Draw construction if two points selected
-    if (points.length >= 2) {
-      var P = points[0], Q = points[1];
-      plot.drawPoint(P[0], P[1], '#e94560', 6, 'P');
-      plot.drawPoint(Q[0], Q[1], '#64b5f6', 6, 'Q');
-
-      var result = Plot2D.ecAdd(P, Q, a);
-      if (result) {
-        // Draw secant/tangent line
-        plot.drawLineThrough(P[0], P[1], Q[0], Q[1], 'rgba(255,255,255,0.3)', 1);
-
-        // R is the un-reflected third intersection
-        var R = [result[0], -result[1]];
-        plot.drawPoint(R[0], R[1], 'rgba(255,255,255,0.5)', 4, 'R');
-
-        // Vertical line from R to P+Q
-        plot.drawLine(R[0], R[1], result[0], result[1], 'rgba(255,255,255,0.3)', 1);
-
-        // P+Q
-        plot.drawPoint(result[0], result[1], '#4caf50', 7, 'P+Q');
-
-        var info = document.getElementById('add-info');
-        info.style.display = 'block';
-        info.innerHTML = 'P = (' + P[0].toFixed(2) + ', ' + P[1].toFixed(2) + '), ' +
-                         'Q = (' + Q[0].toFixed(2) + ', ' + Q[1].toFixed(2) + ')<br>' +
-                         '<strong>P + Q = (' + result[0].toFixed(2) + ', ' + result[1].toFixed(2) + ')</strong>';
+    function updateDisc() {
+      var d = disc();
+      var el = document.getElementById('disc-info');
+      if (!el) return;
+      if (Math.abs(d) < 0.5) {
+        el.className = 'note warn';
+        el.innerHTML = '<strong>Warning:</strong> Δ ≈ ' + d.toFixed(1) + ' — curve is singular (degenerate)!';
+      } else {
+        el.className = 'note';
+        // FIX 1: Positive discriminant = 3 real roots = 2 components
+        el.innerHTML = 'Δ = ' + d.toFixed(1) + (d > 0 ? ' — two connected components' : ' — one connected component');
       }
-    } else if (points.length === 1) {
-      plot.drawPoint(points[0][0], points[0][1], '#e94560', 6, 'P');
-      document.getElementById('add-info').style.display = 'none';
-    } else {
-      document.getElementById('add-info').style.display = 'none';
     }
-  }
 
-  // Find nearest point on curve to a click
-  function snapToCurve(mx, my) {
-    var bestDist = Infinity, bestPt = null;
-    // Search nearby x values
-    for (var dx = -0.5; dx <= 0.5; dx += 0.02) {
-      var x = mx + dx;
-      var val = x*x*x + a*x + b;
-      if (val < 0) continue;
-      var y = Math.sqrt(val);
-      // Check both +y and -y
-      for (var sign = -1; sign <= 1; sign += 2) {
-        var yy = sign * y;
-        var d = Math.hypot(x - mx, yy - my);
-        if (d < bestDist) {
-          bestDist = d;
-          bestPt = [x, yy];
+    function draw() {
+      plot.w = canvas.width; plot.h = canvas.height;
+      if (plot.w === 0 || plot.h === 0) return; 
+
+      plot.clear();
+      plot.drawGrid();
+
+      // Draw curve
+      plot.plotImplicit(function(x, y) {
+        return y*y - x*x*x - a*x - b;
+      }, '#e94560', 2.5);
+
+      // Draw construction if points are valid
+      if (points.length >= 2 && points[0] && points[1]) {
+        var P = points[0], Q = points[1];
+        
+        // FIX 2: plot2d.js accidentally returns the un-reflected point R. 
+        // We will capture it as R, and then manually reflect it to get P+Q.
+        var R = Plot2D.ecAdd(P, Q, a);
+        var info = document.getElementById('add-info');
+        
+        if (R && !isNaN(R[0]) && !isNaN(R[1])) {
+          var sum = [R[0], -R[1]]; // True P+Q
+
+          plot.drawLineThrough(P[0], P[1], Q[0], Q[1], 'rgba(255,255,255,0.3)', 1.5);
+          
+          plot.drawPoint(R[0], R[1], 'rgba(255,255,255,0.5)', 4, 'R');
+          plot.drawLine(R[0], R[1], sum[0], sum[1], 'rgba(255,255,255,0.5)', 1.5);
+          plot.drawPoint(sum[0], sum[1], '#4caf50', 7, 'P+Q');
+
+          if (info) {
+            info.style.display = 'block';
+            info.innerHTML = 'P = (' + P[0].toFixed(2) + ', ' + P[1].toFixed(2) + ') &nbsp;|&nbsp; ' +
+                             'Q = (' + Q[0].toFixed(2) + ', ' + Q[1].toFixed(2) + ')<br>' +
+                             '<strong>P + Q = (' + sum[0].toFixed(2) + ', ' + sum[1].toFixed(2) + ')</strong>';
+          }
+        } else if (info) {
+          info.style.display = 'none';
+        }
+        
+        plot.drawPoint(P[0], P[1], '#e94560', 6, 'P');
+        plot.drawPoint(Q[0], Q[1], '#64b5f6', 6, 'Q');
+      }
+    }
+
+    function snapToCurve(mx, my) {
+      if (typeof mx !== 'number' || typeof my !== 'number') return [0, 1]; 
+      var val = mx*mx*mx + a*mx + b;
+      if (val >= 0) {
+        var y = Math.sqrt(val);
+        return [mx, Math.abs(my - y) < Math.abs(my + y) ? y : -y];
+      }
+      var step = 0.05;
+      for (var dx = step; dx < 3; dx += step) {
+        var xRight = mx + dx, xLeft = mx - dx;
+        var vRight = xRight*xRight*xRight + a*xRight + b;
+        var vLeft = xLeft*xLeft*xLeft + a*xLeft + b;
+        if (vRight >= 0) return [xRight, my > 0 ? Math.sqrt(vRight) : -Math.sqrt(vRight)];
+        if (vLeft >= 0) return [xLeft, my > 0 ? Math.sqrt(vLeft) : -Math.sqrt(vLeft)];
+      }
+      return (draggingIdx >= 0 && points[draggingIdx]) ? points[draggingIdx] : [mx, 0];
+    }
+
+    function getPos(e) {
+      var pos = UI.canvasPos(canvas, e);
+      return plot.fromScreen(pos.x, pos.y);
+    }
+
+    function onDown(e) {
+      e.preventDefault();
+      var coord = getPos(e);
+      var minDist = Infinity;
+      for (var i = 0; i < points.length; i++) {
+        if(!points[i]) continue;
+        var d = Math.hypot(points[i][0] - coord.x, points[i][1] - coord.y);
+        if (d < 0.6 && d < minDist) {
+          minDist = d;
+          draggingIdx = i;
         }
       }
     }
-    return bestDist < 1.0 ? bestPt : null;
-  }
 
-  function onClick(e) {
-    e.preventDefault();
-    var pos = UI.canvasPos(canvas, e);
-    var coord = plot.fromScreen(pos.x, pos.y);
-    var pt = snapToCurve(coord.x, coord.y);
-    if (!pt) return;
-
-    if (points.length >= 2) {
-      points = [pt];
-    } else {
-      points.push(pt);
-    }
-    draw();
-  }
-
-  canvas.addEventListener('click', onClick);
-  canvas.addEventListener('touchend', function(e) {
-    if (e.changedTouches.length === 1) {
-      var t = e.changedTouches[0];
-      var rect = canvas.getBoundingClientRect();
-      var scaleX = canvas.width / rect.width;
-      var scaleY = canvas.height / rect.height;
-      var pos = { x: (t.clientX - rect.left)*scaleX, y: (t.clientY - rect.top)*scaleY };
-      var coord = plot.fromScreen(pos.x, pos.y);
+    function onMove(e) {
+      if (draggingIdx === -1) return;
+      e.preventDefault();
+      var coord = getPos(e);
       var pt = snapToCurve(coord.x, coord.y);
-      if (!pt) return;
-      if (points.length >= 2) points = [pt];
-      else points.push(pt);
-      draw();
+      if (pt) {
+        points[draggingIdx] = pt;
+        draw();
+      }
     }
-  });
 
-  UI.bindSlider('slider-a', 'val-a', function(v) { a = v; points = []; updateDisc(); draw(); });
-  UI.bindSlider('slider-b', 'val-b', function(v) { b = v; points = []; updateDisc(); draw(); });
+    function onUp(e) { draggingIdx = -1; }
 
-  updateDisc();
-  draw();
+    canvas.addEventListener('mousedown', onDown);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    canvas.addEventListener('touchstart', onDown, { passive: false });
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onUp);
 
-  UI.onResize(function() {
-    dpr = UI.fitCanvas(canvas, 0.85);
-    plot.w = canvas.width; plot.h = canvas.height;
-    draw();
-  });
+    function validatePoints() {
+      for (var i = 0; i < points.length; i++) {
+        if (points[i]) points[i] = snapToCurve(points[i][0], points[i][1]);
+      }
+    }
 
-})();
+    UI.bindSlider('slider-a', 'val-a', function(v) { a = v; validatePoints(); updateDisc(); draw(); });
+    UI.bindSlider('slider-b', 'val-b', function(v) { b = v; validatePoints(); updateDisc(); draw(); });
+
+    setTimeout(function() {
+      dpr = UI.fitCanvas(canvas, 0.85);
+      updateDisc();
+      draw();
+    }, 50);
+
+    UI.onResize(function() {
+      dpr = UI.fitCanvas(canvas, 0.85);
+      draw();
+    });
+
+  } catch (err) {
+    console.error("Initialization Error: ", err);
+    var errBox = document.getElementById('add-info');
+    if (errBox) {
+      errBox.className = "note warn";
+      errBox.innerHTML = "<strong>Script Error:</strong> " + err.message + " <br><small>Check console for details.</small>";
+    }
+  }
+});
 </script>
 </body>
 </html>
