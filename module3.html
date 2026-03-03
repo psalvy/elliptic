@@ -18,17 +18,23 @@
 
   <h1>Elliptic Curves over ℂ</h1>
 
-  <h2>3.1 — The Big Reveal</h2>
-  <p>Here's the deep connection: <strong>every elliptic curve over $\mathbb{C}$ is a torus</strong> — specifically, it's isomorphic to a quotient $\mathbb{C}/\Lambda$ for some lattice $\Lambda$.</p>
+  <h2>3.1 — The Big Reveal: The Translator Function</h2>
+  <p>Here is the deep connection: <strong>every elliptic curve over $\mathbb{C}$ is a torus</strong>. Specifically, it is isomorphic to a quotient space $\mathbb{C}/\Lambda$ (the complex plane folded over a lattice $\Lambda$).</p>
 
-  <p>The bridge between the flat torus and the algebraic curve is the <strong>Weierstrass ℘-function</strong>:</p>
+  <p>To get from a flat 2D coordinate $z$ on the lattice to an $(x, y)$ coordinate on the algebraic curve, we need a "translator." The <strong>Weierstrass $\wp$-function</strong> is exactly this translator:</p>
 
   <div class="math-block">$$\wp(z) = \frac{1}{z^2} + \sum_{\omega \in \Lambda \setminus \{0\}} \left(\frac{1}{(z-\omega)^2} - \frac{1}{\omega^2}\right)$$</div>
 
-  <p>This doubly-periodic meromorphic function satisfies:</p>
-  <div class="math-block">$$(\wp')^2 = 4\wp^3 - g_2\wp - g_3$$</div>
+  <p>Because of the warp-around boundaries of the lattice, any function mapping the torus to a curve must be <em>doubly-periodic</em> (giving the same output on opposite edges of the fundamental domain). The $\wp$-function is perfectly built for this.</p>
 
-  <p>The map $z \mapsto (\wp(z), \wp'(z))$ sends the flat torus $\mathbb{C}/\Lambda$ into the elliptic curve $Y^2 = 4X^3 - g_2 X - g_3$ in $\mathbb{CP}^2$. This is an <em>isomorphism</em>.</p>
+  <p>By an elegant result in complex analysis, this specific function and its derivative inherently satisfy a specific differential equation:</p>
+  <div class="math-block">$$(\wp'(z))^2 = 4\wp(z)^3 - g_2\wp(z) - g_3$$</div>
+
+  <p>Notice the shape of that equation! If we let our $x$-coordinate be $\wp(z)$ and our $y$-coordinate be $\wp'(z)$, we perfectly recreate the structure of our elliptic curve $y^2 = 4x^3 - ax - b$ (the $4$ is just a scaling convention).</p>
+  
+  <p>The map $z \mapsto (\wp(z), \wp'(z))$ takes a coordinate from the flat torus and embeds it perfectly onto the algebraic curve in $\mathbb{CP}^2$.</p>
+  
+  
 
   <h2>3.2 — Interactive: Lattice ↔ Torus</h2>
   <p>Draw a straight line on the flat lattice (left) by dragging. Straight lines on the flat torus become <strong>winding curves</strong> on the 3D torus (right). The slope determines how many times the curve winds around each cycle.</p>
@@ -68,19 +74,20 @@
     <button onclick="document.getElementById('slope-slider').value='1'; document.getElementById('slope-slider').dispatchEvent(new Event('input'))">Set slope = 1</button>
   </div>
 
-  <h2>3.4 — The ℘-Function as a Map</h2>
-  <p>The Weierstrass ℘-function is doubly periodic with periods $\omega_1, \omega_2$:</p>
+  <h2>3.4 — The Grand Finale: Why the Group Law Works</h2>
+  <p>The Weierstrass $\wp$-function is doubly periodic with periods $\omega_1, \omega_2$:</p>
   <div class="math-block">$$\wp(z + \omega_1) = \wp(z), \quad \wp(z + \omega_2) = \wp(z)$$</div>
 
-  <p>This means $\wp$ is well-defined on the quotient $\mathbb{C}/\Lambda$. It has:</p>
-  <ul>
-    <li>A <strong>double pole</strong> at the origin (the "point at infinity" on the torus maps to $\mathcal{O}$ on the curve)</li>
-    <li><strong>Even</strong> symmetry: $\wp(-z) = \wp(z)$ — each value is taken twice (reflecting the $y \mapsto -y$ symmetry of the curve)</li>
-  </ul>
+  <p>This means $\wp$ has an <strong>even</strong> symmetry: $\wp(-z) = \wp(z)$ — each value is taken twice, which geometrically reflects the $y \mapsto -y$ symmetry of the curve from Module 2.</p>
 
-  <div class="note">
-    <strong>Key insight:</strong> The equivalence between tori and elliptic curves is not just topological — it preserves the <em>group structure</em>. Addition of points on the curve corresponds to addition of complex numbers modulo the lattice. Lines on the lattice map to the secant construction from Module 2.
+  <div class="note success">
+    <strong>The Key Insight:</strong> The equivalence between tori and elliptic curves is not just topological—it preserves the <em>group structure</em>. <br><br>
+    Adding points on the flat $\mathbb{C}/\Lambda$ lattice is just standard, simple complex vector addition. Because the $\wp$-function perfectly translates the Torus to the Curve, it also translates the math happening <em>on</em> them. <br><br>
+    If you pick three points on the flat torus that add up to zero ($z_1 + z_2 + z_3 = 0 \pmod \Lambda$), and you feed those three coordinates through the $\wp$-function, they become three points $P, Q, R$ on the elliptic curve that <strong>lie on a perfectly straight line</strong>.<br><br>
+    The bizarre secant-line addition you performed in Module 2 is literally just the curve's distorted algebraic representation of standard vector addition happening on the flat torus.
   </div>
+  
+  
 
   <nav class="nav-bottom">
     <a href="module2.html">← Module 2: Curves over ℝ</a>
