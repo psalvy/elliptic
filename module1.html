@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 1: Quotient Spaces</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="lib/katex/katex.min.css">
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top">
+    <a href="index.html">← Home</a>
+    <span>Module 1 of 5</span>
+    <a href="module2.html">Next →</a>
+  </nav>
+
+  <h1>Demystifying Quotient Spaces</h1>
+
+  <h2>1.1 — The Simplest Case: $\mathbb{R}/\mathbb{Z}$</h2>
+  <p>Before diving into complex tori, let's see the simplest quotient space: the real line modulo the integers. We declare $x \sim x + 1$ — any two points differing by an integer are "the same." The real line wraps into a circle.</p>
+
+  <div class="canvas-wrap">
+    <canvas id="c-circle"></canvas>
+    <span class="canvas-label">Drag the point</span>
+  </div>
+  <div class="controls">
+    <div class="control-group">
+      <label>t =</label>
+      <span class="val" id="circle-t">0.00</span>
+    </div>
+    <div class="control-group">
+      <label>$t \bmod 1$ =</label>
+      <span class="val" id="circle-tmod">0.00</span>
+    </div>
+  </div>
+
+  <p>As you drag $t$ along the number line (top), the point wraps around the circle (bottom). Every time $t$ crosses an integer, you're back where you started. The quotient $\mathbb{R}/\mathbb{Z} \cong S^1$.</p>
+
+  <h2>1.2 — The 2D Lattice: $\mathbb{C}/\Lambda$</h2>
+  <p>Now move to the complex plane $\mathbb{C}$. Pick two complex numbers $\omega_1, \omega_2$ that aren't real multiples of each other. The <strong>lattice</strong> is:</p>
+
+  <div class="math-block">$$\Lambda = \{m\omega_1 + n\omega_2 \mid m,n \in \mathbb{Z}\}$$</div>
+
+  <p>The quotient $\mathbb{C}/\Lambda$ identifies every point with all its translates by lattice vectors. Geometrically, a <strong>fundamental parallelogram</strong> with opposite edges glued. Drag the lattice generators below:</p>
+
+  <div class="canvas-wrap">
+    <canvas id="c-lattice"></canvas>
+    <span class="canvas-label">Drag ω₁ and ω₂</span>
+  </div>
+  <div class="controls">
+    <div class="control-group">
+      <label>$\omega_1$:</label>
+      <span class="val" id="w1-val">(1.0, 0.0)</span>
+    </div>
+    <div class="control-group">
+      <label>$\omega_2$:</label>
+      <span class="val" id="w2-val">(0.3, 0.9)</span>
+    </div>
+  </div>
+
+  <h2>1.3 — Gluing: Parallelogram → Torus</h2>
+  <p>The identification of edges turns a flat parallelogram into a torus. The slider controls two steps, and the shape is driven by $\omega_1, \omega_2$ above:</p>
+  <ol>
+    <li><strong>0–50%: Glue the orange ($\omega_2$) edges</strong> — roll the sheet into a <strong>cylinder</strong>. The tube radius comes from $|\omega_2|$.</li>
+    <li><strong>50–100%: Bend the cylinder</strong> to glue the green ($\omega_1$) ends → a <strong>torus</strong>. The ring radius comes from $|\omega_1|$.</li>
+  </ol>
+  <p>Try dragging $\omega_1, \omega_2$ above and watch the torus shape change — a longer $\omega_2$ relative to $\omega_1$ makes a fatter tube.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Gluing:</label>
+      <input type="range" id="glue-slider" min="0" max="1" step="0.01" value="0">
+      <span class="val" id="glue-val">0%</span>
+    </div>
+  </div>
+  <div class="canvas-wrap">
+    <canvas id="c-torus"></canvas>
+    <span class="canvas-label">Drag to rotate</span>
+  </div>
+
+  <h2>1.4 — Linked Point: 2D ↔ 3D</h2>
+  <p>Drag the red point on the flat lattice (left) and watch it move on the torus (right). Every point on the fundamental domain maps to exactly one point on the torus surface.</p>
+
+  <div class="split-view">
+    <div class="canvas-wrap">
+      <canvas id="c-flat"></canvas>
+      <span class="canvas-label">Flat lattice — drag point</span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="c-torus2"></canvas>
+      <span class="canvas-label">Torus — linked point</span>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>Key insight:</strong> The torus is not just a topological shape — it's the <em>quotient space</em> $\mathbb{C}/\Lambda$, inheriting a flat metric from the plane. Two tori with different lattices are genuinely different geometric objects. This is the foundation of elliptic curve theory.
+  </div>
+
+  <nav class="nav-bottom">
+    <a href="index.html">← Home</a>
+    <a href="module2.html">Module 2: Curves over ℝ →</a>
+  </nav>
+
+</div>
+
+<script src="lib/katex/katex.min.js"></script>
+<script src="js/math-render.js"></script>
+<script src="js/canvas3d.js"></script>
+<script src="js/plot2d.js"></script>
+<script src="js/interactive.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // === Shared lattice state across sections 1.2, 1.3, 1.4 ===
+  var lattice = {
+    w1: {x: 1.0, y: 0.0},
+    w2: {x: 0.3, y: 0.9},
+    listeners: [],
+    onChange: function(fn) { this.listeners.push(fn); },
+    notify: function() {
+      for (var i = 0; i < this.listeners.length; i++) this.listeners[i]();
+    },
+    // Torus radii derived from lattice shape.
+    // ratio = |ω₂| / |ω₁| controls the tube thickness relative to ring radius.
+    torusR: function() { return 1.0; },
+    torusR2: function() {
+      var l1 = Math.hypot(this.w1.x, this.w1.y);
+      var l2 = Math.hypot(this.w2.x, this.w2.y);
+      var ratio = l2 / (l1 || 0.01);
+      return Math.min(0.7, Math.max(0.15, 0.4 * ratio));
+    }
+  };
+
+  // === 1.1 R/Z Circle ===
+  (function() {
+    var canvas = document.getElementById('c-circle');
+    var dpr = UI.fitCanvas(canvas, 0.45);
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    var t = 0.35;
+    var dragging = false;
+
+    function draw() {
+      ctx.fillStyle = '#0d1117';
+      ctx.fillRect(0, 0, w, h);
+
+      var lineY = h * 0.25;
+      var circCx = w * 0.5, circCy = h * 0.68;
+      var circR = Math.min(w, h) * 0.2;
+      var lineL = w * 0.1, lineR = w * 0.9;
+
+      // Number line
+      ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+      ctx.lineWidth = 2 * dpr;
+      ctx.beginPath(); ctx.moveTo(lineL, lineY); ctx.lineTo(lineR, lineY); ctx.stroke();
+
+      // Tick marks
+      ctx.fillStyle = '#aaa';
+      ctx.font = (12 * dpr) + 'px sans-serif';
+      ctx.textAlign = 'center';
+      for (var i = -1; i <= 3; i++) {
+        var tx = lineL + (i + 1) / 4 * (lineR - lineL);
+        ctx.beginPath(); ctx.moveTo(tx, lineY - 6*dpr); ctx.lineTo(tx, lineY + 6*dpr);
+        ctx.strokeStyle = '#888'; ctx.lineWidth = 1.5*dpr; ctx.stroke();
+        ctx.fillText(i, tx, lineY + 20*dpr);
+      }
+
+      // Point on line
+      var px = lineL + (t + 1) / 4 * (lineR - lineL);
+      ctx.beginPath(); ctx.arc(px, lineY, 7*dpr, 0, Math.PI*2);
+      ctx.fillStyle = '#e94560'; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5*dpr; ctx.stroke();
+
+      // Arrow
+      var tmod = ((t % 1) + 1) % 1;
+      var angle = -Math.PI/2 + tmod * Math.PI * 2;
+      ctx.strokeStyle = 'rgba(233,69,96,0.4)';
+      ctx.lineWidth = 1*dpr;
+      ctx.setLineDash([4*dpr, 4*dpr]);
+      ctx.beginPath();
+      ctx.moveTo(px, lineY + 10*dpr);
+      ctx.lineTo(circCx + circR * Math.cos(angle), circCy + circR * Math.sin(angle) - 5*dpr);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Circle
+      ctx.strokeStyle = 'rgba(74,158,255,0.5)';
+      ctx.lineWidth = 2*dpr;
+      ctx.beginPath(); ctx.arc(circCx, circCy, circR, 0, Math.PI*2); ctx.stroke();
+
+      // Point on circle
+      var cpx = circCx + circR * Math.cos(angle);
+      var cpy = circCy + circR * Math.sin(angle);
+      ctx.beginPath(); ctx.arc(cpx, cpy, 7*dpr, 0, Math.PI*2);
+      ctx.fillStyle = '#e94560'; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5*dpr; ctx.stroke();
+
+      document.getElementById('circle-t').textContent = t.toFixed(2);
+      document.getElementById('circle-tmod').textContent = tmod.toFixed(2);
+    }
+
+    canvas.addEventListener('mousedown', function() { dragging = true; });
+    canvas.addEventListener('touchstart', function(e) { e.preventDefault(); dragging = true; }, {passive:false});
+    window.addEventListener('mouseup', function() { dragging = false; });
+    window.addEventListener('touchend', function() { dragging = false; });
+
+    function onMove(e) {
+      if (!dragging) return;
+      e.preventDefault();
+      var pos = UI.canvasPos(canvas, e);
+      var lineL = canvas.width * 0.1, lineR = canvas.width * 0.9;
+      t = -1 + (pos.x - lineL) / (lineR - lineL) * 4;
+      t = Math.max(-1, Math.min(3, t));
+      draw();
+    }
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('touchmove', onMove, {passive:false});
+
+    draw();
+    UI.onResize(function() { dpr = UI.fitCanvas(canvas, 0.45); w = canvas.width; h = canvas.height; draw(); });
+  })();
+
+  // === 1.2 Lattice ===
+  (function() {
+    var canvas = document.getElementById('c-lattice');
+    var dpr = UI.fitCanvas(canvas, 0.7);
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+
+    var dragging = null;
+    var scale = Math.min(w, h) * 0.18;
+    var cx = w / 2, cy = h / 2;
+
+    function toScr(x, y) { return {x: cx + x * scale, y: cy - y * scale}; }
+    function fromScr(sx, sy) { return {x: (sx - cx) / scale, y: (cy - sy) / scale}; }
+
+    function draw() {
+      var w1 = lattice.w1, w2 = lattice.w2;
+      ctx.fillStyle = '#0d1117';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(74,158,255,0.15)';
+      ctx.lineWidth = 1 * dpr;
+      for (var m = -4; m <= 4; m++) {
+        for (var n = -4; n <= 4; n++) {
+          var px = m * w1.x + n * w2.x;
+          var py = m * w1.y + n * w2.y;
+          var s = toScr(px, py);
+          ctx.beginPath(); ctx.arc(s.x, s.y, 3*dpr, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba(74,158,255,0.5)'; ctx.fill();
+        }
+      }
+
+      // Grid lines along w1 direction
+      for (var n = -4; n <= 4; n++) {
+        var ox = n * w2.x, oy = n * w2.y;
+        var a = toScr(ox - 4*w1.x, oy - 4*w1.y);
+        var b = toScr(ox + 4*w1.x, oy + 4*w1.y);
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+      for (var m = -4; m <= 4; m++) {
+        var ox = m * w1.x, oy = m * w1.y;
+        var a = toScr(ox - 4*w2.x, oy - 4*w2.y);
+        var b = toScr(ox + 4*w2.x, oy + 4*w2.y);
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+
+      // Fundamental parallelogram
+      ctx.fillStyle = 'rgba(233,69,96,0.12)';
+      ctx.strokeStyle = 'rgba(233,69,96,0.7)';
+      ctx.lineWidth = 2 * dpr;
+      var p0 = toScr(0, 0);
+      var p1 = toScr(w1.x, w1.y);
+      var p2 = toScr(w1.x + w2.x, w1.y + w2.y);
+      var p3 = toScr(w2.x, w2.y);
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+
+      // Edge labels: color-matched to gluing
+      // ω₁ edges (green) = top & bottom, glued first → cylinder
+      ctx.strokeStyle = '#4caf50'; ctx.lineWidth = 3 * dpr;
+      ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(p3.x, p3.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+      // ω₂ edges (orange) = left & right, glued second → torus
+      ctx.strokeStyle = '#ff9800'; ctx.lineWidth = 3 * dpr;
+      ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p3.x, p3.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+
+      // Origin
+      ctx.beginPath(); ctx.arc(p0.x, p0.y, 4*dpr, 0, Math.PI*2);
+      ctx.fillStyle = '#fff'; ctx.fill();
+
+      // ω₁ handle
+      ctx.beginPath(); ctx.arc(p1.x, p1.y, 6*dpr, 0, Math.PI*2);
+      ctx.fillStyle = '#4caf50'; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5*dpr; ctx.stroke();
+      ctx.fillStyle = '#4caf50'; ctx.font = (13*dpr)+'px sans-serif';
+      ctx.fillText('ω₁', p1.x + 10*dpr, p1.y - 8*dpr);
+
+      // ω₂ handle
+      ctx.beginPath(); ctx.arc(p3.x, p3.y, 6*dpr, 0, Math.PI*2);
+      ctx.fillStyle = '#ff9800'; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5*dpr; ctx.stroke();
+      ctx.fillStyle = '#ff9800'; ctx.font = (13*dpr)+'px sans-serif';
+      ctx.fillText('ω₂', p3.x + 10*dpr, p3.y - 8*dpr);
+
+      document.getElementById('w1-val').textContent = '(' + w1.x.toFixed(1) + ', ' + w1.y.toFixed(1) + ')';
+      document.getElementById('w2-val').textContent = '(' + w2.x.toFixed(1) + ', ' + w2.y.toFixed(1) + ')';
+    }
+
+    function hitTest(sx, sy) {
+      var p1 = toScr(lattice.w1.x, lattice.w1.y);
+      var p2 = toScr(lattice.w2.x, lattice.w2.y);
+      if (Math.hypot(sx - p1.x, sy - p1.y) < 25*dpr) return 'w1';
+      if (Math.hypot(sx - p2.x, sy - p2.y) < 25*dpr) return 'w2';
+      return null;
+    }
+
+    canvas.addEventListener('mousedown', function(e) {
+      var p = UI.canvasPos(canvas, e);
+      dragging = hitTest(p.x, p.y);
+    });
+    canvas.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      var p = UI.canvasPos(canvas, e);
+      dragging = hitTest(p.x, p.y);
+    }, {passive:false});
+
+    function onMove(e) {
+      if (!dragging) return;
+      e.preventDefault();
+      var p = UI.canvasPos(canvas, e);
+      var c = fromScr(p.x, p.y);
+      if (dragging === 'w1') { lattice.w1.x = c.x; lattice.w1.y = c.y; }
+      else { lattice.w2.x = c.x; lattice.w2.y = c.y; }
+      draw();
+      lattice.notify();
+    }
+    canvas.addEventListener('mousemove', onMove);
+    canvas.addEventListener('touchmove', onMove, {passive:false});
+    window.addEventListener('mouseup', function() { dragging = null; });
+    window.addEventListener('touchend', function() { dragging = null; });
+
+    draw();
+    UI.onResize(function() { dpr = UI.fitCanvas(canvas, 0.7); w = canvas.width; h = canvas.height; cx = w/2; cy = h/2; scale = Math.min(w,h)*0.18; draw(); });
+  })();
+
+  // === 1.3 Gluing Animation ===
+  // The slider interpolates: 0% = flat parallelogram, 50% = cylinder (ω₂ edges glued),
+  // 100% = torus (both pairs glued).
+  //
+  // Coordinates:
+  //   u ∈ [0,1] parameterises the ω₁ direction (green edges)
+  //   v ∈ [0,1] parameterises the ω₂ direction (orange edges)
+  //
+  // Phase 1 (0–50%): roll the sheet along v into a cylinder.
+  //   The orange (ω₂) edges at v=0 and v=1 come together.
+  //   Flat: (u,v) → (u-0.5)*L₁ along x-axis, (v-0.5)*L₂ along y-axis, z=0
+  //   Cylinder: v wraps into a circle (y,z) = r*(cos φ, sin φ), x stays as u.
+  //
+  // Phase 2 (50–100%): bend the cylinder into a torus.
+  //   The green (ω₁) ends at u=0 and u=1 come together.
+  //   Cylinder: straight along x → torus: x wraps into the big circle (x,y) = (R+…)*cos θ …
+  (function() {
+    var canvas = document.getElementById('c-torus');
+    var dpr = UI.fitCanvas(canvas, 0.75);
+    var w = canvas.width, h = canvas.height;
+    var scene = new Canvas3D(canvas, {scale: Math.min(w,h)*0.3, rotX: -0.5, rotY: 0.5});
+
+    var glueVal = 0;
+
+    UI.bindSlider('glue-slider', 'glue-val', function(v) {
+      glueVal = v;
+      renderGlue();
+    }, function(v) { return Math.round(v * 100) + '%'; });
+
+    function renderGlue() {
+      var R = lattice.torusR();
+      var r = lattice.torusR2();
+      var nu = 32, nv = 24;
+      var grid = [];
+
+      for (var i = 0; i <= nu; i++) {
+        var row = [];
+        var u = i / nu; // 0..1, ω₁ direction
+        var theta = u * Math.PI * 2; // angle for torus big circle
+
+        for (var j = 0; j <= nv; j++) {
+          var v = j / nv; // 0..1, ω₂ direction
+          var phi = v * Math.PI * 2; // angle for cylinder / torus tube
+
+          if (glueVal < 0.5) {
+            // Phase 1: flat rectangle → cylinder
+            // v wraps into a circle, u stays straight
+            var t = glueVal * 2; // 0→1
+
+            // Flat position
+            var flatX = (u - 0.5) * 2;   // along ω₁
+            var flatY = (v - 0.5) * 2;   // along ω₂
+
+            // Cylinder position: v becomes angle φ around tube cross-section
+            // tube sits along x-axis, cross-section in (y,z) plane
+            var cylX = (u - 0.5) * 2;
+            var cylY = r * Math.cos(phi);
+            var cylZ = r * Math.sin(phi);
+
+            // For the flat shape, scale y to match cylinder radius at t=0
+            // so interpolation is smooth
+            row.push([
+              flatX * (1 - t) + cylX * t,
+              flatY * (1 - t) + cylY * t,
+              0     * (1 - t) + cylZ * t
+            ]);
+          } else {
+            // Phase 2: cylinder → torus
+            // u wraps into the big circle (bending the cylinder axis)
+            var t = (glueVal - 0.5) * 2; // 0→1
+
+            // Cylinder: straight tube along x
+            var cylX = (u - 0.5) * 2;
+            var cylY = r * Math.cos(phi);
+            var cylZ = r * Math.sin(phi);
+
+            // Torus: tube axis becomes a circle of radius R in (x,y) plane
+            var torusX = (R + r * Math.cos(phi)) * Math.cos(theta);
+            var torusY = (R + r * Math.cos(phi)) * Math.sin(theta);
+            var torusZ = r * Math.sin(phi);
+
+            row.push([
+              cylX   * (1 - t) + torusX * t,
+              cylY   * (1 - t) + torusY * t,
+              cylZ   * (1 - t) + torusZ * t
+            ]);
+          }
+        }
+        grid.push(row);
+      }
+
+      scene.clear();
+
+      // Color the wireframe edges to match the identification:
+      // Lines along u (constant v) = green (ω₁ direction)
+      // Lines along v (constant u) = orange (ω₂ direction)
+      for (var i = 0; i < grid.length; i += 2) {
+        for (var j = 0; j < grid[i].length - 1; j++) {
+          var p1 = scene.project(grid[i][j][0], grid[i][j][1], grid[i][j][2]);
+          var p2 = scene.project(grid[i][j+1][0], grid[i][j+1][1], grid[i][j+1][2]);
+          scene.drawLine(p1, p2, 'rgba(255,152,0,0.35)', 0.7);
+        }
+      }
+      for (var j = 0; j < grid[0].length; j += 2) {
+        for (var i = 0; i < grid.length - 1; i++) {
+          var p1 = scene.project(grid[i][j][0], grid[i][j][1], grid[i][j][2]);
+          var p2 = scene.project(grid[i+1][j][0], grid[i+1][j][1], grid[i+1][j][2]);
+          scene.drawLine(p1, p2, 'rgba(76,175,80,0.35)', 0.7);
+        }
+      }
+    }
+
+    renderGlue();
+    lattice.onChange(renderGlue);
+  })();
+
+  // === 1.4 Linked Point ===
+  (function() {
+    var cFlat = document.getElementById('c-flat');
+    var cTorus = document.getElementById('c-torus2');
+    var dpr1 = UI.fitCanvas(cFlat, 1.0);
+    var dpr2 = UI.fitCanvas(cTorus, 1.0);
+
+    var ctxF = cFlat.getContext('2d');
+    var wF = cFlat.width, hF = cFlat.height;
+
+    var scene = new Canvas3D(cTorus, {scale: Math.min(cTorus.width, cTorus.height)*0.35, rotX: -0.4, rotY: 0.6, autoRotate: true});
+
+    var pt = {u: 0.3, v: 0.4}; // normalized 0..1
+    var dragging = false;
+
+    function drawFlat() {
+      var w = wF, h = hF;
+      ctxF.fillStyle = '#0d1117';
+      ctxF.fillRect(0, 0, w, h);
+
+      var margin = w * 0.1;
+      var sz = w - 2 * margin;
+
+      // Grid
+      ctxF.strokeStyle = 'rgba(74,158,255,0.15)';
+      ctxF.lineWidth = 1 * dpr1;
+      for (var i = 0; i <= 10; i++) {
+        var t = margin + i / 10 * sz;
+        ctxF.beginPath(); ctxF.moveTo(t, margin); ctxF.lineTo(t, margin + sz); ctxF.stroke();
+        ctxF.beginPath(); ctxF.moveTo(margin, t); ctxF.lineTo(margin + sz, t); ctxF.stroke();
+      }
+
+      // Edge colors matching gluing: green = ω₁ (horizontal), orange = ω₂ (vertical)
+      ctxF.lineWidth = 3 * dpr1;
+      // Horizontal edges (ω₁ direction) = green
+      ctxF.strokeStyle = '#4caf50';
+      ctxF.beginPath(); ctxF.moveTo(margin, margin); ctxF.lineTo(margin + sz, margin); ctxF.stroke();
+      ctxF.beginPath(); ctxF.moveTo(margin, margin + sz); ctxF.lineTo(margin + sz, margin + sz); ctxF.stroke();
+      // Vertical edges (ω₂ direction) = orange
+      ctxF.strokeStyle = '#ff9800';
+      ctxF.beginPath(); ctxF.moveTo(margin, margin); ctxF.lineTo(margin, margin + sz); ctxF.stroke();
+      ctxF.beginPath(); ctxF.moveTo(margin + sz, margin); ctxF.lineTo(margin + sz, margin + sz); ctxF.stroke();
+
+      // Arrows showing identification direction
+      var midX = margin + sz/2, midY = margin + sz/2;
+      drawArrow(ctxF, midX - 5*dpr1, margin, midX + 5*dpr1, margin, '#4caf50');
+      drawArrow(ctxF, midX - 5*dpr1, margin + sz, midX + 5*dpr1, margin + sz, '#4caf50');
+      drawArrow(ctxF, margin, midY - 5*dpr1, margin, midY + 5*dpr1, '#ff9800');
+      drawArrow(ctxF, margin + sz, midY - 5*dpr1, margin + sz, midY + 5*dpr1, '#ff9800');
+
+      // Labels
+      ctxF.fillStyle = '#4caf50'; ctxF.font = (12*dpr1)+'px sans-serif'; ctxF.textAlign = 'center';
+      ctxF.fillText('ω₁', midX, margin - 6*dpr1);
+      ctxF.fillStyle = '#ff9800';
+      ctxF.fillText('ω₂', margin - 14*dpr1, midY + 4*dpr1);
+
+      // Point
+      var px = margin + pt.u * sz;
+      var py = margin + (1 - pt.v) * sz;
+      ctxF.beginPath(); ctxF.arc(px, py, 7*dpr1, 0, Math.PI*2);
+      ctxF.fillStyle = '#e94560'; ctxF.fill();
+      ctxF.strokeStyle = '#fff'; ctxF.lineWidth = 2*dpr1; ctxF.stroke();
+    }
+
+    function drawArrow(ctx, x1, y1, x2, y2, color) {
+      var angle = Math.atan2(y2-y1, x2-x1);
+      var len = 8 * dpr1;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - len*Math.cos(angle-0.4), y2 - len*Math.sin(angle-0.4));
+      ctx.lineTo(x2 - len*Math.cos(angle+0.4), y2 - len*Math.sin(angle+0.4));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawTorus() {
+      var R = lattice.torusR();
+      var r = lattice.torusR2();
+      var torusGrid = Canvas3D.torusPoints(R, r, 30, 20);
+      scene.clear();
+      scene.drawWireframe(torusGrid, 'rgba(74,158,255,0.25)');
+
+      // Draw point on torus
+      var tp = Canvas3D.torusPoint(R, r, pt.u, pt.v);
+      var pp = scene.project(tp[0], tp[1], tp[2]);
+      scene.drawPoint(pp, '#e94560', 6);
+    }
+
+    cFlat.addEventListener('mousedown', function(e) { dragging = true; updatePt(e); });
+    cFlat.addEventListener('touchstart', function(e) { e.preventDefault(); dragging = true; updatePt(e); }, {passive:false});
+    window.addEventListener('mouseup', function() { dragging = false; });
+    window.addEventListener('touchend', function() { dragging = false; });
+
+    function updatePt(e) {
+      var p = UI.canvasPos(cFlat, e);
+      var margin = wF * 0.1;
+      var sz = wF - 2 * margin;
+      pt.u = Math.max(0, Math.min(1, (p.x - margin) / sz));
+      pt.v = Math.max(0, Math.min(1, 1 - (p.y - margin) / sz));
+      drawFlat();
+      drawTorus();
+    }
+
+    cFlat.addEventListener('mousemove', function(e) { if (dragging) updatePt(e); });
+    cFlat.addEventListener('touchmove', function(e) { if (dragging) { e.preventDefault(); updatePt(e); } }, {passive:false});
+
+    drawFlat();
+    scene.animate(function() { drawTorus(); });
+
+    lattice.onChange(function() { drawTorus(); });
+
+    UI.onResize(function() {
+      dpr1 = UI.fitCanvas(cFlat, 1.0);
+      dpr2 = UI.fitCanvas(cTorus, 1.0);
+      wF = cFlat.width; hF = cFlat.height;
+      scene.w = cTorus.width; scene.h = cTorus.height;
+      scene.cx = scene.w/2; scene.cy = scene.h/2;
+      scene.scale = Math.min(scene.w, scene.h)*0.35;
+      drawFlat();
+    });
+  })();
+
+})();
+</script>
+</body>
+</html>

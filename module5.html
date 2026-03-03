@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 5: Complex Multiplication &amp; Ramanujan's π</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="lib/katex/katex.min.css">
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top">
+    <a href="module4.html">← Prev</a>
+    <span>Module 5 of 5</span>
+    <a href="index.html">Home →</a>
+  </nav>
+
+  <h1>Complex Multiplication &amp; Ramanujan's π</h1>
+
+  <h2>5.1 — Complex Multiplication</h2>
+  <p>Most lattices $\Lambda \subset \mathbb{C}$ only have the obvious symmetries: $z \mapsto -z$ (and scaling). But some lattices have <strong>extra endomorphisms</strong> — multiplication by elements beyond $\mathbb{Z}$.</p>
+
+  <p>If $\Lambda = \mathbb{Z} + \mathbb{Z}\tau$ and there exists $\alpha \notin \mathbb{Z}$ with $\alpha\Lambda \subseteq \Lambda$, then $\tau$ satisfies a quadratic equation, meaning $\tau$ lives in an <strong>imaginary quadratic field</strong> $\mathbb{Q}(\sqrt{-d})$.</p>
+
+  <div class="math-block">$$\text{Example: } \tau = i \implies \Lambda = \mathbb{Z}[i], \quad \tau = \frac{-1+\sqrt{-3}}{2} \implies \Lambda = \mathbb{Z}[\rho]$$</div>
+
+  <p>For these "CM curves," the $j$-invariant is an <strong>algebraic integer</strong>. Here's the remarkable fact:</p>
+
+  <div class="note success">
+    $j(i) = 1728$ (exactly)<br>
+    $j(\rho) = 0$ (exactly)<br>
+    $j(\sqrt{-2}) = 8000$<br>
+    $j\!\left(\frac{1+\sqrt{-163}}{2}\right) = -262537412640768000$ (exactly!)
+  </div>
+
+  <h2>5.2 — The CM Lattice for $d = 163$</h2>
+  <p>The lattice $\Lambda = \mathbb{Z} + \mathbb{Z}\cdot\frac{1+\sqrt{-163}}{2}$ has $\tau = \frac{1+\sqrt{-163}}{2}$, with $\operatorname{Im}(\tau) \approx 6.38$. This extremely "tall" fundamental domain produces a very thin torus:</p>
+
+  <div class="canvas-wrap">
+    <canvas id="c-cm-torus"></canvas>
+    <span class="canvas-label">CM torus for d=163 — drag to rotate</span>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>d =</label>
+      <select id="cm-select">
+        <option value="1">1 (Gaussian integers)</option>
+        <option value="2">2</option>
+        <option value="3">3 (Eisenstein integers)</option>
+        <option value="7">7</option>
+        <option value="11">11</option>
+        <option value="19">19</option>
+        <option value="43">43</option>
+        <option value="67">67</option>
+        <option value="163" selected>163 (Ramanujan's favorite)</option>
+      </select>
+    </div>
+  </div>
+
+  <p>These values of $d$ are exactly the <strong>Heegner numbers</strong> — the imaginary quadratic fields with class number 1. The near-integer $e^{\pi\sqrt{163}} \approx 262537412640768743.99999999999925\ldots$ is no coincidence: it's explained by the $j$-invariant's $q$-expansion.</p>
+
+  <h2>5.3 — Ramanujan's Series for $1/\pi$</h2>
+  <p>In 1914, Ramanujan stated (without proof!) the extraordinary formula:</p>
+
+  <div class="math-block">$$\frac{1}{\pi} = \frac{2\sqrt{2}}{9801} \sum_{k=0}^{\infty} \frac{(4k)!\,(1103 + 26390k)}{(k!)^4\, 396^{4k}}$$</div>
+
+  <p>Each term adds roughly <strong>8 decimal digits</strong> of precision. The number 1103 connects to $j(\sqrt{-58})$, and 396 relates to the singular modulus. The Chudnovsky brothers later found an even faster variant using $d = 163$:</p>
+
+  <div class="math-block">$$\frac{1}{\pi} = \frac{1}{426880\sqrt{10005}} \sum_{k=0}^{\infty} \frac{(6k)!\,(13591409 + 545140134k)}{(3k)!\,(k!)^3\,(-262537412640768000)^k}$$</div>
+
+  <p>giving about <strong>14 digits per term</strong>.</p>
+
+  <h2>5.4 — Approximation Engine</h2>
+  <p>Step through the series term by term. Watch the digits of $\pi$ lock in:</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Terms (k):</label>
+      <input type="range" id="k-slider" min="0" max="8" step="1" value="0">
+      <span class="val" id="k-val">0</span>
+    </div>
+    <button id="btn-step">Next term →</button>
+  </div>
+
+  <div class="controls" style="font-size:0.85rem">
+    <div class="control-group">
+      <label>Series:</label>
+      <select id="series-select">
+        <option value="ramanujan">Ramanujan (1914) — ~8 digits/term</option>
+        <option value="chudnovsky">Chudnovsky — ~14 digits/term</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="digit-display" class="digit-display">π ≈ 3.</div>
+
+  <div id="precision-info" class="note success"></div>
+
+  <h2>5.5 — Why This Works</h2>
+  <p>The conceptual chain is:</p>
+  <ol>
+    <li><strong>CM lattice</strong> with extra symmetry ($d = 58$ or $163$)</li>
+    <li><strong>$j$-invariant</strong> is an algebraic integer → produces exact algebraic relations</li>
+    <li><strong>Modular equation</strong> connecting $j$ to Eisenstein series and $\pi$</li>
+    <li>The large value of $e^{\pi\sqrt{d}}$ makes the $q$-expansion converge <strong>extremely fast</strong></li>
+  </ol>
+
+  <p>The bigger $d$ is, the smaller $|q| = e^{-\pi\sqrt{d}}$ is, and the faster the series converges. Ramanujan's genius was recognizing which CM values produced series with rational coefficients.</p>
+
+  <div class="note">
+    <strong>The full circle:</strong> We started with quotient spaces (Module 1), learned the group law on elliptic curves (Module 2), connected tori to curves via $\wp$ (Module 3), classified curves by $j$ (Module 4), and now see how special CM values of $j$ unlock formulas that compute $\pi$ at breathtaking speed. The geometry of lattices, the algebra of elliptic curves, and the analysis of modular forms all converge on a single transcendental number.
+  </div>
+
+  <nav class="nav-bottom">
+    <a href="module4.html">← Module 4: j-invariant</a>
+    <a href="index.html">Back to Home →</a>
+  </nav>
+
+</div>
+
+<script src="lib/katex/katex.min.js"></script>
+<script src="js/math-render.js"></script>
+<script src="js/canvas3d.js"></script>
+<script src="js/interactive.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // === CM Torus ===
+  var cTor = document.getElementById('c-cm-torus');
+  var dpr = UI.fitCanvas(cTor, 0.7);
+  var scene = new Canvas3D(cTor, {
+    scale: Math.min(cTor.width, cTor.height)*0.32,
+    rotX: -0.3, rotY: 0.5, autoRotate: true
+  });
+
+  var currentD = 163;
+
+  function drawCMTorus() {
+    var tau_y = Math.sqrt(currentD) / (currentD === 1 ? 1 : (currentD === 3 ? 2 : 2));
+    if (currentD === 1) tau_y = 1;
+    else if (currentD === 3) tau_y = Math.sqrt(3)/2;
+    else tau_y = Math.sqrt(currentD)/2;
+
+    // Torus proportions from τ
+    var R = 1.0;
+    var rr = Math.min(0.7, Math.max(0.08, 0.7 / tau_y));
+
+    var grid = Canvas3D.torusPoints(R, rr, 32, 18);
+    scene.clear();
+    scene.drawWireframe(grid, 'rgba(74,158,255,0.25)');
+
+    // Highlight the two fundamental cycles
+    var prev = null;
+    for (var i = 0; i <= 60; i++) {
+      var u = i / 60;
+      var pt = Canvas3D.torusPoint(R, rr, u, 0);
+      var p = scene.project(pt[0], pt[1], pt[2]);
+      if (prev) scene.drawLine(prev, p, '#4caf50', 2);
+      prev = p;
+    }
+    prev = null;
+    for (var i = 0; i <= 60; i++) {
+      var v = i / 60;
+      var pt = Canvas3D.torusPoint(R, rr, 0, v);
+      var p = scene.project(pt[0], pt[1], pt[2]);
+      if (prev) scene.drawLine(prev, p, '#ff9800', 2);
+      prev = p;
+    }
+  }
+
+  document.getElementById('cm-select').addEventListener('change', function() {
+    currentD = parseInt(this.value);
+    drawCMTorus();
+  });
+
+  scene.animate(function() { drawCMTorus(); });
+
+  // === Ramanujan / Chudnovsky series computation ===
+  // We use string-based arbitrary precision for display,
+  // but rely on JS floats for the actual computation (enough for ~15 digits demo)
+
+  // Reference π digits
+  var PI_DIGITS = '3.14159265358979323846264338327950288419716939937510' +
+                  '58209749445923078164062862089986280348253421170679' +
+                  '82148086513282306647093844609550582231725359408128';
+
+  var currentSeries = 'ramanujan';
+
+  // Factorial with BigInt-like approach using regular numbers (fine for k<=8)
+  function factorial(n) {
+    var r = 1;
+    for (var i = 2; i <= n; i++) r *= i;
+    return r;
+  }
+
+  // Ramanujan series partial sum (returns 1/π approximation)
+  function ramanujanSum(K) {
+    var prefactor = 2 * Math.sqrt(2) / 9801;
+    var sum = 0;
+    for (var k = 0; k <= K; k++) {
+      var num = factorial(4*k) * (1103 + 26390*k);
+      var den = Math.pow(factorial(k), 4) * Math.pow(396, 4*k);
+      sum += num / den;
+    }
+    return 1 / (prefactor * sum);
+  }
+
+  // Chudnovsky series (returns π approximation)
+  function chudnovskySum(K) {
+    var prefactor = 1 / (426880 * Math.sqrt(10005));
+    var sum = 0;
+    for (var k = 0; k <= K; k++) {
+      var sign = (k % 2 === 0) ? 1 : -1;
+      var num = factorial(6*k) * (13591409 + 545140134*k);
+      var den = factorial(3*k) * Math.pow(factorial(k), 3) * Math.pow(640320, 3*k + 1.5);
+      sum += sign * num / den;
+    }
+    // For Chudnovsky, 1/π = 12 * sum
+    return 1 / (12 * sum);
+  }
+
+  function computePi(K) {
+    if (currentSeries === 'ramanujan') {
+      return ramanujanSum(K);
+    } else {
+      return chudnovskySum(K);
+    }
+  }
+
+  function updateDigits(K) {
+    var approx = computePi(K);
+    var approxStr = approx.toPrecision(20);
+
+    // Compare with reference
+    var display = document.getElementById('digit-display');
+    var html = 'π ≈ ';
+    var piStr = PI_DIGITS.replace('.', '');
+    var appStr = approxStr.replace('.', '').replace('-', '');
+
+    // Find how many digits match
+    var matchCount = 0;
+    var appClean = approx.toFixed(18);
+
+    for (var i = 0; i < Math.min(PI_DIGITS.length, appClean.length); i++) {
+      if (PI_DIGITS[i] === appClean[i]) {
+        matchCount++;
+      } else {
+        break;
+      }
+    }
+
+    // Build display
+    html = '';
+    var maxShow = Math.min(50, PI_DIGITS.length);
+    for (var i = 0; i < maxShow; i++) {
+      var c = PI_DIGITS[i];
+      if (i < matchCount) {
+        html += '<span class="correct">' + c + '</span>';
+      } else {
+        html += '<span class="pending">' + c + '</span>';
+      }
+    }
+    if (maxShow < PI_DIGITS.length) html += '<span class="pending">…</span>';
+    display.innerHTML = html;
+
+    // Precision info
+    var digitsCorrect = matchCount - 2; // subtract "3."
+    if (digitsCorrect < 0) digitsCorrect = 0;
+    var info = document.getElementById('precision-info');
+
+    var digitsPerTerm = currentSeries === 'ramanujan' ? '~8' : '~14';
+    info.innerHTML = '<strong>k = ' + K + '</strong>: ' + digitsCorrect + ' correct decimal digits' +
+                     (K > 0 ? ' (' + digitsPerTerm + ' digits/term)' : '') +
+                     '<br>Approximate value: ' + approx.toFixed(Math.min(16, digitsCorrect + 2));
+  }
+
+  var kSlider = document.getElementById('k-slider');
+
+  UI.bindSlider('k-slider', 'k-val', function(v) {
+    updateDigits(Math.round(v));
+  }, function(v) { return Math.round(v).toString(); });
+
+  document.getElementById('btn-step').addEventListener('click', function() {
+    var k = parseInt(kSlider.value);
+    if (k < 8) {
+      kSlider.value = k + 1;
+      kSlider.dispatchEvent(new Event('input'));
+    }
+  });
+
+  document.getElementById('series-select').addEventListener('change', function() {
+    currentSeries = this.value;
+    updateDigits(parseInt(kSlider.value));
+  });
+
+  updateDigits(0);
+
+  UI.onResize(function() {
+    dpr = UI.fitCanvas(cTor, 0.7);
+    scene.w = cTor.width; scene.h = cTor.height;
+    scene.cx = scene.w/2; scene.cy = scene.h/2;
+    scene.scale = Math.min(scene.w, scene.h)*0.32;
+  });
+
+})();
+</script>
+</body>
+</html>

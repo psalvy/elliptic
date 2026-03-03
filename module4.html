@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 4: The j-invariant &amp; Modular Forms</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="lib/katex/katex.min.css">
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top">
+    <a href="module3.html">← Prev</a>
+    <span>Module 4 of 5</span>
+    <a href="module5.html">Next →</a>
+  </nav>
+
+  <h1>The j-invariant &amp; Modular Forms</h1>
+
+  <h2>4.1 — Fingerprinting Elliptic Curves</h2>
+  <p>Different lattices can give isomorphic tori (just rescale or rotate). The <strong>$j$-invariant</strong> is the number that tells them apart. For a curve $y^2 = x^3 + ax + b$:</p>
+
+  <div class="math-block">$$j(E) = 1728 \cdot \frac{4a^3}{4a^3 + 27b^2}$$</div>
+
+  <p>Two elliptic curves over $\mathbb{C}$ are isomorphic if and only if they have the same $j$-invariant. Every value $j \in \mathbb{C}$ corresponds to some curve.</p>
+
+  <h2>4.2 — The Upper Half-Plane</h2>
+  <p>Instead of specifying a lattice by two generators $\omega_1, \omega_2$, we can normalize to $\Lambda = \mathbb{Z} + \mathbb{Z}\tau$ where $\tau = \omega_2/\omega_1$ lives in the <strong>upper half-plane</strong> $\mathbb{H} = \{\tau \in \mathbb{C} : \operatorname{Im}(\tau) > 0\}$.</p>
+
+  <p>The modular group $SL(2, \mathbb{Z})$ acts on $\mathbb{H}$: $\tau \mapsto \frac{a\tau + b}{c\tau + d}$. Two values of $\tau$ give the same torus iff they're related by this action. The <strong>fundamental domain</strong> is highlighted below.</p>
+
+  <div class="canvas-wrap">
+    <canvas id="c-upper"></canvas>
+    <span class="canvas-label">Tap to select τ</span>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>$\tau$ =</label>
+      <span class="val" id="tau-val">0.00 + 1.00i</span>
+    </div>
+    <div class="control-group">
+      <label>$j(\tau)$ =</label>
+      <span class="val" id="j-val">1728.0</span>
+    </div>
+  </div>
+
+  <h2>4.3 — Interactive: τ → Torus → j</h2>
+  <p>Tap a point $\tau$ in the upper half-plane above. The visualization below shows the corresponding torus and computes $j(\tau)$.</p>
+
+  <div class="canvas-wrap">
+    <canvas id="c-torus-j"></canvas>
+    <span class="canvas-label">Corresponding torus — drag to rotate</span>
+  </div>
+
+  <h2>4.4 — Modular Forms</h2>
+  <p>A <strong>modular form</strong> of weight $k$ is a holomorphic function $f: \mathbb{H} \to \mathbb{C}$ satisfying:</p>
+  <div class="math-block">$$f\!\left(\frac{a\tau+b}{c\tau+d}\right) = (c\tau+d)^k f(\tau)$$</div>
+
+  <p>The $j$-invariant is the unique modular <em>function</em> (weight 0) with a simple pole at the cusp $\tau \to i\infty$, normalized so $j(e^{2\pi i/3}) = 0$ and $j(i) = 1728$.</p>
+
+  <p>Its Fourier expansion (the "$q$-expansion", where $q = e^{2\pi i \tau}$):</p>
+  <div class="math-block">$$j(\tau) = \frac{1}{q} + 744 + 196884q + 21493760q^2 + \cdots$$</div>
+
+  <p>The appearance of 196884 here connects to the Monster group — but that's a story for another course!</p>
+
+  <div class="note">
+    <strong>Key insight:</strong> The $j$-invariant converts the geometry of lattices into a single complex number. Special values of $j$ (algebraic integers) correspond to lattices with extra symmetry — these are the "CM curves" central to Module 5 and Ramanujan's work.
+  </div>
+
+  <nav class="nav-bottom">
+    <a href="module3.html">← Module 3: Curves over ℂ</a>
+    <a href="module5.html">Module 5: Ramanujan's π →</a>
+  </nav>
+
+</div>
+
+<script src="lib/katex/katex.min.js"></script>
+<script src="js/math-render.js"></script>
+<script src="js/canvas3d.js"></script>
+<script src="js/interactive.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // === Upper Half-Plane with Fundamental Domain ===
+  var cUp = document.getElementById('c-upper');
+  var dpr = UI.fitCanvas(cUp, 0.8);
+  var ctx = cUp.getContext('2d');
+  var W = cUp.width, H = cUp.height;
+
+  // View: x in [-2, 2], y in [0, 3]
+  var viewXMin = -2, viewXMax = 2, viewYMin = 0, viewYMax = 3;
+  var tau = {x: 0, y: 1}; // τ = 0 + 1i
+
+  function toScr(x, y) {
+    return {
+      x: (x - viewXMin) / (viewXMax - viewXMin) * W,
+      y: H - (y - viewYMin) / (viewYMax - viewYMin) * H
+    };
+  }
+  function fromScr(sx, sy) {
+    return {
+      x: viewXMin + sx / W * (viewXMax - viewXMin),
+      y: viewYMax - sy / H * (viewYMax - viewYMin)
+    };
+  }
+
+  function drawUpper() {
+    ctx.fillStyle = '#0d1117';
+    ctx.fillRect(0, 0, W, H);
+
+    // Grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    for (var x = Math.ceil(viewXMin); x <= viewXMax; x++) {
+      var p = toScr(x, 0);
+      ctx.beginPath(); ctx.moveTo(p.x, 0); ctx.lineTo(p.x, H); ctx.stroke();
+    }
+    for (var y = 0; y <= viewYMax; y += 0.5) {
+      var p = toScr(0, y);
+      ctx.beginPath(); ctx.moveTo(0, p.y); ctx.lineTo(W, p.y); ctx.stroke();
+    }
+
+    // Real axis
+    var ax = toScr(0, 0);
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, ax.y); ctx.lineTo(W, ax.y); ctx.stroke();
+
+    // Fundamental domain of SL(2,Z)
+    // |τ| >= 1, -1/2 <= Re(τ) <= 1/2
+    ctx.fillStyle = 'rgba(233,69,96,0.12)';
+    ctx.strokeStyle = 'rgba(233,69,96,0.6)';
+    ctx.lineWidth = 2 * dpr;
+
+    ctx.beginPath();
+    // Left vertical line at Re = -1/2
+    var bl = toScr(-0.5, Math.sqrt(0.75));
+    var tl = toScr(-0.5, viewYMax);
+    var tr = toScr(0.5, viewYMax);
+    var br = toScr(0.5, Math.sqrt(0.75));
+
+    ctx.moveTo(tl.x, tl.y);
+    ctx.lineTo(bl.x, bl.y);
+
+    // Arc |τ| = 1 from angle 2π/3 to π/3
+    var center = toScr(0, 0);
+    var radius = (toScr(1, 0).x - toScr(0, 0).x);
+    // Arc from 120° to 60° (in standard math angles)
+    // Canvas arcs go clockwise, and y is flipped
+    var startAngle = -Math.PI + Math.PI/3; // = -2π/3
+    var endAngle = -Math.PI/3;
+    ctx.arc(center.x, center.y, radius, -2*Math.PI/3, -Math.PI/3, false);
+
+    ctx.lineTo(tr.x, tr.y);
+    ctx.lineTo(tl.x, tl.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw unit circle (partial)
+    ctx.strokeStyle = 'rgba(74,158,255,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, radius, -Math.PI, 0, false);
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = '#888';
+    ctx.font = (11*dpr) + 'px sans-serif';
+    ctx.textAlign = 'center';
+    var p0 = toScr(0, -0.15);
+    ctx.fillText('0', p0.x, p0.y);
+    var p1 = toScr(1, -0.15);
+    ctx.fillText('1', p1.x, p1.y);
+    var pm1 = toScr(-1, -0.15);
+    ctx.fillText('-1', pm1.x, pm1.y);
+    var ph = toScr(0.5, -0.15);
+    ctx.fillText('½', ph.x, ph.y);
+    var pmh = toScr(-0.5, -0.15);
+    ctx.fillText('-½', pmh.x, pmh.y);
+
+    // Special points
+    // τ = i
+    var pi = toScr(0, 1);
+    ctx.beginPath(); ctx.arc(pi.x, pi.y, 4*dpr, 0, Math.PI*2);
+    ctx.fillStyle = '#64b5f6'; ctx.fill();
+    ctx.fillStyle = '#64b5f6'; ctx.font = (11*dpr) + 'px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('i (j=1728)', pi.x + 8*dpr, pi.y - 4*dpr);
+
+    // τ = e^{2πi/3}
+    var rho = toScr(-0.5, Math.sqrt(3)/2);
+    ctx.beginPath(); ctx.arc(rho.x, rho.y, 4*dpr, 0, Math.PI*2);
+    ctx.fillStyle = '#ff9800'; ctx.fill();
+    ctx.fillStyle = '#ff9800';
+    ctx.fillText('ρ (j=0)', rho.x + 8*dpr, rho.y - 4*dpr);
+
+    // Selected τ
+    var pt = toScr(tau.x, tau.y);
+    ctx.beginPath(); ctx.arc(pt.x, pt.y, 7*dpr, 0, Math.PI*2);
+    ctx.fillStyle = '#e94560'; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2*dpr; ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.font = (12*dpr) + 'px sans-serif';
+    ctx.fillText('τ', pt.x + 10*dpr, pt.y - 6*dpr);
+  }
+
+  // Compute j(τ) numerically using q-expansion
+  function computeJ(tauX, tauY) {
+    // q = e^{2πiτ}
+    var qr = Math.exp(-2 * Math.PI * tauY) * Math.cos(2 * Math.PI * tauX);
+    var qi = Math.exp(-2 * Math.PI * tauY) * Math.sin(2 * Math.PI * tauX);
+    var qmag = Math.exp(-2 * Math.PI * tauY);
+
+    if (qmag > 0.9) return {r: NaN, i: NaN}; // too close to cusp
+
+    // j(τ) ≈ 1/q + 744 + 196884*q + 21493760*q^2
+    // 1/q
+    var denom = qr*qr + qi*qi;
+    if (denom < 1e-30) return {r: NaN, i: NaN};
+    var invQr = qr / denom;
+    var invQi = -qi / denom;
+
+    // q^2
+    var q2r = qr*qr - qi*qi;
+    var q2i = 2*qr*qi;
+
+    var jr = invQr + 744 + 196884*qr + 21493760*q2r;
+    var ji = invQi + 196884*qi + 21493760*q2i;
+
+    return {r: jr, i: ji};
+  }
+
+  function updateInfo() {
+    document.getElementById('tau-val').textContent =
+      tau.x.toFixed(2) + (tau.y >= 0 ? ' + ' : ' - ') + Math.abs(tau.y).toFixed(2) + 'i';
+
+    var j = computeJ(tau.x, tau.y);
+    if (isNaN(j.r)) {
+      document.getElementById('j-val').textContent = '∞ (cusp)';
+    } else if (Math.abs(j.i) < 1) {
+      document.getElementById('j-val').textContent = j.r.toFixed(1);
+    } else {
+      document.getElementById('j-val').textContent =
+        j.r.toFixed(1) + (j.i >= 0 ? '+' : '') + j.i.toFixed(1) + 'i';
+    }
+  }
+
+  function onSelect(e) {
+    e.preventDefault();
+    var pos = UI.canvasPos(cUp, e);
+    var c = fromScr(pos.x, pos.y);
+    if (c.y < 0.1) return; // don't go below real axis
+    tau.x = c.x;
+    tau.y = c.y;
+    drawUpper();
+    updateInfo();
+    drawJTorus();
+  }
+
+  cUp.addEventListener('click', onSelect);
+  cUp.addEventListener('touchend', function(e) {
+    if (e.changedTouches.length === 1) {
+      var t = e.changedTouches[0];
+      var rect = cUp.getBoundingClientRect();
+      var sx = (t.clientX - rect.left) * cUp.width / rect.width;
+      var sy = (t.clientY - rect.top) * cUp.height / rect.height;
+      var c = fromScr(sx, sy);
+      if (c.y < 0.1) return;
+      tau.x = c.x; tau.y = c.y;
+      drawUpper(); updateInfo(); drawJTorus();
+    }
+  });
+
+  drawUpper();
+  updateInfo();
+
+  // === Torus corresponding to τ ===
+  var cTor = document.getElementById('c-torus-j');
+  var dpr2 = UI.fitCanvas(cTor, 0.75);
+  var scene = new Canvas3D(cTor, {
+    scale: Math.min(cTor.width, cTor.height)*0.32,
+    rotX: -0.4, rotY: 0.6, autoRotate: true
+  });
+
+  function drawJTorus() {
+    // Shape the torus based on τ
+    // The ratio |τ| affects the torus proportions
+    var ratio = Math.sqrt(tau.x*tau.x + tau.y*tau.y);
+    var R = 1.0;
+    var rr = Math.min(0.8, 0.3 * ratio);
+
+    var grid = Canvas3D.torusPoints(R, rr, 30, 18);
+    scene.clear();
+    scene.drawWireframe(grid, 'rgba(74,158,255,0.3)');
+
+    // Mark the lattice generators as colored curves on the torus
+    // ω₁ direction: u varies, v=0
+    var prev1 = null;
+    for (var i = 0; i <= 50; i++) {
+      var u = i / 50;
+      var pt = Canvas3D.torusPoint(R, rr, u, 0);
+      var p = scene.project(pt[0], pt[1], pt[2]);
+      if (prev1) scene.drawLine(prev1, p, '#4caf50', 2.5);
+      prev1 = p;
+    }
+    // ω₂ direction: map (0,0)->(τ_x, τ_y) normalized
+    var prev2 = null;
+    for (var i = 0; i <= 50; i++) {
+      var t = i / 50;
+      var u = (t * tau.x % 1 + 1) % 1;
+      var v = (t * tau.y % 1 + 1) % 1;
+      var pt = Canvas3D.torusPoint(R, rr, u, v);
+      var p = scene.project(pt[0], pt[1], pt[2]);
+      if (prev2) {
+        var d = Math.hypot(p.x - prev2.x, p.y - prev2.y);
+        if (d < 80) scene.drawLine(prev2, p, '#ff9800', 2.5);
+      }
+      prev2 = p;
+    }
+  }
+
+  scene.animate(function() { drawJTorus(); });
+
+  UI.onResize(function() {
+    dpr = UI.fitCanvas(cUp, 0.8);
+    W = cUp.width; H = cUp.height;
+    ctx = cUp.getContext('2d');
+    drawUpper();
+    dpr2 = UI.fitCanvas(cTor, 0.75);
+    scene.w = cTor.width; scene.h = cTor.height;
+    scene.cx = scene.w/2; scene.cy = scene.h/2;
+    scene.scale = Math.min(scene.w, scene.h)*0.32;
+  });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 2: Elliptic Curves over ℝ</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="lib/katex/katex.min.css">
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top">
+    <a href="module1.html">← Prev</a>
+    <span>Module 2 of 5</span>
+    <a href="module3.html">Next →</a>
+  </nav>
+
+  <h1>Elliptic Curves over ℝ</h1>
+
+  <h2>2.1 — The Weierstrass Form</h2>
+  <p>An <strong>elliptic curve</strong> over the reals is defined by:</p>
+  <div class="math-block">$$y^2 = x^3 + ax + b$$</div>
+  <p>The curve is non-singular (no cusps or self-intersections) exactly when the <strong>discriminant</strong> is nonzero:</p>
+  <div class="math-block">$$\Delta = -16(4a^3 + 27b^2) \neq 0$$</div>
+
+  <p>Use the sliders to morph the curve. Watch it split into components or degenerate when $\Delta \to 0$:</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>a =</label>
+      <input type="range" id="slider-a" min="-4" max="2" step="0.05" value="-1">
+      <span class="val" id="val-a">-1.00</span>
+    </div>
+    <div class="control-group">
+      <label>b =</label>
+      <input type="range" id="slider-b" min="-3" max="3" step="0.05" value="1">
+      <span class="val" id="val-b">1.00</span>
+    </div>
+  </div>
+
+  <div id="disc-info" class="note" style="margin-top:0"></div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-curve"></canvas>
+    <span class="canvas-label">Tap two points on the curve</span>
+  </div>
+
+  <h2>2.2 — The Group Law: Point Addition</h2>
+  <p>Elliptic curves have a remarkable <strong>group structure</strong>. Given two points $P$ and $Q$ on the curve:</p>
+  <ol>
+    <li>Draw the line through $P$ and $Q$. It intersects the curve at a third point $R$.</li>
+    <li>Reflect $R$ over the $x$-axis to get $P + Q$.</li>
+  </ol>
+  <p>When $P = Q$, use the tangent line instead (point doubling).</p>
+
+  <p><strong>Tap two points</strong> on the curve above to see point addition in action. The first tap selects $P$ (red), the second selects $Q$ (blue), then the construction draws automatically.</p>
+
+  <div id="add-info" class="note success" style="display:none"></div>
+
+  <h2>2.3 — Special Cases</h2>
+  <p>Try these parameter values to see important curve shapes:</p>
+  <ul>
+    <li><strong>$a = -1, b = 0$</strong> — curve passes through the origin, has two components</li>
+    <li><strong>$a = -3, b = 2$</strong> — singular! ($\Delta = 0$), the curve has a node</li>
+    <li><strong>$a = 0, b = 0$</strong> — singular cusp at the origin</li>
+    <li><strong>$a = -1, b = 1$</strong> — a nice smooth curve with one component</li>
+  </ul>
+
+  <div class="note">
+    <strong>Key insight:</strong> The set of points on a non-singular elliptic curve, together with a "point at infinity" $\mathcal{O}$, forms an <em>abelian group</em>. This algebraic structure is what makes elliptic curves so powerful in number theory and cryptography.
+  </div>
+
+  <nav class="nav-bottom">
+    <a href="module1.html">← Module 1: Quotient Spaces</a>
+    <a href="module3.html">Module 3: Curves over ℂ →</a>
+  </nav>
+
+</div>
+
+<script src="lib/katex/katex.min.js"></script>
+<script src="js/math-render.js"></script>
+<script src="js/plot2d.js"></script>
+<script src="js/interactive.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  var canvas = document.getElementById('c-curve');
+  var dpr = UI.fitCanvas(canvas, 0.85);
+  var plot = new Plot2D(canvas, {xMin: -4, xMax: 4, yMin: -5, yMax: 5});
+
+  var a = -1, b = 1;
+  var points = []; // clicked points on curve
+  var hoverPt = null;
+
+  function disc() { return -16 * (4*a*a*a + 27*b*b); }
+
+  function updateDisc() {
+    var d = disc();
+    var el = document.getElementById('disc-info');
+    if (Math.abs(d) < 0.5) {
+      el.className = 'note warn';
+      el.innerHTML = '<strong>Warning:</strong> Δ ≈ ' + d.toFixed(1) + ' — curve is singular (degenerate)!';
+    } else {
+      el.className = 'note';
+      el.innerHTML = 'Δ = ' + d.toFixed(1) + (d > 0 ? ' — one connected component' : ' — two connected components');
+    }
+  }
+
+  function draw() {
+    plot.w = canvas.width; plot.h = canvas.height;
+    plot.clear();
+    plot.drawGrid();
+
+    // Draw curve
+    plot.plotImplicit(function(x, y) {
+      return y*y - x*x*x - a*x - b;
+    }, '#e94560', 2.5);
+
+    // Draw construction if two points selected
+    if (points.length >= 2) {
+      var P = points[0], Q = points[1];
+      plot.drawPoint(P[0], P[1], '#e94560', 6, 'P');
+      plot.drawPoint(Q[0], Q[1], '#64b5f6', 6, 'Q');
+
+      var result = Plot2D.ecAdd(P, Q, a);
+      if (result) {
+        // Draw secant/tangent line
+        plot.drawLineThrough(P[0], P[1], Q[0], Q[1], 'rgba(255,255,255,0.3)', 1);
+
+        // R is the un-reflected third intersection
+        var R = [result[0], -result[1]];
+        plot.drawPoint(R[0], R[1], 'rgba(255,255,255,0.5)', 4, 'R');
+
+        // Vertical line from R to P+Q
+        plot.drawLine(R[0], R[1], result[0], result[1], 'rgba(255,255,255,0.3)', 1);
+
+        // P+Q
+        plot.drawPoint(result[0], result[1], '#4caf50', 7, 'P+Q');
+
+        var info = document.getElementById('add-info');
+        info.style.display = 'block';
+        info.innerHTML = 'P = (' + P[0].toFixed(2) + ', ' + P[1].toFixed(2) + '), ' +
+                         'Q = (' + Q[0].toFixed(2) + ', ' + Q[1].toFixed(2) + ')<br>' +
+                         '<strong>P + Q = (' + result[0].toFixed(2) + ', ' + result[1].toFixed(2) + ')</strong>';
+      }
+    } else if (points.length === 1) {
+      plot.drawPoint(points[0][0], points[0][1], '#e94560', 6, 'P');
+      document.getElementById('add-info').style.display = 'none';
+    } else {
+      document.getElementById('add-info').style.display = 'none';
+    }
+  }
+
+  // Find nearest point on curve to a click
+  function snapToCurve(mx, my) {
+    var bestDist = Infinity, bestPt = null;
+    // Search nearby x values
+    for (var dx = -0.5; dx <= 0.5; dx += 0.02) {
+      var x = mx + dx;
+      var val = x*x*x + a*x + b;
+      if (val < 0) continue;
+      var y = Math.sqrt(val);
+      // Check both +y and -y
+      for (var sign = -1; sign <= 1; sign += 2) {
+        var yy = sign * y;
+        var d = Math.hypot(x - mx, yy - my);
+        if (d < bestDist) {
+          bestDist = d;
+          bestPt = [x, yy];
+        }
+      }
+    }
+    return bestDist < 1.0 ? bestPt : null;
+  }
+
+  function onClick(e) {
+    e.preventDefault();
+    var pos = UI.canvasPos(canvas, e);
+    var coord = plot.fromScreen(pos.x, pos.y);
+    var pt = snapToCurve(coord.x, coord.y);
+    if (!pt) return;
+
+    if (points.length >= 2) {
+      points = [pt];
+    } else {
+      points.push(pt);
+    }
+    draw();
+  }
+
+  canvas.addEventListener('click', onClick);
+  canvas.addEventListener('touchend', function(e) {
+    if (e.changedTouches.length === 1) {
+      var t = e.changedTouches[0];
+      var rect = canvas.getBoundingClientRect();
+      var scaleX = canvas.width / rect.width;
+      var scaleY = canvas.height / rect.height;
+      var pos = { x: (t.clientX - rect.left)*scaleX, y: (t.clientY - rect.top)*scaleY };
+      var coord = plot.fromScreen(pos.x, pos.y);
+      var pt = snapToCurve(coord.x, coord.y);
+      if (!pt) return;
+      if (points.length >= 2) points = [pt];
+      else points.push(pt);
+      draw();
+    }
+  });
+
+  UI.bindSlider('slider-a', 'val-a', function(v) { a = v; points = []; updateDisc(); draw(); });
+  UI.bindSlider('slider-b', 'val-b', function(v) { b = v; points = []; updateDisc(); draw(); });
+
+  updateDisc();
+  draw();
+
+  UI.onResize(function() {
+    dpr = UI.fitCanvas(canvas, 0.85);
+    plot.w = canvas.width; plot.h = canvas.height;
+    draw();
+  });
+
+})();
+</script>
+</body>
+</html>
