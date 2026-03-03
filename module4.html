@@ -18,55 +18,139 @@
 
   <h1>The j-invariant &amp; Modular Forms</h1>
 
-  <h2>4.1 — Fingerprinting Elliptic Curves</h2>
-  <p>Different lattices can give isomorphic tori (just rescale or rotate). The <strong>$j$-invariant</strong> is the number that tells them apart. For a curve $y^2 = x^3 + ax + b$:</p>
+  <h2>4.1 — Fingerprinting: Where does the formula come from?</h2>
+  <p>If I draw a circle, and you draw a circle twice as big, we both still drew a "circle." They are geometrically the same shape, just scaled. The exact same thing happens with elliptic curves.</p>
 
-  <div class="math-block">$$j(E) = 1728 \cdot \frac{4a^3}{4a^3 + 27b^2}$$</div>
+  <p>Suppose you have a curve $E_1$: $$y^2 = x^3 + ax + b$$</p>
+  
+  <p>If we scale the coordinates by introducing a complex number $u \neq 0$, substituting $x = u^2 X$ and $y = u^3 Y$, we get a new curve $E_2$: $$(u^3 Y)^2 = (u^2 X)^3 + a(u^2 X) + b$$</p>
+  
+  <p>If we divide the whole equation by $u^6$, we get the standard form back:</p>
+  <div class="math-block">$$Y^2 = X^3 + \left(\frac{a}{u^4}\right)X + \left(\frac{b}{u^6}\right)$$</div>
 
-  <p>Two elliptic curves over $\mathbb{C}$ are isomorphic if and only if they have the same $j$-invariant. Every value $j \in \mathbb{C}$ corresponds to some curve.</p>
+  <p>This means the curve with coefficients $(a, b)$ is <strong>exactly the same curve</strong> as the one with coefficients $(a/u^4, b/u^6)$. They are isomorphic. </p>
 
-  <h2>4.2 — The Upper Half-Plane</h2>
-  <p>Instead of specifying a lattice by two generators $\omega_1, \omega_2$, we can normalize to $\Lambda = \mathbb{Z} + \mathbb{Z}\tau$ where $\tau = \omega_2/\omega_1$ lives in the <strong>upper half-plane</strong> $\mathbb{H} = \{\tau \in \mathbb{C} : \operatorname{Im}(\tau) > 0\}$.</p>
+  <p><strong>Building the Invariant:</strong></p>
+  <p>If we want a "fingerprint" that uniquely identifies the curve regardless of how it was scaled by $u$, we need to build a fraction out of $a$ and $b$ where the $u$'s completely cancel out.</p>
+  <ul>
+    <li>Notice that $a^3$ scales by $(1/u^4)^3 = 1/u^{12}$</li>
+    <li>Notice that $b^2$ scales by $(1/u^6)^2 = 1/u^{12}$</li>
+  </ul>
+  
+  <p>Because they both scale by $1/u^{12}$, any ratio comparing $a^3$ and $b^2$ will cancel the $u$'s entirely! A very simple fingerprint would just be $a^3 / b^2$. But there is a fatal flaw with that formula: what if we have the curve $y^2 = x^3 - x$?</p>
+  
+  <p>For that curve, $a = -1$ and $b = 0$. It is a beautifully smooth, valid curve. But our formula $a^3 / b^2$ would divide by zero and explode to infinity! We need a denominator that <strong>never</strong> equals zero for a valid curve.</p>
 
-  <p>The modular group $SL(2, \mathbb{Z})$ acts on $\mathbb{H}$: $\tau \mapsto \frac{a\tau + b}{c\tau + d}$. Two values of $\tau$ give the same torus iff they're related by this action. The <strong>fundamental domain</strong> is highlighted below.</p>
+  <details class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #e94560; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #e94560;">Deep Dive: The Origin of the Discriminant</summary>
+    <div style="margin-top: 15px;">
+      <p>How do we mathematically guarantee a curve is "valid" (smooth)? We have to ensure the cubic side of the equation $x^3 + ax + b = 0$ does not have any <strong>repeated roots</strong>.</p>
+      <p>If a cubic has three roots ($r_1, r_2, r_3$), we can measure how far apart they are by multiplying their differences and squaring the result to keep it positive:</p>
+      <div class="math-block">$$\Delta_{\text{roots}} = (r_1 - r_2)^2 (r_2 - r_3)^2 (r_1 - r_3)^2$$</div>
+      <p>If any two roots touch (meaning the curve pinches itself into a sharp node or cusp), this product becomes exactly zero.</p>
+      <p>Through a massive expansion of algebra, if you translate those roots back into our coefficients $a$ and $b$, that product equals exactly:</p>
+      <div class="math-block">$$-\left(4a^3 + 27b^2\right)$$</div>
+      <p>This is the <strong>discriminant</strong>. If this expression equals zero, the curve is broken. If it does not equal zero, the curve is smooth.</p>
+    </div>
+  </details>
 
-  <div class="canvas-wrap">
+  <p><strong>The Final Formula:</strong></p>
+  <p>By using the discriminant as our denominator instead of $b^2$, we guarantee our fingerprinting machine will never divide by zero on a healthy curve. It maps every valid curve to a finite number, and only blows up to infinity when the curve degenerates into a singularity.</p>
+
+  <p>Multiply by a historical scaling constant ($1728$, which makes Fourier expansions nicer later), and we arrive at the perfect fingerprint:</p>
+
+  <div class="math-block">$$j(E) = 1728 \frac{4a^3}{4a^3 + 27b^2}$$</div>
+
+  <h2>4.2 — Simplifying the Torus: Why the Upper Half-Plane?</h2>
+  <p>In Module 3, we defined a torus using a lattice $\Lambda$ built from two complex numbers: $\omega_1$ and $\omega_2$. But tracking two variables is annoying.</p>
+
+  <p><strong>The Normalization Trick:</strong> Let's divide the whole lattice by $\omega_1$.</p>
+  <ul>
+    <li>The first vector $\omega_1$ becomes $1$ (a flat step along the real axis).</li>
+    <li>The second vector $\omega_2$ becomes a new complex number: $\tau = \frac{\omega_2}{\omega_1}$.</li>
+  </ul>
+  
+  <p>To keep things consistent, we always order our vectors so that $\tau$ points "up" into the top half of the complex plane. This region is called the <strong>Upper Half-Plane</strong> ($\mathbb{H}$).</p>
+  
+  <p>This is a massive simplification! Now, <em>every possible elliptic curve in existence</em> can be represented by a single complex point $\tau$ residing in the upper half of the complex plane.</p>
+
+  <h2>4.3 — The "Grid Alias" Problem and $SL(2, \mathbb{Z})$</h2>
+  <p>There is a catch. Suppose you have an infinite grid of dots. I might describe that grid by giving you a short horizontal arrow and a short diagonal arrow. You might describe the <strong>exact same grid of dots</strong> by giving me a long skewed arrow and a vertical arrow.</p>
+  
+  
+  <p>Different choices of $\tau$ can generate the exact same infinite lattice! How do we know which $\tau$ values are just "aliases" of each other?</p>
+
+  <p>Because the grid points must remain integers, the valid transformations are $a, b, c, d \in \mathbb{Z}$, with $ad - bc = 1$. This forms the matrix group $SL(2, \mathbb{Z})$. Let's look at two specific, fundamental transformations that carve out our physical boundaries:</p>
+  
+  <ul>
+    <li><strong>The Side Walls ($x = \pm 1/2$):</strong> Using the matrix $a=1, b=1, c=0, d=1$, we get the transformation $\tau \mapsto \tau + 1$. This physically means that shifting the top vector one full unit left or right just draws diagonal lines through the exact same dots! To avoid duplicates, we restrict our view to a window exactly 1 unit wide, symmetrically centered from $-1/2$ to $1/2$.</li>
+    <li><strong>The Curved Floor ($|\tau| = 1$):</strong> Using $a=0, b=-1, c=1, d=0$, we get $\tau \mapsto -1/\tau$. This transformation reflects points inside the unit circle to the outside. To avoid duplicates here, we only look at points where $|\tau| \ge 1$.</li>
+  </ul>
+
+  <p>The resulting highlighted region is the <strong>fundamental domain</strong> . Every $\tau$ outside this region is just an alias for a point inside it. You'll also notice two special points on the boundary:</p>
+
+  <ul>
+    <li><strong>$i$ ($j=1728$):</strong> This straight vertical vector represents a perfectly square lattice.</li>
+    <li><strong>$\rho$ ($j=0$):</strong> This point is $e^{2\pi i / 3} = -1/2 + i\sqrt{3}/2$. It represents a perfectly hexagonal lattice . Because of its massive 6-fold rotational symmetry, its invariant mathematically cancels out to exactly 0.</li>
+  </ul>
+
+  <div class="canvas-wrap" style="margin-bottom: 20px;">
     <canvas id="c-upper"></canvas>
-    <span class="canvas-label">Tap to select τ</span>
+    <span class="canvas-label">Tap to select τ in the Fundamental Domain</span>
   </div>
 
-  <div class="controls">
-    <div class="control-group">
-      <label>$\tau$ =</label>
-      <span class="val" id="tau-val">0.00 + 1.00i</span>
-    </div>
-    <div class="control-group">
-      <label>$j(\tau)$ =</label>
-      <span class="val" id="j-val">1728.0</span>
-    </div>
-  </div>
+  <h2>4.4 — Interactive: τ → Torus → j</h2>
+  <p>Tap a point $\tau$ in the upper half-plane above. The visualization below shows the corresponding torus. Because the $j$-invariant uniquely identifies the curve, any two $\tau$ aliases will output the exact same $j(\tau)$ value!</p>
 
-  <h2>4.3 — Interactive: τ → Torus → j</h2>
-  <p>Tap a point $\tau$ in the upper half-plane above. The visualization below shows the corresponding torus and computes $j(\tau)$.</p>
+  <p>In the 3D torus below, the two colored loops represent the fundamental cycles of the torus, mapped directly from the lattice vectors:</p>
+  <ul>
+    <li><strong><span style="color: #4caf50;">Green Loop:</span></strong> The $\omega_1$ cycle (the standard step of $1$ along the real axis).</li>
+    <li><strong><span style="color: #ff9800;">Orange Loop:</span></strong> The $\omega_2$ cycle (the complex step defined by your chosen $\tau$). Notice how changing the real part of $\tau$ twists the orange loop around the donut!</li>
+  </ul>
+
+  <div id="torus-info-header" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 10px; margin-bottom: 10px; font-family: monospace; font-size: 15px; text-align: center;">
+    τ = 0.00 + 1.00i &nbsp;|&nbsp; j(τ) = 1728.0
+  </div>
 
   <div class="canvas-wrap">
     <canvas id="c-torus-j"></canvas>
     <span class="canvas-label">Corresponding torus — drag to rotate</span>
   </div>
 
-  <h2>4.4 — Modular Forms</h2>
-  <p>A <strong>modular form</strong> of weight $k$ is a holomorphic function $f: \mathbb{H} \to \mathbb{C}$ satisfying:</p>
+  <h2>4.5 — Why Modular Forms? (The Setup for Ramanujan)</h2>
+  <p>If we want to do calculus or algebra on these tori, we need functions that respect this weird alias symmetry. We need functions that are "blind" to which basis vectors you picked. These are called <strong>Modular Forms</strong>.</p>
+  
+  <p>A modular form is a function $f(\tau)$ that behaves predictably when you hit it with an $SL(2, \mathbb{Z})$ transformation:</p>
   <div class="math-block">$$f\!\left(\frac{a\tau+b}{c\tau+d}\right) = (c\tau+d)^k f(\tau)$$</div>
 
-  <p>The $j$-invariant is the unique modular <em>function</em> (weight 0) with a simple pole at the cusp $\tau \to i\infty$, normalized so $j(e^{2\pi i/3}) = 0$ and $j(i) = 1728$.</p>
-
-  <p>Its Fourier expansion (the "$q$-expansion", where $q = e^{2\pi i \tau}$):</p>
+  <p>The $j$-invariant is the ultimate modular function (where $k=0$, meaning it doesn't scale at all—it is perfectly invariant). It has a famous Fourier series expansion:</p>
   <div class="math-block">$$j(\tau) = \frac{1}{q} + 744 + 196884q + 21493760q^2 + \cdots$$</div>
+  <p><em>(Where $q = e^{2\pi i \tau}$)</em></p>
 
-  <p>The appearance of 196884 here connects to the Monster group — but that's a story for another course!</p>
+  <div class="note success">
+    <strong>The Bridge to $\pi$:</strong> Why does Ramanujan care about this? Because $j(\tau)$ maps geometry to algebra. For very specific, highly symmetric lattices (called Complex Multiplication), the $j$-invariant spits out <strong>exact integers</strong>. By plugging a highly symmetric $\tau$ into the Fourier series above, Ramanujan was able to force $q$ (which contains $\pi$ in its exponent) to equal a massive integer, allowing him to isolate $\pi$ with mind-boggling precision.
+  </div>
+
+  <h2>4.6 — The Computational Divide: Cryptography vs. Number Theory</h2>
+  <p>You might be wondering: <em>Why use a massive, infinite Fourier series to calculate the $j$-invariant when the algebraic formula $1728 \frac{4a^3}{4a^3+27b^2}$ is so incredibly simple?</em></p>
+
+  <p>It all comes down to your <strong>direction of travel</strong>.</p>
+
+  <ul>
+    <li><strong>The Forward Path (Cryptography):</strong> In Elliptic Curve Cryptography (ECC), computer scientists start with the algebraic equation ($y^2 = x^3 + ax + b$). Because they already have $a$ and $b$, calculating the fingerprint is instant, middle-school arithmetic. </li>
+    <li><strong>The Reverse Path (Number Theory):</strong> In our interactive tool above, we didn't start with an equation; we started with a geometric shape ($\tau$). To use the simple $a$ and $b$ formula, we would first have to calculate $a$ and $b$ from our lattice.</li>
+  </ul>
+
+  <p>How do you find $a$ and $b$ from a lattice $\Lambda$? You have to calculate the <strong>Eisenstein series</strong>, which requires running an infinite 2D loop over every single point in the grid!</p>
+  
+  
+  <div class="math-block">$$g_2 \propto \sum_{\omega \in \Lambda \setminus \{0\}} \frac{1}{\omega^4}, \quad g_3 \propto \sum_{\omega \in \Lambda \setminus \{0\}} \frac{1}{\omega^6}$$</div>
+
+  <p><strong>The $q$-Expansion Shortcut:</strong></p>
+  <p>Calculating infinite 2D sums is computationally agonizing. By substituting $q = e^{2\pi i \tau}$, mathematicians used complex analysis to compress that entire 2D grid into a single 1D Fourier series. </p>
 
   <div class="note">
-    <strong>Key insight:</strong> The $j$-invariant converts the geometry of lattices into a single complex number. Special values of $j$ (algebraic integers) correspond to lattices with extra symmetry — these are the "CM curves" central to Module 5 and Ramanujan's work.
+    <strong>Key insight:</strong> The $q$-expansion isn't just a different formula—it is a computational miracle. It allows number theorists to bypass the infinite grid sums and calculate the exact algebraic properties of a geometric shape almost instantly. This is exactly the tool Ramanujan needed.
   </div>
 
   <nav class="nav-bottom">
@@ -90,9 +174,8 @@
   var ctx = cUp.getContext('2d');
   var W = cUp.width, H = cUp.height;
 
-  // View: x in [-2, 2], y in [0, 3]
   var viewXMin = -2, viewXMax = 2, viewYMin = 0, viewYMax = 3;
-  var tau = {x: 0, y: 1}; // τ = 0 + 1i
+  var tau = {x: 0, y: 1}; 
 
   function toScr(x, y) {
     return {
@@ -111,7 +194,6 @@
     ctx.fillStyle = '#0d1117';
     ctx.fillRect(0, 0, W, H);
 
-    // Grid
     ctx.strokeStyle = 'rgba(255,255,255,0.06)';
     ctx.lineWidth = 1;
     for (var x = Math.ceil(viewXMin); x <= viewXMax; x++) {
@@ -123,20 +205,16 @@
       ctx.beginPath(); ctx.moveTo(0, p.y); ctx.lineTo(W, p.y); ctx.stroke();
     }
 
-    // Real axis
     var ax = toScr(0, 0);
     ctx.strokeStyle = 'rgba(255,255,255,0.2)';
     ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(0, ax.y); ctx.lineTo(W, ax.y); ctx.stroke();
 
-    // Fundamental domain of SL(2,Z)
-    // |τ| >= 1, -1/2 <= Re(τ) <= 1/2
     ctx.fillStyle = 'rgba(233,69,96,0.12)';
     ctx.strokeStyle = 'rgba(233,69,96,0.6)';
     ctx.lineWidth = 2 * dpr;
 
     ctx.beginPath();
-    // Left vertical line at Re = -1/2
     var bl = toScr(-0.5, Math.sqrt(0.75));
     var tl = toScr(-0.5, viewYMax);
     var tr = toScr(0.5, viewYMax);
@@ -145,13 +223,8 @@
     ctx.moveTo(tl.x, tl.y);
     ctx.lineTo(bl.x, bl.y);
 
-    // Arc |τ| = 1 from angle 2π/3 to π/3
     var center = toScr(0, 0);
     var radius = (toScr(1, 0).x - toScr(0, 0).x);
-    // Arc from 120° to 60° (in standard math angles)
-    // Canvas arcs go clockwise, and y is flipped
-    var startAngle = -Math.PI + Math.PI/3; // = -2π/3
-    var endAngle = -Math.PI/3;
     ctx.arc(center.x, center.y, radius, -2*Math.PI/3, -Math.PI/3, false);
 
     ctx.lineTo(tr.x, tr.y);
@@ -160,14 +233,12 @@
     ctx.fill();
     ctx.stroke();
 
-    // Draw unit circle (partial)
     ctx.strokeStyle = 'rgba(74,158,255,0.3)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(center.x, center.y, radius, -Math.PI, 0, false);
     ctx.stroke();
 
-    // Labels
     ctx.fillStyle = '#888';
     ctx.font = (11*dpr) + 'px sans-serif';
     ctx.textAlign = 'center';
@@ -182,23 +253,18 @@
     var pmh = toScr(-0.5, -0.15);
     ctx.fillText('-½', pmh.x, pmh.y);
 
-    // Special points
-    // τ = i
     var pi = toScr(0, 1);
     ctx.beginPath(); ctx.arc(pi.x, pi.y, 4*dpr, 0, Math.PI*2);
     ctx.fillStyle = '#64b5f6'; ctx.fill();
-    ctx.fillStyle = '#64b5f6'; ctx.font = (11*dpr) + 'px sans-serif';
+    ctx.font = (11*dpr) + 'px sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('i (j=1728)', pi.x + 8*dpr, pi.y - 4*dpr);
 
-    // τ = e^{2πi/3}
     var rho = toScr(-0.5, Math.sqrt(3)/2);
     ctx.beginPath(); ctx.arc(rho.x, rho.y, 4*dpr, 0, Math.PI*2);
     ctx.fillStyle = '#ff9800'; ctx.fill();
-    ctx.fillStyle = '#ff9800';
     ctx.fillText('ρ (j=0)', rho.x + 8*dpr, rho.y - 4*dpr);
 
-    // Selected τ
     var pt = toScr(tau.x, tau.y);
     ctx.beginPath(); ctx.arc(pt.x, pt.y, 7*dpr, 0, Math.PI*2);
     ctx.fillStyle = '#e94560'; ctx.fill();
@@ -207,52 +273,60 @@
     ctx.fillText('τ', pt.x + 10*dpr, pt.y - 6*dpr);
   }
 
-  // Compute j(τ) numerically using q-expansion
-  function computeJ(tauX, tauY) {
-    // q = e^{2πiτ}
+function computeJ(tauX, tauY) {
+    // Snap to exact analytical values for our pedagogical special points
+    if (Math.hypot(tauX, tauY - 1) < 0.03) return {r: 1728, i: 0}; // τ = i
+    if (Math.hypot(tauX + 0.5, tauY - Math.sqrt(3)/2) < 0.03) return {r: 0, i: 0}; // τ = ρ
+    if (Math.hypot(tauX - 0.5, tauY - Math.sqrt(3)/2) < 0.03) return {r: 0, i: 0}; // τ = -ρ alias
+
     var qr = Math.exp(-2 * Math.PI * tauY) * Math.cos(2 * Math.PI * tauX);
     var qi = Math.exp(-2 * Math.PI * tauY) * Math.sin(2 * Math.PI * tauX);
     var qmag = Math.exp(-2 * Math.PI * tauY);
 
-    if (qmag > 0.9) return {r: NaN, i: NaN}; // too close to cusp
+    if (qmag > 0.9) return {r: NaN, i: NaN}; 
 
-    // j(τ) ≈ 1/q + 744 + 196884*q + 21493760*q^2
-    // 1/q
     var denom = qr*qr + qi*qi;
     if (denom < 1e-30) return {r: NaN, i: NaN};
     var invQr = qr / denom;
     var invQi = -qi / denom;
 
-    // q^2
-    var q2r = qr*qr - qi*qi;
-    var q2i = 2*qr*qi;
+    // Complex multiplication helper
+    function cMul(a, b) { return { r: a.r*b.r - a.i*b.i, i: a.r*b.i + a.i*b.r }; }
+    
+    var q = {r: qr, i: qi};
+    var q2 = cMul(q, q);
+    var q3 = cMul(q2, q);
+    var q4 = cMul(q3, q);
 
-    var jr = invQr + 744 + 196884*qr + 21493760*q2r;
-    var ji = invQi + 196884*qi + 21493760*q2i;
+    // Added more terms of the Fourier expansion for precision
+    var jr = invQr + 744 + 196884*q.r + 21493760*q2.r + 864299970*q3.r + 20245856256*q4.r;
+    var ji = invQi +       196884*q.i + 21493760*q2.i + 864299970*q3.i + 20245856256*q4.i;
 
     return {r: jr, i: ji};
   }
-
+  
   function updateInfo() {
-    document.getElementById('tau-val').textContent =
-      tau.x.toFixed(2) + (tau.y >= 0 ? ' + ' : ' - ') + Math.abs(tau.y).toFixed(2) + 'i';
-
+    var tauStr = tau.x.toFixed(2) + (tau.y >= 0 ? ' + ' : ' - ') + Math.abs(tau.y).toFixed(2) + 'i';
     var j = computeJ(tau.x, tau.y);
+    var jStr = '';
+
     if (isNaN(j.r)) {
-      document.getElementById('j-val').textContent = '∞ (cusp)';
+      jStr = '∞ (cusp)';
     } else if (Math.abs(j.i) < 1) {
-      document.getElementById('j-val').textContent = j.r.toFixed(1);
+      jStr = j.r.toFixed(1);
     } else {
-      document.getElementById('j-val').textContent =
-        j.r.toFixed(1) + (j.i >= 0 ? '+' : '') + j.i.toFixed(1) + 'i';
+      jStr = j.r.toFixed(1) + (j.i >= 0 ? '+' : '') + j.i.toFixed(1) + 'i';
     }
+
+    var infoStr = 'τ = ' + tauStr + ' &nbsp;|&nbsp; j(τ) = ' + jStr;
+    document.getElementById('torus-info-header').innerHTML = infoStr;
   }
 
   function onSelect(e) {
     e.preventDefault();
     var pos = UI.canvasPos(cUp, e);
     var c = fromScr(pos.x, pos.y);
-    if (c.y < 0.1) return; // don't go below real axis
+    if (c.y < 0.1) return; 
     tau.x = c.x;
     tau.y = c.y;
     drawUpper();
@@ -260,19 +334,23 @@
     drawJTorus();
   }
 
-  cUp.addEventListener('click', onSelect);
-  cUp.addEventListener('touchend', function(e) {
-    if (e.changedTouches.length === 1) {
-      var t = e.changedTouches[0];
-      var rect = cUp.getBoundingClientRect();
-      var sx = (t.clientX - rect.left) * cUp.width / rect.width;
-      var sy = (t.clientY - rect.top) * cUp.height / rect.height;
-      var c = fromScr(sx, sy);
-      if (c.y < 0.1) return;
-      tau.x = c.x; tau.y = c.y;
-      drawUpper(); updateInfo(); drawJTorus();
-    }
+  cUp.addEventListener('mousedown', function(e) {
+    cUp.isDragging = true;
+    onSelect(e);
   });
+  cUp.addEventListener('mousemove', function(e) {
+    if(cUp.isDragging) onSelect(e);
+  });
+  window.addEventListener('mouseup', function() { cUp.isDragging = false; });
+
+  cUp.addEventListener('touchstart', function(e) {
+    cUp.isDragging = true;
+    onSelect(e.touches[0]);
+  }, { passive: false });
+  cUp.addEventListener('touchmove', function(e) {
+    if(cUp.isDragging) { e.preventDefault(); onSelect(e.touches[0]); }
+  }, { passive: false });
+  window.addEventListener('touchend', function() { cUp.isDragging = false; });
 
   drawUpper();
   updateInfo();
@@ -286,8 +364,6 @@
   });
 
   function drawJTorus() {
-    // Shape the torus based on τ
-    // The ratio |τ| affects the torus proportions
     var ratio = Math.sqrt(tau.x*tau.x + tau.y*tau.y);
     var R = 1.0;
     var rr = Math.min(0.8, 0.3 * ratio);
@@ -296,8 +372,6 @@
     scene.clear();
     scene.drawWireframe(grid, 'rgba(74,158,255,0.3)');
 
-    // Mark the lattice generators as colored curves on the torus
-    // ω₁ direction: u varies, v=0
     var prev1 = null;
     for (var i = 0; i <= 50; i++) {
       var u = i / 50;
@@ -306,7 +380,7 @@
       if (prev1) scene.drawLine(prev1, p, '#4caf50', 2.5);
       prev1 = p;
     }
-    // ω₂ direction: map (0,0)->(τ_x, τ_y) normalized
+
     var prev2 = null;
     for (var i = 0; i <= 50; i++) {
       var t = i / 50;
