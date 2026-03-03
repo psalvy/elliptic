@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 5: Complex Multiplication & Ramanujan's π</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="lib/katex/katex.min.css">
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top">
+    <a href="module4.html">← Prev</a>
+    <span>Module 5 of 5</span>
+    <span class="disabled">Next →</span>
+  </nav>
+
+  <h1>Complex Multiplication & Ramanujan's π</h1>
+
+  <h2>5.1 — The Grand Unified View</h2>
+  <p>We are finally ready to unite everything. Below is the master dashboard. You are looking at the exact same mathematical operation happening in three different spaces simultaneously.</p>
+  
+  <p><strong>The Real vs. Complex Slice:</strong> Why are you only allowed to drag points along the two horizontal tracks on the flat lattice? Because the 2D algebraic curve you are used to seeing (Pane 3) is only a <em>one-dimensional slice</em> of the full complex torus!  The green track ($v=0$) maps to the open branch, and the orange track ($v=0.5$) maps to the closed loop. If you moved off these tracks, the points would fly off the 2D screen into imaginary dimensions!</p>
+
+  <p><strong>Drag $z_1$ and $z_2$ on the lattice to see the magic in action:</strong></p>
+
+  <div class="split-view" style="margin-bottom: 20px;">
+    <div class="canvas-wrap">
+      <canvas id="c-flat"></canvas>
+      <span class="canvas-label">1. Flat Lattice (Standard Addition)</span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="c-torus-u"></canvas>
+      <span class="canvas-label">2. The 3D Torus</span>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-curve-u"></canvas>
+    <span class="canvas-label" style="top: 10px; bottom: auto;">3. The Algebraic Curve (Weierstrass Map)</span>
+  </div>
+
+  <div class="note">
+    <strong>The Mathematical Proof:</strong> Notice that in Pane 1, we are just using standard vector addition: $z_3 = -(z_1 + z_2)$. We feed those exact coordinates through the Weierstrass $\wp$-function to plot the dots in Pane 3. The fact that the secant line perfectly intersects $R$ proves that the bizarre geometric game from Module 2 is just flat addition in disguise!
+  </div>
+
+  <h2>5.2 — Complex Multiplication (The Symmetry of the Gods)</h2>
+  <p>For almost every choice of $\tau$, the lattice only has trivial symmetries (shifting by integers). But for very specific choices—like $\tau = i$ (a perfect square) or $\tau = e^{2\pi i / 3}$ (a perfect hexagon)—the lattice can be mapped perfectly onto itself via rotation and complex scaling. </p>
+
+  <p>This "extra" symmetry is called <strong>Complex Multiplication (CM)</strong>. The profound consequence of CM is that the $j$-invariant for these special curves is no longer a messy decimal; it is an <strong>exact algebraic integer</strong>.</p>
+  
+  <p>Srinivasa Ramanujan possessed an otherworldly intuition for these CM lattices. He looked at $\tau = \frac{1 + \sqrt{-58}}{2}$, calculated its massive integer invariant, and plugged it into the $q$-expansion of the modular forms from Module 4.</p>
+
+  <h2>5.3 — The Ramanujan π Engine</h2>
+  <p>By forcing the geometric invariant to equal a massive integer, Ramanujan manipulated the $q$-expansion ($q = e^{2\pi i \tau}$) to isolate the $\pi$ hidden in the exponent.  This resulted in a formula of terrifying precision:</p>
+
+  <div class="math-block">$$\frac{1}{\pi} = \frac{2\sqrt{2}}{9801} \sum_{k=0}^\infty \frac{(4k)!(1103+26390k)}{(k!)^4 396^{4k}}$$</div>
+
+  <p>Because the $q$ term is so incredibly small for this specific $\tau$, the series converges faster than almost anything else in mathematics. <strong>Click the button below to add terms to the series:</strong></p>
+
+  <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 20px; margin: 20px 0;">
+    <button id="btn-pi" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #e94560; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 15px;">Add Term (k = <span id="pi-k-val">0</span>)</button>
+    
+    <div style="font-family: monospace; font-size: 16px; margin-bottom: 10px;">
+      <span style="color: #888;">Calculated π:</span> <br>
+      <span id="pi-calc" style="font-size: 22px; color: #4caf50;">3.</span>
+    </div>
+    
+    <div style="font-family: monospace; font-size: 16px;">
+      <span style="color: #888;">Actual Math.PI limit:</span> <br>
+      <span style="font-size: 18px; color: #fff;">3.141592653589793</span>
+    </div>
+
+    <div id="pi-msg" style="margin-top: 15px; color: #ff9800; font-style: italic; font-size: 14px; min-height: 20px;"></div>
+  </div>
+
+  <nav class="nav-bottom">
+    <a href="module4.html">← Module 4: The j-invariant</a>
+    <span class="disabled">End of Course</span>
+  </nav>
+
+</div>
+
+<script src="lib/katex/katex.min.js"></script>
+<script src="js/math-render.js"></script>
+<script src="js/plot2d.js"></script>
+<script src="js/canvas3d.js"></script>
+<script src="js/interactive.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // 5.1 THE GRAND UNIFIED VIEW
+  // ==========================================
+
+  var cFlat = document.getElementById('c-flat');
+  var cTor = document.getElementById('c-torus-u');
+  var cCurve = document.getElementById('c-curve-u');
+  
+  var dprF = UI.fitCanvas(cFlat, 1.0);
+  var dprT = UI.fitCanvas(cTor, 1.0);
+  var dprC = UI.fitCanvas(cCurve, 0.45);
+
+  var ctxF = cFlat.getContext('2d');
+  
+  var scene = new Canvas3D(cTor, {
+    scale: Math.min(cTor.width, cTor.height) * 0.35,
+    rotX: -0.5, rotY: 0.8, autoRotate: false
+  });
+
+  var plot = new Plot2D(cCurve, {xMin: -10, xMax: 15, yMin: -25, yMax: 25});
+
+  // State
+  // v=0 is the green track (open curve), v=0.5 is the orange track (closed loop)
+  var z1 = {u: 0.15, v: 0.0}; 
+  var z2 = {u: 0.40, v: 0.5}; 
+  var dragging = 0; // 1 for z1, 2 for z2
+
+  // --- Complex Math & Weierstrass Approximation ---
+  function cAdd(a,b) { return {r: a.r+b.r, i: a.i+b.i}; }
+  function cSub(a,b) { return {r: a.r-b.r, i: a.i-b.i}; }
+  function cInv(a) { var d = a.r*a.r + a.i*a.i; return {r: a.r/d, i: -a.i/d}; }
+  function cSqr(a) { return {r: a.r*a.r - a.i*a.i, i: 2*a.r*a.i}; }
+  function cCub(a) { return {r: a.r*a.r*a.r - 3*a.r*a.i*a.i, i: 3*a.r*a.r*a.i - a.i*a.i*a.i}; }
+
+  // Computes the coordinates of the algebraic curve using the exact lattice sum
+  function weierstrassMap(u, v) {
+    if (u < 0.05) u = 0.05; // Prevent singularity blowup at origin
+    if (u > 0.95) u = 0.95;
+    
+    var z = {r: u, i: v};
+    var sum = cInv(cSqr(z));
+    var p_prime = {r: 0, i: 0};
+    
+    var N = 4; // 9x9 grid sum is incredibly fast and highly accurate
+    for (var m = -N; m <= N; m++) {
+      for (var n = -N; n <= N; n++) {
+        if (m === 0 && n === 0) continue;
+        var w = {r: m, i: n};
+        var zw = cSub(z, w);
+        sum = cAdd(sum, cSub(cInv(cSqr(zw)), cInv(cSqr(w))));
+        p_prime = cAdd(p_prime, cInv(cCub(zw)));
+      }
+    }
+    p_prime = {r: -2*p_prime.r, i: -2*p_prime.i};
+
+    // The sum naturally maps to y^2 = 4x^3 - g2*x. 
+    // We scale Y by 1/2 to match our Plot2D graphing standard of y^2 = x^3 - (g2/4)x
+    return [sum.r, p_prime.r / 2];
+  }
+
+  // --- Drawing functions ---
+
+  function drawFlat() {
+    var w = cFlat.width, h = cFlat.height;
+    ctxF.fillStyle = '#0d1117';
+    ctxF.fillRect(0, 0, w, h);
+
+    var pad = w * 0.1;
+    var sz = w - 2*pad;
+
+    // Draw Tracks
+    var y0 = pad + sz;       // v = 0 (bottom)
+    var yHalf = pad + sz/2;  // v = 0.5 (middle)
+
+    ctxF.strokeStyle = '#4caf50'; ctxF.lineWidth = 2*dprF;
+    ctxF.beginPath(); ctxF.moveTo(pad, y0); ctxF.lineTo(pad+sz, y0); ctxF.stroke();
+    
+    ctxF.strokeStyle = '#ff9800'; ctxF.lineWidth = 2*dprF;
+    ctxF.beginPath(); ctxF.moveTo(pad, yHalf); ctxF.lineTo(pad+sz, yHalf); ctxF.stroke();
+
+    // Box outline
+    ctxF.strokeStyle = 'rgba(255,255,255,0.2)'; ctxF.lineWidth = 1*dprF;
+    ctxF.strokeRect(pad, pad, sz, sz);
+
+    // Calculate z3 = -(z1 + z2) mod 1
+    var z3u = (-z1.u - z2.u) % 1; if (z3u < 0) z3u += 1;
+    var z3v = (-z1.v - z2.v) % 1; if (z3v < 0) z3v += 1;
+
+    // Draw Points
+    function drawDot(u, v, col, label) {
+      var px = pad + u*sz;
+      var py = pad + sz - v*sz; // invert Y for canvas
+      ctxF.beginPath(); ctxF.arc(px, py, 6*dprF, 0, Math.PI*2);
+      ctxF.fillStyle = col; ctxF.fill();
+      ctxF.fillStyle = '#fff'; ctxF.font = (14*dprF) + 'px monospace';
+      ctxF.fillText(label, px - 6*dprF, py - 12*dprF);
+    }
+
+    drawDot(z1.u, z1.v, '#e94560', 'z1');
+    drawDot(z2.u, z2.v, '#64b5f6', 'z2');
+    drawDot(z3u, z3v, 'rgba(255,255,255,0.6)', 'z3');
+  }
+
+  function drawTorus() {
+    var R = 1.0, r = 0.4;
+    var grid = Canvas3D.torusPoints(R, r, 32, 16);
+    scene.clear();
+    scene.drawWireframe(grid, 'rgba(74,158,255,0.15)');
+
+    var z3u = (-z1.u - z2.u) % 1; if (z3u < 0) z3u += 1;
+    var z3v = (-z1.v - z2.v) % 1; if (z3v < 0) z3v += 1;
+
+    function plot3D(u, v, col) {
+      var pt = Canvas3D.torusPoint(R, r, u, v);
+      var p = scene.project(pt[0], pt[1], pt[2]);
+      scene.drawPoint(p, col, 6);
+    }
+
+    plot3D(z1.u, z1.v, '#e94560');
+    plot3D(z2.u, z2.v, '#64b5f6');
+    plot3D(z3u, z3v, 'rgba(255,255,255,0.6)');
+  }
+
+  function drawCurve() {
+    plot.w = cCurve.width; plot.h = cCurve.height;
+    plot.clear();
+    plot.drawGrid();
+
+    // The approximate value of g2/4 for tau=i is 47.268. 
+    var a = -47.268;
+
+    // Draw mathematical curve
+    plot.plotImplicit(function(x, y) {
+      return y*y - x*x*x - a*x;
+    }, '#e94560', 2.0);
+
+    var z3u = (-z1.u - z2.u) % 1; if (z3u < 0) z3u += 1;
+    var z3v = (-z1.v - z2.v) % 1; if (z3v < 0) z3v += 1;
+
+    // Convert lattice coords to actual algebraic curve coords using Calculus!
+    var P = weierstrassMap(z1.u, z1.v);
+    var Q = weierstrassMap(z2.u, z2.v);
+    var R = weierstrassMap(z3u, z3v);
+
+    // Draw secant line and dots
+    plot.drawLineThrough(P[0], P[1], Q[0], Q[1], 'rgba(255,255,255,0.3)', 1.5);
+    
+    plot.drawPoint(P[0], P[1], '#e94560', 6, 'P');
+    plot.drawPoint(Q[0], Q[1], '#64b5f6', 6, 'Q');
+    plot.drawPoint(R[0], R[1], 'rgba(255,255,255,0.6)', 5, 'R');
+    
+    // R reflected is P+Q
+    var sum = [R[0], -R[1]];
+    plot.drawLine(R[0], R[1], sum[0], sum[1], 'rgba(255,255,255,0.4)', 1.5);
+    plot.drawPoint(sum[0], sum[1], '#4caf50', 6, 'P+Q');
+  }
+
+  function updateUnified() {
+    drawFlat();
+    drawTorus();
+    drawCurve();
+  }
+
+  // --- Dragging Interactions ---
+  function getFlatU(mx) {
+    var pad = cFlat.width * 0.1;
+    var sz = cFlat.width - 2*pad;
+    var u = (mx - pad) / sz;
+    return Math.max(0.05, Math.min(0.95, u));
+  }
+
+  cFlat.addEventListener('mousedown', function(e) {
+    var pos = UI.canvasPos(cFlat, e);
+    var pad = cFlat.width * 0.1;
+    var sz = cFlat.width - 2*pad;
+    var y0 = pad + sz;
+    var yHalf = pad + sz/2;
+    
+    if (Math.abs(pos.y - y0) < 30) dragging = 1; // Snapped to green track
+    else if (Math.abs(pos.y - yHalf) < 30) dragging = 2; // Snapped to orange track
+  });
+
+  window.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    var pos = UI.canvasPos(cFlat, e);
+    var u = getFlatU(pos.x);
+    if (dragging === 1) z1.u = u;
+    if (dragging === 2) z2.u = u;
+    updateUnified();
+  });
+  window.addEventListener('mouseup', function() { dragging = 0; });
+  
+  // Touch support
+  cFlat.addEventListener('touchstart', function(e) {
+    var pos = UI.canvasPos(cFlat, e.touches[0]);
+    var pad = cFlat.width * 0.1;
+    var sz = cFlat.width - 2*pad;
+    if (Math.abs(pos.y - (pad+sz)) < 40) dragging = 1;
+    else if (Math.abs(pos.y - (pad+sz/2)) < 40) dragging = 2;
+  }, {passive: false});
+  window.addEventListener('touchmove', function(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    var pos = UI.canvasPos(cFlat, e.touches[0]);
+    var u = getFlatU(pos.x);
+    if (dragging === 1) z1.u = u;
+    if (dragging === 2) z2.u = u;
+    updateUnified();
+  }, {passive: false});
+  window.addEventListener('touchend', function() { dragging = 0; });
+
+  updateUnified();
+  scene.animate(function() { drawTorus(); });
+
+
+  // ==========================================
+  // 5.3 RAMANUJAN PI ENGINE
+  // ==========================================
+
+  var btnPi = document.getElementById('btn-pi');
+  var spanK = document.getElementById('pi-k-val');
+  var spanCalc = document.getElementById('pi-calc');
+  var msg = document.getElementById('pi-msg');
+  
+  var pi_k = 0;
+  var current_sum = 0;
+
+  function fact(n) { var f=1; for(var i=2;i<=n;i++) f*=i; return f; }
+
+  btnPi.addEventListener('click', function() {
+    // Calculate next term
+    var num = fact(4*pi_k) * (1103 + 26390*pi_k);
+    var den = Math.pow(fact(pi_k), 4) * Math.pow(396, 4*pi_k);
+    current_sum += num / den;
+
+    var invPi = (2 * Math.sqrt(2) / 9801) * current_sum;
+    var pi_calc = 1 / invPi;
+
+    spanK.textContent = pi_k;
+    
+    // Format to show precision
+    var piStr = pi_calc.toFixed(15);
+    var refStr = Math.PI.toFixed(15);
+    var html = "";
+    var matched = true;
+    for(var i=0; i<piStr.length; i++) {
+      if(matched && piStr[i] === refStr[i]) {
+        html += piStr[i];
+      } else {
+        matched = false;
+        html += "<span style='color:#e94560'>" + piStr[i] + "</span>";
+      }
+    }
+    spanCalc.innerHTML = html;
+
+    if (pi_k === 0) {
+      msg.innerHTML = "k=0 already gives 6 decimal places of perfect accuracy!";
+    } else if (pi_k === 1) {
+      msg.innerHTML = "k=1 hit the absolute maximum precision limit of standard 64-bit JavaScript floats! (15 digits). We literally broke the computer in just two steps.";
+      btnPi.disabled = true;
+      btnPi.style.opacity = 0.5;
+      btnPi.textContent = "Hardware Limit Reached";
+    }
+
+    pi_k++;
+  });
+
+
+  // Window Resize
+  UI.onResize(function() {
+    dprF = UI.fitCanvas(cFlat, 1.0);
+    dprT = UI.fitCanvas(cTor, 1.0);
+    scene.w = cTor.width; scene.h = cTor.height;
+    scene.cx = scene.w/2; scene.cy = scene.h/2;
+    scene.scale = Math.min(scene.w, scene.h)*0.35;
+    
+    dprC = UI.fitCanvas(cCurve, 0.45);
+    updateUnified();
+  });
+
+})();
+</script>
+</body>
+</html>
