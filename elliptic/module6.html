@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 6: Deriving Ramanujan's π</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>Into the Weeds: The Rigorous Derivation</h1>
+
+  <p>In Module 5, we saw the formula. Now, we derive it. To get from a torus to Ramanujan's $\pi$ formula, we must execute four distinct mathematical steps: evaluating the elliptic period via Taylor series, squaring it, introducing $\pi$ via topology, and locking it all down with Complex Multiplication.</p>
+
+  <h2 id="step1">Step 1: The Period as a Taylor Series</h2>
+  <p>To see the exact calculus of how an elliptic period becomes an infinite sum of factorials, let's map our elliptic curve into its <strong>Legendre Normal Form</strong>: $y^2 = x(1-x)(1-\lambda x)$.</p>
+
+  <p>This form is obtained by applying a Möbius transformation that pins two of the four branch points (the values of $x$ where $y = 0$) at $x = 0$ and $x = 1$. The third finite root then lands at $x = 1/\lambda$. So <strong>$\lambda$ is not a root of the curve</strong> — it is a <em>shape coordinate</em>, a single number encoding where the third root sits relative to the first two. It carries exactly the same information as the $j$-invariant, just in different clothing:</p>
+
+  <div class="math-block">$$j(\lambda) = 256\,\frac{(1 - \lambda + \lambda^2)^3}{\lambda^2(1-\lambda)^2}$$</div>
+
+  <p>As a function of the period ratio $\tau$, $\lambda = \lambda(\tau)$ is the <strong>modular lambda function</strong>. For a generic torus it is transcendental. But for a CM point like $\tau = \frac{1+\sqrt{-58}}{2}$, complex multiplication forces $\lambda(\tau)$ to be an algebraic number — a root of a polynomial with integer coefficients. That algebraic constraint is what ultimately allows everything to rationalize in Step 4.</p>
+
+  <details id="deep-dive-lambda" class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: The Modular Lambda Function as a q-Series</summary>
+    <div style="margin-top: 15px;">
+      <p>If $\lambda(\tau)$ looks mysterious, a q-series expansion makes it concrete. Recall from Module 4 that the <em>nome</em> $q = e^{2\pi i\tau}$ converts the abstract period ratio $\tau$ into a single small complex number ($|q| \ll 1$ in the upper half-plane). The $j$-invariant has the famous expansion</p>
+      <div class="math-block">$$j(\tau) = \frac{1}{q} + 744 + 196884\,q + 21493760\,q^2 + \cdots$$</div>
+      <p>$\lambda$ is a <strong>modular function of level 2</strong> — it only has full symmetry under the index-6 congruence subgroup $\Gamma(2) \subset \mathrm{SL}_2(\mathbb{Z})$, not the full modular group. Because of this restricted symmetry it is more sensitive to $\tau$, and it uses a <em>half-nome</em> $q_2 = e^{i\pi\tau}$ (so $q_2^2 = q$). Its expansion at the cusp $\tau \to i\infty$ is</p>
+      <div class="math-block">$$\lambda(\tau) = 16\,q_2 - 128\,q_2^2 + 704\,q_2^3 - 3072\,q_2^4 + 11488\,q_2^5 - \cdots$$</div>
+      <p>Compare the two structures side by side:</p>
+      <div class="math-block">$$j(\tau) = q^{-1} + 744 + 196884\,q + \cdots \qquad \lambda(\tau) = 16\,q_2 - 128\,q_2^2 + \cdots$$</div>
+      <ul style="margin-top:10px;">
+        <li><strong>$j$ has a pole</strong> at the cusp ($q \to 0$), reflecting the fact that every elliptic curve has a $j$-invariant but "most" of the moduli space lies near that pole.</li>
+        <li><strong>$\lambda$ has a zero</strong> at the cusp ($q_2 \to 0$). This is because pinning two branch points at $0$ and $1$ leaves the third one ($1/\lambda$) flying off to infinity as the curve degenerates — so $\lambda \to 0$.</li>
+      </ul>
+      <p>You can verify the $j$–$\lambda$ formula numerically: substitute the first few terms of $\lambda(\tau) = 16q_2 - 128q_2^2 + \cdots$ into</p>
+      <div class="math-block">$$j = 256\,\frac{(1-\lambda+\lambda^2)^3}{\lambda^2(1-\lambda)^2}$$</div>
+      <p>and expand. The leading term $256/(16q_2)^2 = 256/(256\,q_2^2) = 1/q_2^2 = 1/q$ reproduces the pole of $j$ exactly.</p>
+      <p>For our CM point $\tau = \frac{1+\sqrt{-58}}{2}$, the nome $q_2 = e^{i\pi\tau}$ is exponentially tiny (since $\mathrm{Im}(\tau) = \frac{\sqrt{58}}{2} \approx 3.8$), so only a handful of terms are needed to compute $\lambda(\tau)$ to many decimal places — and CM guarantees the result is algebraic.</p>
+    </div>
+  </details>
+
+  <p>The fundamental real period $\omega$ is the integral between the roots $x = 0$ and $x = 1$:</p>
+  <div class="math-block">$$\omega = \int_0^1 \frac{dx}{\sqrt{x(1-x)(1-\lambda x)}}$$</div>
+
+  <p>We can rewrite the denominator by splitting the square roots:</p>
+  <div class="math-block">$$\omega = \int_0^1 x^{-1/2} (1-x)^{-1/2} (1-\lambda x)^{-1/2} \, dx$$</div>
+
+  <p>Now, we use Isaac Newton's generalized binomial theorem to expand the rightmost term into an infinite Taylor series:</p>
+  <div class="math-block">$$(1 - \lambda x)^{-1/2} = \sum_{k=0}^\infty \frac{(\frac{1}{2})_k}{k!} (\lambda x)^k$$</div>
+  <p><em>(Note: $(a)_k$ is the Pochhammer symbol, representing a rising factorial: $a(a+1)(a+2)\dots(a+k-1)$.)</em></p>
+
+  <p>We substitute this infinite sum back into our integral. Because the series converges uniformly, we can swap the integral and the infinite sum, pulling everything that doesn't depend on $x$ completely outside the integral:</p>
+
+  <div class="math-block">$$\omega = \sum_{k=0}^\infty \frac{(\frac{1}{2})_k}{k!} \lambda^k \left( \int_0^1 x^{k-1/2} (1-x)^{-1/2} \, dx \right)$$</div>
+
+  <p>We have successfully isolated $x$! The integral inside the parentheses is exactly the definition of the <strong>Euler Beta Function</strong>, $B(k+1/2, 1/2)$.</p>
+
+  <p>The Beta function evaluates perfectly into Euler Gamma functions ($\Gamma$), which map directly back to Pochhammer factorials ($\Gamma(k+1/2) = (\frac{1}{2})_k \sqrt{\pi}$):</p>
+
+  <div class="math-block">
+    $$B\left(k+\frac{1}{2}, \frac{1}{2}\right) = \frac{\Gamma(k+\frac{1}{2})\Gamma(\frac{1}{2})}{\Gamma(k+1)} = \frac{(\frac{1}{2})_k \sqrt{\pi} \cdot \sqrt{\pi}}{k!} = \pi \frac{(\frac{1}{2})_k}{k!}$$
+  </div>
+
+  <p>We plug this beautifully simplified result back into our infinite sum, and the two $(\frac{1}{2})_k$ terms multiply together:</p>
+
+  <div class="math-block">$$\omega = \pi \sum_{k=0}^\infty \frac{(\frac{1}{2})_k (\frac{1}{2})_k}{(k!)^2} \lambda^k$$</div>
+
+  <p>Because infinite sums built out of rising factorials appear everywhere in differential equations, mathematicians gave them a template called a <strong>Hypergeometric Series</strong> (${}_2F_1$). Our result perfectly matches that template!</p>
+
+  <div class="math-block">$$\omega = \pi \cdot {}_2F_1\left(\frac{1}{2}, \frac{1}{2}; 1; \lambda\right)$$</div>
+
+  <details id="deep-dive" class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: The U-Substitution & Defining $\alpha$</summary>
+    <div style="margin-top: 15px;">
+      <p>We just proved the period equals $\pi \cdot {}_2F_1(\frac{1}{2}, \frac{1}{2}; 1; \lambda)$. But Ramanujan's formula uses a $(1/4, 3/4)$ series. Where did that come from?</p>
+      <p>Just like you can stretch the x-axis on a graph without changing the shape of a circle, you can apply a rational u-substitution to shift the roots of an elliptic curve without changing the physical 3D Torus.  If we apply <strong>Gauss's Quadratic Transformation</strong> $x \mapsto \frac{4x}{(1+x)^2}$, the square roots in our integral get reshuffled.</p>
+      <p>This exact transformation yields a famous identity that perfectly shifts our series from halves into quarters:</p>
+      <div class="math-block">$${}_2F_1\left(\frac{1}{2}, \frac{1}{2}; 1; \lambda\right) = \frac{1}{\sqrt{1+\sqrt{\lambda}}} {}_2F_1\left(\frac{1}{4}, \frac{3}{4}; 1; \underbrace{\frac{4\sqrt{\lambda}}{(1+\sqrt{\lambda})^2}}_{\text{We define this as } \alpha}\right)$$</div>
+      <p>This identity explicitly defines our new parameter, $\alpha$.</p>
+      <p><strong>Why do this?</strong> Because factorials of $(1/4)_k$ expand into $(4k)!$, whereas $(1/2)_k$ only expands into $(2k)!$. The $(4k)!$ variant grows astronomically faster, which is exactly what Ramanujan wanted to maximize the speed at which his formula calculates $\pi$!</p>
+    </div>
+  </details>
+
+  <h2 id="step2">Step 2: Clausen's Formula & The Singular Modulus</h2>
+  
+  <p>Ramanujan's formulas don't use $\omega$; they use $\omega^2$. We now work with the $(1/4, 3/4)$ variant of the period — recall from the <a href="#deep-dive">Deep Dive above</a> that Gauss's quadratic transformation shifts us from the $(1/2, 1/2)$ series to the faster-converging $(1/4, 3/4)$ one, at the cost of introducing the new parameter $\alpha$. In 1828, Thomas Clausen discovered a miraculous identity: squaring a ${}_2F_1$ series produces a generalized ${}_3F_2$ series.</p>
+
+  <div class="math-block">$$\left[ {}_2F_1\left(\frac{1}{4}, \frac{3}{4}; 1; \alpha\right) \right]^2 = {}_3F_2\left(\frac{1}{2}, \frac{1}{4}, \frac{3}{4}; 1, 1; \alpha\right)$$</div>
+
+  <p>Let's unpack that ${}_3F_2$ series back into standard factorials. The Pochhammer symbols expand perfectly, but they throw off an extra $256^k$ in the denominator:</p>
+
+  <div class="math-block">$$\frac{(\frac{1}{2})_k (\frac{1}{4})_k (\frac{3}{4})_k}{(1)_k (1)_k k!} = \frac{(4k)!}{(k!)^4 256^k}$$</div>
+
+  <p>Now, we plug this back into our squared period. Notice that our new geometric parameter $\alpha^k$ combines with the factorial's $1/256^k$ to form $(\alpha / 256)^k$.</p>
+  
+  <p><strong>But what exactly is $\alpha$?</strong></p>
+  <p>It is known as the <strong>Singular Modulus</strong>. Because our specific torus ($d=58$) has perfect Complex Multiplication, its extra geometric symmetries act as strict algebraic constraints. These constraints force the original curve parameter $\lambda$ to be the exact root of an integer polynomial. Because $\lambda$ is an exact algebraic root, our transformed parameter $\alpha = \frac{4\sqrt{\lambda}}{(1+\sqrt{\lambda})^2}$ is <em>also</em> an exact algebraic root.</p>
+
+  <p>By solving the modular polynomial equations for the $d=58$ symmetry, Ramanujan derived the exact algebraic root for $\alpha$. Miraculously, because of the specific structure of this imaginary quadratic field, when Ramanujan's root for $\alpha$ is divided by $256$, the nested square roots simplify entirely. It perfectly rationalizes into an astronomically tiny fraction:</p>
+  
+  <div class="math-block">$$ \frac{\alpha}{256} = \frac{1}{396^4} $$</div>
+
+  <p>This leaves us with the exact skeleton of Ramanujan's formula!</p>
+  
+  <div class="math-block">$$\omega^2 \propto \pi^2 \sum_{k=0}^\infty \frac{(4k)!}{(k!)^4} \left(\frac{1}{396^4}\right)^k$$</div>
+
+<h2 id="step3">Step 3: Legendre's Relation & The Missing Variables</h2>
+  <p>We have an infinite series for $\omega_1^2$ (which we just called $\omega$ earlier). But how do we connect this to $\pi$? We must look at the topology of the torus. </p>
+
+  <p>Alongside the periods $\omega_1$ and $\omega_2$, there are "quasi-periods" $\eta_1$ and $\eta_2$ created by integrating a different differential over the same loops. Integrating around the fundamental parallelogram of the torus yields a topological residue, creating <strong>Legendre's Relation</strong>:</p>
+
+  <div class="math-block">$$\omega_1 \eta_2 - \omega_2 \eta_1 = 2\pi i$$</div>
+
+  <p>To use this, we need formulas for the quasi-periods. By the Picard-Fuchs differential equation, a quasi-period acts like a derivative of a period. Specifically, $\eta_1$ can be written as a combination of $\omega_1$ and its derivative with respect to our curve parameter:</p>
+
+  <div class="math-block">$$\eta_1 = C_1 \cdot \omega_1 + C_2 \cdot \left( z \frac{d\omega_1}{dz} \right)$$</div>
+
+  <p>This explicit derivative is the secret engine of Ramanujan's formula! Look what happens when we apply the differential operator $z \frac{d}{dz}$ to an infinite series of $z^k$:</p>
+
+  <div class="math-block">$$z \frac{d}{dz} (z^k) = k \cdot z^k$$</div>
+
+  <p>Because $\eta_1$ contains the derivative of the series, a factor of $k$ drops down from the exponent into the numerator.</p> 
+
+  <p><strong>The Roadblock:</strong> We now understand how to calculate $\omega_1$ and $\eta_1$. But Legendre's relation still contains $\omega_2$ and $\eta_2$! We have one equation and two unknown variables. We cannot isolate $\pi$ unless we find a way to eliminate the second loop of the torus.</p>
+
+  <h2 id="step4">Step 4: Complex Multiplication (The Algebraic Lock)</h2>
+  <p>This is where Ramanujan's choice of $d=58$ saves the day. We assume $\tau$ is in an imaginary quadratic field (e.g., $\tau = \frac{1 + \sqrt{-58}}{2}$). This gives the lattice <strong>Complex Multiplication (CM)</strong>.</p>
+
+  <p>Because the CM lattice has extra rotational symmetries, it maps perfectly onto itself. This geometric lock forces the second period $\omega_2$ to be a strict, exact multiple of the first period $\omega_1$:</p>
+  
+  <div class="math-block">$$\omega_2 = \tau \omega_1$$</div>
+
+  <p>Substitute this into Legendre's Relation: $\omega_1 \eta_2 - (\tau \omega_1) \eta_1 = 2\pi i$. Notice that $\omega_1$ factors out completely!</p>
+  
+  <div class="math-block">$$\omega_1 (\eta_2 - \tau \eta_1) = 2\pi i$$</div>
+
+  <p>The symmetry of Complex Multiplication doesn't just lock the periods; it also locks the quasi-periods. The term $(\eta_2 - \tau \eta_1)$ is mathematically guaranteed to evaluate to exactly $\omega_1$ multiplied by some exact algebraic constant, let's call it $C_{CM}$. Therefore, the unknown $\eta_2$ is absorbed, and the left side collapses entirely to $C_{CM} \cdot \omega_1^2$!</p>
+
+  <div class="note success">
+    <strong>The Grand Conclusion:</strong> Complex Multiplication collapses Legendre's relation from four variables down to exactly $C_{CM} \cdot \omega_1^2 = 2\pi i$. 
+    <br><br>
+    We substitute our infinite series for $\omega_1^2$ (from Step 2), and the derivative rules from the $\eta$ function (which injects the $+ Bk$ term). We evaluate the geometric parameters for $d=58$, and the exact algebraic constants $A=1103$, $B=26390$, and the singular modulus fraction $1/396^4$ fall out flawlessly.
+  </div>
+
+  <h2 id="inspector">6.5 — Interactive: Anatomy of Ramanujan's Formula</h2>
+  <p>Click on the components of Ramanujan's $d=58$ formula to see exactly which step of the derivation produced them.</p>
+
+  <div class="formula-inspector">
+    <div class="math-block" style="font-size: 1.5em; cursor: pointer;">
+      $$\frac{1}{\pi} = \underbrace{\frac{2\sqrt{2}}{9801}}_{\text{A}} \sum_{k=0}^\infty \underbrace{\frac{(4k)!}{(k!)^4}}_{\text{B}} \underbrace{(1103 + 26390k)}_{\text{C}} \underbrace{\left(\frac{1}{396^4}\right)^k}_{\text{D}}$$
+    </div>
+    
+    <div class="controls" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+      <button class="preset-btn" id="btn-A">Part A</button>
+      <button class="preset-btn" id="btn-B">Part B</button>
+      <button class="preset-btn" id="btn-C">Part C</button>
+      <button class="preset-btn" id="btn-D">Part D</button>
+    </div>
+
+    <div id="inspector-info" class="note" style="min-height: 120px;">
+      <em>Select a part of the formula above to see its mathematical origin.</em>
+    </div>
+  </div>
+
+  <nav class="nav-bottom"></nav>
+
+  <div style="display: none;">
+  <div id="expl-A">
+    <strong>Part A: The Normalization Constant.</strong><br><br>This originates from <a href="#step4">Step 4</a>. When the lattice has $d=58$ Complex Multiplication, the algebraic constant $C_{CM}$ generated by the collapsed Legendre relation $C_{CM} \cdot \omega_1^2 = 2\pi i$ evaluates exactly to this prefactor. The denominator $9801 = 99^2$ and the $396^4$ in Part D are not coincidental — both emerge from the same $j$-invariant computation for $d=58$, with $396 = 4 \times 99$.
+  </div>
+  <div id="expl-B">
+    <strong>Part B: The Hypergeometric Skeleton.</strong><br><br>This comes from <a href="#step1">Step 1</a> and <a href="#step2">Step 2</a>. The binomial Taylor series of the elliptic integral yields a ${}_2F_1$ hypergeometric series. By Clausen's formula, squaring that series transforms it into a ${}_3F_2$ series, whose Pochhammer symbols expand exactly into $(4k)! / (k!)^4$.
+  </div>
+  <div id="expl-C">
+    <strong>Part C: The Linear Shift $(A + Bk)$.</strong><br><br>This is the physical signature of the quasi-period from <a href="#step3">Step 3</a>. Because Legendre's relation requires $\eta_1$, and $\eta_1$ is defined via the derivative operator $z \frac{d}{dz}$ acting on the period series, the exponent $k$ drops down into the coefficient. The constant-$k$ terms from $\omega_1$ contribute $A = 1103$; the $k$-weighted terms from $\eta_1$ contribute $B = 26390$. The combination is resolved in <a href="#step4">Step 4</a> once CM eliminates $\omega_2$ and $\eta_2$.
+  </div>
+  <div id="expl-D">
+    <strong>Part D: The Singular Modulus Expansion $(\alpha / 256)^k$.</strong><br><br>This comes from the substitution in <a href="#step1">Step 1</a> (the <a href="#deep-dive">Deep Dive</a>) and <a href="#step2">Step 2</a>. The parameter $\alpha$ is the Singular Modulus, derived from Gauss's quadratic transformation of the curve's roots. Because the $d=58$ lattice has perfect Complex Multiplication symmetry, $\alpha$ is forced to be an exact algebraic root. When divided by the $256$ from Clausen's formula, the nested radicals perfectly rationalize into $1/396^4$. Note that $396 = 4 \times 99$, linking this denominator to the $9801 = 99^2$ in Part A — both fingerprints of the same CM field.
+  </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  var info = document.getElementById('inspector-info');
+  
+  function setInfo(part) {
+    info.innerHTML = document.getElementById('expl-' + part).innerHTML;
+    info.style.borderLeft = '4px solid #4caf50';
+    info.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+  }
+
+  document.getElementById('btn-A').addEventListener('click', function() { setInfo('A'); });
+  document.getElementById('btn-B').addEventListener('click', function() { setInfo('B'); });
+  document.getElementById('btn-C').addEventListener('click', function() { setInfo('C'); });
+  document.getElementById('btn-D').addEventListener('click', function() { setInfo('D'); });
+
+})();
+</script>
+</body>
+</html>

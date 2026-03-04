@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Module 3: Elliptic Curves over ℂ</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 </head>
 <body>
@@ -85,15 +85,20 @@
   
   
 
+  <div class="note">
+    <strong>Real-world application:</strong> The group law you just built — point addition on an elliptic curve — is also the security primitive protecting most encrypted internet traffic and every Bitcoin transaction. When the same construction is applied over a <em>finite</em> field $\mathbb{F}_p$ instead of $\mathbb{R}$, the group becomes finite and the inverse problem (finding $n$ from $nP$) becomes computationally infeasible. We explore this in <a href="module8.html">Module 8</a>.
+  </div>
+
   <nav class="nav-bottom"></nav>
 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
-<script src="js/math-render.js"></script>
-<script src="js/canvas3d.js"></script>
-<script src="js/interactive.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="../js/canvas3d.js"></script>
+<script src="../js/interactive.js"></script>
 <script>
 (function() {
   'use strict';

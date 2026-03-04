@@ -1,24 +1,29 @@
-// Service Worker — offline-first caching for Elliptic Curves course.
+// Service Worker — offline-first caching for all courses.
 // Our own files: network-first, fall back to cache.
-// CDN resources (KaTeX): cache-first (they are version-pinned, never change).
+// CDN resources (KaTeX): cache-first (version-pinned, never change).
 
-const CACHE = 'elliptic-v1';
+const CACHE = 'math-v1';
 
 const PRECACHE = [
   'index.html',
-  'module1.html',
-  'module2.html',
-  'module3.html',
-  'module4.html',
-  'module-4.1-dashboard.html',
-  'module5.html',
-  'module6.html',
   'css/style.css',
-  'js/nav.js',
+  'js/nav-core.js',
   'js/math-render.js',
   'js/canvas3d.js',
   'js/plot2d.js',
   'js/interactive.js',
+  // Elliptic course
+  'elliptic/index.html',
+  'elliptic/js/nav.js',
+  'elliptic/module1.html',
+  'elliptic/module2.html',
+  'elliptic/module3.html',
+  'elliptic/module4.html',
+  'elliptic/module-4.1-dashboard.html',
+  'elliptic/module5.html',
+  'elliptic/module6.html',
+  'elliptic/module7.html',
+  'elliptic/module8.html',
 ];
 
 self.addEventListener('install', function (e) {

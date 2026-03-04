@@ -4,38 +4,54 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project
 
-Interactive web course on Elliptic Curves and Ramanujan's π. See `README.md` for the user-facing overview.
+Monorepo for interactive mathematics courses. Each course lives in its own subdirectory. See `COURSE_STYLE.md` for the full style guide to follow when building any course.
 
-## Implementation status
+## Repo layout
 
-All 7 entries (6 modules + 1 interlude) are implemented as standalone HTML pages:
+```
+root/
+├── index.html                     — top-level course listing
+├── css/style.css                  — shared base styles (all courses inherit this)
+├── js/
+│   ├── nav-core.js                — shared nav rendering engine
+│   ├── math-render.js             — KaTeX wrapper (shared)
+│   ├── canvas3d.js                — 3D wireframe engine (shared)
+│   ├── plot2d.js                  — 2D plot engine (shared)
+│   └── interactive.js             — slider/drag utilities (shared)
+├── sw.js                          — service worker (offline caching, covers all courses)
+├── CLAUDE.md                      — this file
+├── COURSE_STYLE.md                — style guide for course creation
+└── elliptic/                      — Course 1: Elliptic Curves & Ramanujan's π
+    ├── index.html                 — course landing page
+    ├── module1.html … module6.html
+    ├── module-4.1-dashboard.html  — interlude
+    └── js/nav.js                  — MODULES array for this course
+```
 
-- `index.html` — course home / module list
-- `module1.html` — Quotient Spaces (Three.js torus gluing)
-- `module2.html` — Elliptic Curves over ℝ (Plotly.js, point addition)
-- `module3.html` — Elliptic Curves over ℂ (split-screen lattice ↔ torus)
-- `module4.html` — j-invariant & Modular Forms (upper half-plane explorer)
-- `module-4.1-dashboard.html` — Interlude: The Grand Unification (live τ explorer)
-- `module5.html` — Complex Multiplication & Ramanujan's π (series visualizer)
-- `module6.html` — Deriving the Formula (Legendre's relation, periods)
+## Courses
+
+- `elliptic/` — Elliptic Curves & Ramanujan's π (7 entries: 6 modules + 1 interlude)
 
 ## Tech stack
 
-- **Rendering:** Three.js for 3D, Plotly.js for 2D curves
-- **Math typesetting:** KaTeX (bundled under `lib/katex/`)
+- **Rendering:** custom Canvas 2D engines (`canvas3d.js`, `plot2d.js`) — no Three.js or Plotly
+- **Math typesetting:** KaTeX from jsDelivr CDN (cached offline by service worker)
 - **Structure:** Static HTML/JS/CSS, no build system
-
-## Conventions
-
-- Each module is self-contained — shared styles live in `css/style.css`
-- Math is rendered via KaTeX with `<div class="math-block">` for display math
 
 ## Navigation
 
-Navigation is centralised in `js/nav.js`. **Never hardcode nav links in module HTML.**
+Navigation is split into two layers. **Never hardcode nav links in module HTML.**
 
-- `MODULES` array in `nav.js` is the single source of truth for module order, labels, titles, and index-page descriptions.
-- To add or reorder a module: edit `MODULES` only — all counters, prev/next links, and the index page update automatically.
-- Each module HTML has empty `<nav class="nav-top"></nav>` and `<nav class="nav-bottom"></nav>` shells that `nav.js` populates at runtime.
-- `index.html` has an empty `<ul class="module-list"></ul>` that `nav.js` populates from the `desc` field.
-- Script order in every page: `katex.min.js` → `nav.js` → `math-render.js` (so nav content is in the DOM before KaTeX scans it).
+- `js/nav-core.js` — shared rendering logic, exposes `window.navCore`
+- `{course}/js/nav.js` — course-specific MODULES array, calls `navCore.init(MODULES)`
+- To add or reorder a module: edit the course `js/nav.js` only
+- Each module HTML has empty `<nav class="nav-top"></nav>` and `<nav class="nav-bottom"></nav>` shells
+- Script order in every module page: `katex.min.js` → `../js/nav-core.js` → `js/nav.js` → `../js/math-render.js` → module-specific scripts
+
+## Adding a new course
+
+1. Create `{course}/` directory with `index.html` and module HTML files
+2. Create `{course}/js/nav.js` with the MODULES array calling `navCore.init(...)`
+3. Reference shared assets with `../css/style.css`, `../js/nav-core.js`, `../js/math-render.js`, etc.
+4. Add course pages to PRECACHE list in `sw.js`
+5. Add course entry to root `index.html` and to PRECACHE in `sw.js`
