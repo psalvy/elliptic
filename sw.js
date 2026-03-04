@@ -24,6 +24,24 @@ const PRECACHE = [
   'elliptic/module6.html',
   'elliptic/module7.html',
   'elliptic/module8.html',
+  // Riemann course
+  'riemann/index.html',
+  'riemann/js/nav.js',
+  'riemann/module1.html',
+  'riemann/module2.html',
+  'riemann/module3.html',
+  'riemann/module4.html',
+  'riemann/module5.html',
+  'riemann/module6.html',
+  // Galois course
+  'galois/index.html',
+  'galois/js/nav.js',
+  'galois/module1.html',
+  'galois/module2.html',
+  'galois/module3.html',
+  'galois/module4.html',
+  'galois/module5.html',
+  'galois/module6.html',
 ];
 
 self.addEventListener('install', function (e) {
