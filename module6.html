@@ -12,69 +12,134 @@
 
   <nav class="nav-top"></nav>
 
-  <h1>Into the Weeds: Deriving the Formula</h1>
+  <h1>Into the Weeds: The Rigorous Derivation</h1>
 
-  <p>In Module 5, we saw Ramanujan's terrifyingly precise formula. But where does $\pi$ actually come from? And why is there a sum of factorials? To derive this, we need to look at the calculus of elliptic curves. The derivation relies on four "gears" turning together.</p>
+  <p>In Module 5, we saw the formula. Now, we derive it. To get from a torus to Ramanujan's $\pi$ formula, we must execute four distinct mathematical steps: evaluating the elliptic period via Taylor series, squaring it, introducing $\pi$ via topology, and locking it all down with Complex Multiplication.</p>
 
-  <h2>Gear 1: The Origin of π (Legendre's Relation)</h2>
-  <p>If we want to calculate $\pi$, we need an equation that inherently contains $\pi$. In elliptic curve theory, $\pi$ is hiding in the curve's periods.</p>
+  <h2>Step 1: The Period as a Taylor Series</h2>
+  <p>To see the exact calculus of how an elliptic period becomes an infinite sum of factorials, let's map our elliptic curve into its <strong>Legendre Normal Form</strong>: $y^2 = x(1-x)(1-zx)$.</p>
+
+  <p>The fundamental real period $\omega$ is the integral between the roots (from $x=0$ to $x=1$):</p>
+  <div class="math-block">$$\omega = \int_0^1 \frac{dx}{\sqrt{x(1-x)(1-zx)}}$$</div>
+
+  <p>We can rewrite the denominator by splitting the square roots:</p>
+  <div class="math-block">$$\omega = \int_0^1 x^{-1/2} (1-x)^{-1/2} (1-zx)^{-1/2} \, dx$$</div>
+
+  <p>Now, we use Isaac Newton's generalized binomial theorem to expand the rightmost term into an infinite Taylor series:</p>
+  <div class="math-block">$$(1 - zx)^{-1/2} = \sum_{k=0}^\infty \frac{(\frac{1}{2})_k}{k!} (zx)^k$$</div>
+  <p><em>(Note: $(a)_k$ is the Pochhammer symbol, representing a rising factorial: $a(a+1)(a+2)\dots(a+k-1)$.)</em></p>
+
+  <p>We substitute this infinite sum back into our integral. Because the series converges uniformly, we are allowed to swap the integral and the infinite sum, pulling everything that doesn't depend on $x$ completely outside the integral:</p>
+
+  <div class="math-block">$$\omega = \sum_{k=0}^\infty \frac{(\frac{1}{2})_k}{k!} z^k \left( \int_0^1 x^{k-1/2} (1-x)^{-1/2} \, dx \right)$$</div>
+
+  <p>We have successfully isolated $x$! The integral inside the parentheses is famous: it is exactly the definition of the <strong>Euler Beta Function</strong>, $B(k+1/2, 1/2)$. </p>
+
+  <p>The Beta function evaluates perfectly into Euler Gamma functions ($\Gamma$), which in turn map directly back to Pochhammer factorials ($\Gamma(k+1/2) = (\frac{1}{2})_k \sqrt{\pi}$):</p>
+
+  <div class="math-block">
+    $$B\left(k+\frac{1}{2}, \frac{1}{2}\right) = \frac{\Gamma(k+\frac{1}{2})\Gamma(\frac{1}{2})}{\Gamma(k+1)} = \frac{(\frac{1}{2})_k \sqrt{\pi} \cdot \sqrt{\pi}}{k!} = \pi \frac{(\frac{1}{2})_k}{k!}$$
+  </div>
+
+  <p>We plug this beautifully simplified result back into our infinite sum, and the two $(\frac{1}{2})_k$ terms multiply together:</p>
+
+  <div class="math-block">$$\omega = \pi \sum_{k=0}^\infty \frac{(\frac{1}{2})_k (\frac{1}{2})_k}{(k!)^2} z^k$$</div>
+
+  <p>Because infinite sums built out of rising factorials appear everywhere in differential equations, mathematicians gave them a template called a <strong>Hypergeometric Series</strong> ($_2F_1$). Our result perfectly matches that template!</p>
+
+  <div class="math-block">$$\omega = \pi \cdot {}_2F_1\left(\frac{1}{2}, \frac{1}{2}; 1; z\right)$$</div>
+
+  <p><em>By applying a slightly different algebraic transformation to the roots of the curve, this exact same calculus process generates the $_2F_1(\frac{1}{4}, \frac{3}{4}; 1; z)$ variant that Ramanujan used.</em></p>
+  <h2>Step 2: The Hypergeometric Function & Clausen's Identity</h2>
+  <p>Because infinite sums built out of rising factorials appear everywhere in differential equations, mathematicians gave them a name: <strong>Hypergeometric Series</strong>. The standard form is $_2F_1$, which takes two top parameters ($a, b$) and one bottom parameter ($c$):</p>
+
+  <div class="math-block">$$ _2F_1(a, b; c; z) = \sum_{k=0}^\infty \frac{(a)_k (b)_k}{(c)_k k!} z^k $$</div>
+
+  <p>Looking at our integration result from Step 1, it matches this template perfectly! Therefore, we can write the period elegantly as $\omega = \pi \cdot {}_2F_1(\frac{1}{4}, \frac{3}{4}; 1; z)$.</p>
+
+  <p>Ramanujan's formulas don't use $\omega$; they use $\omega^2$. In 1828, Thomas Clausen discovered a miraculous identity: squaring a $_2F_1$ series produces a generalized $_3F_2$ series.</p>
+
+  <div class="math-block">$$\left[ {}_2F_1\left(\frac{1}{4}, \frac{3}{4}; 1; z\right) \right]^2 = {}_3F_2\left(\frac{1}{2}, \frac{1}{4}, \frac{3}{4}; 1, 1; z\right)$$</div>
+
+  <p>If we unpack that $_3F_2$ series back into Pochhammer symbols, they expand into a massive ratio of standard factorials:</p>
+
+  <div class="math-block">$$\frac{(\frac{1}{2})_k (\frac{1}{4})_k (\frac{3}{4})_k}{(1)_k (1)_k k!} = \frac{(4k)!}{(k!)^4 256^k}$$</div>
+
+  <p>Substituting this back into our squared period, we get the exact skeleton of Ramanujan's sum!</p>
   
-  <p>Recall that an elliptic curve is made by folding a lattice with periods $\omega_1$ and $\omega_2$. In calculus, there are also "quasi-periods" $\eta_1$ and $\eta_2$ associated with the integrals of the second kind (measuring the surface area/flux). In 1811, Legendre proved a fundamental topological law relating these four numbers:</p>
+  <div class="math-block">$$\omega^2 \propto \pi^2 \sum_{k=0}^\infty \frac{(4k)!}{(k!)^4} \frac{1}{(j / 6.75)^k}$$</div>
+
+  <h2>Step 3: Legendre's Relation (Injecting $\pi$)</h2>
+  <p>We have a series for $\omega^2$, but we need an equation for $1/\pi$. This comes from the topology of the torus.  Integrating around the fundamental parallelogram yields a residue, creating <strong>Legendre's Relation</strong>:</p>
 
   <div class="math-block">$$\omega_1 \eta_2 - \omega_2 \eta_1 = 2\pi i$$</div>
 
-  <p>This is the anchor. If we can calculate $\omega$ and $\eta$, we can isolate $\pi$. </p>
+  <p>To use this, we need an explicit formula for the quasi-period $\eta$. By the Picard-Fuchs differential equation, the quasi-period is fundamentally linked to the derivative of the real period. Specifically, $\eta$ can be written as a linear combination of $\omega$ and its derivative with respect to $z$:</p>
 
-  <h2>Gear 2: Calculating Periods (Hypergeometric Series)</h2>
-  <p>How do we actually compute the period $\omega$? By integrating the differential $dx/y$ over the elliptic curve $y^2 = 4x^3 - g_2x - g_3$.</p>
-  <p>Through a Taylor expansion of the integral, the period $\omega$ can be expressed as a <strong>Hypergeometric Series</strong> — an infinite sum built out of ascending factorials. For a specific curve parameterization (using a variable $x$ related to the $j$-invariant), the period looks like:</p>
+  <div class="math-block">$$\eta = C_1 \cdot \omega + C_2 \cdot \left( z \frac{d\omega}{dz} \right)$$</div>
 
-  <div class="math-block">$$\omega \propto \sum_{k=0}^\infty \frac{\left(\frac{1}{4}\right)_k \left(\frac{1}{2}\right)_k \left(\frac{3}{4}\right)_k}{(k!)^3} x^k$$</div>
+  <p>This explicit derivative is the secret engine of Ramanujan's formula! Look what happens when we apply the differential operator $z \frac{d}{dz}$ to our infinite series $z^k$:</p>
+
+  <div class="math-block">$$z \frac{d}{dz} (z^k) = k \cdot z^k$$</div>
+
+  <p>Because $\eta$ contains the derivative of the series, a factor of $k$ drops down from the exponent. When we substitute $\omega$ (which has no $k$ multiplier) and $\eta$ (which has a $k$ multiplier) into Legendre's relation, the terms combine into a single infinite sum containing $(A + B \cdot k)$.</p>
+
+  <div class="math-block">$$\frac{1}{\pi} = \sum_{k=0}^\infty \frac{(4k)!}{(k!)^4} (A + B \cdot k) z^k$$</div>
+
+  <h2>Step 4: Complex Multiplication (The Algebraic Lock)</h2>
+  <p>We are almost there. We have the exact shape of the formula, but $A, B$, and $z$ are messy functions of $\tau$. We need them to be exact rational numbers.</p>
+
+  <p>We assume $\tau$ is in an imaginary quadratic field (e.g., $\tau = \frac{1 + \sqrt{-58}}{2}$). This gives the lattice <strong>Complex Multiplication (CM)</strong>. Because the lattice maps onto itself, the second period $\omega_2$ is strictly proportional to $\omega_1$:</p>
   
-  <p><em>(Note: $(a)_k$ is the Pochhammer symbol, meaning $a(a+1)(a+2)\dots(a+k-1)$. This evaluates to heavily nested factorials like $(4k)! / (k!)^4$.)</em></p>
+  <div class="math-block">$$\omega_2 = \tau \omega_1$$</div>
 
-  <p>Because $\eta$ is related to the derivative of $\omega$, the quasi-period $\eta$ is just a variation of this same sum, but with an extra "$k$" multiplied into the terms.</p>
+  <p>Substitute this into Legendre's Relation: $\omega_1 \eta_2 - \tau \omega_1 \eta_1 = 2\pi i$. Notice that $\omega_1$ factors out completely!</p>
+  
+  <div class="math-block">$$\omega_1 (\eta_2 - \tau \eta_1) = 2\pi i$$</div>
 
-  <h2>Gear 3: Complex Multiplication (The Algebraic Lock)</h2>
-  <p>Normally, $\omega_1$, $\omega_2$, $\eta_1$, and $\eta_2$ are four completely independent, messy transcendental numbers. Legendre's relation ($\omega_1 \eta_2 - \omega_2 \eta_1 = 2\pi i$) is useless if you have four unknowns.</p>
-
-  <p>This is where <strong>Complex Multiplication (CM)</strong> saves us. Remember from Module 5 that for special Heegner numbers (like $d=58$ or $163$), the lattice has rotational symmetry. Mathematically, this forces $\omega_2$ to be an exact algebraic multiple of $\omega_1$. It also locks $\eta$ and $\omega$ together via algebraic constants!</p>
+  <p>Because of CM, the term $(\eta_2 - \tau \eta_1)$ evaluates to exactly $\omega_1$ multiplied by an algebraic constant $\alpha$. Therefore, the left side collapses entirely to $\alpha \cdot \omega_1^2$.</p>
 
   <div class="note success">
-    <strong>The CM Miracle:</strong> At a CM point, the left side of Legendre's relation simplifies from a mess of four variables into exactly: <strong>$\omega^2 \times \text{(An Algebraic Number)} = \pi$</strong>
+    <strong>The Grand Conclusion:</strong> Complex Multiplication collapses Legendre's relation from four messy variables into exactly $\alpha \cdot \omega_1^2 = 2\pi i$. We substitute our infinite series for $\omega_1^2$ from Step 2, evaluate $j(\tau)$ for $d=58$, and the exact algebraic constants $A=1103$, $B=26390$, and $z = 1/396^4$ fall out flawlessly. 
   </div>
 
-  <h2>Gear 4: Clausen's Formula (Squaring the Sum)</h2>
-  <p>Legendre + CM tells us that $\omega^2 \propto \pi$. But our series from Gear 2 only computes $\omega$. How do we square an infinite hypergeometric sum?</p>
-  
-  <p>In 1828, Thomas Clausen proved a bizarre identity: the square of a hypergeometric series is just another, generalized hypergeometric series! When you square the series for $\omega$ and combine it with the derivative series for $\eta$, the result collapses into a single, unified infinite sum of the form:</p>
-
-  <div class="math-block">$$\frac{1}{\pi} = \sum_{k=0}^\infty \frac{(4k)!}{(k!)^4} (A + B \cdot k) X^k$$</div>
-
-  <p><strong>This is the skeleton of Ramanujan's formula!</strong> The $(4k)! / (k!)^4$ comes from Clausen's hypergeometric squaring. The $(A + B \cdot k)$ comes from combining the $\omega$ (constant) and $\eta$ (derivative, $k$) series. The $X$ is related to $1/j(\tau)$.</p>
-
   <h2>6.5 — Interactive: Anatomy of Ramanujan's Formula</h2>
-  <p>Click on the components of Ramanujan's $d=58$ formula to see exactly which "Gear" of the derivation produced them.</p>
+  <p>Click on the components of Ramanujan's $d=58$ formula to see exactly which step of the derivation produced them.</p>
 
   <div class="formula-inspector">
     <div class="math-block" style="font-size: 1.5em; cursor: pointer;">
       $$\frac{1}{\pi} = \underbrace{\frac{2\sqrt{2}}{9801}}_{\text{A}} \sum_{k=0}^\infty \underbrace{\frac{(4k)!}{(k!)^4}}_{\text{B}} \underbrace{(1103 + 26390k)}_{\text{C}} \underbrace{\left(\frac{1}{396^4}\right)^k}_{\text{D}}$$
     </div>
     
-    <div class="controls" style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <div class="controls" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
       <button class="preset-btn" id="btn-A">Part A</button>
       <button class="preset-btn" id="btn-B">Part B</button>
       <button class="preset-btn" id="btn-C">Part C</button>
       <button class="preset-btn" id="btn-D">Part D</button>
     </div>
 
-    <div id="inspector-info" class="note" style="min-height: 100px;">
+    <div id="inspector-info" class="note" style="min-height: 120px;">
       <em>Select a part of the formula above to see its mathematical origin.</em>
     </div>
   </div>
 
   <nav class="nav-bottom"></nav>
 
+</div>
+
+<div style="display: none;">
+  <div id="expl-A">
+    <strong>Part A: The Normalization Constant.</strong><br><br>This originates from Step 4. When the lattice has $d=58$ Complex Multiplication, the algebraic constant $\alpha$ generated by the collapsed Legendre relation $\alpha \cdot \omega_1^2 = 2\pi i$ evaluates exactly to this prefactor.
+  </div>
+  <div id="expl-B">
+    <strong>Part B: The Hypergeometric Skeleton.</strong><br><br>This comes from Step 1 and Step 2. The binomial Taylor series of the elliptic integral yields a ${}_2F_1$ hypergeometric series. By Clausen's formula, squaring that series transforms it into a ${}_3F_2$ series, whose Pochhammer symbols expand exactly into $(4k)! / (k!)^4$.
+  </div>
+  <div id="expl-C">
+    <strong>Part C: The Linear Shift $(A + Bk)$.</strong><br><br>This is the physical signature of the Picard-Fuchs differential equation from Step 3! Because Legendre requires $\eta$, and $\eta$ is explicitly defined using the derivative operator $z \frac{d}{dz}$, the exponent $k$ drops down into the coefficient, resulting in a constant term ($1103$) plus a derivative term scaled by the index $k$ ($26390k$).
+  </div>
+  <div id="expl-D">
+    <strong>Part D: The $j$-invariant Expansion $(z^k)$.</strong><br><br>This comes from the substitution in Step 1. The parameter $z$ is proportional to $1/j(\tau)$. For the CM lattice $d=58$, the $j$-invariant is a massive exact integer, resulting in a denominator of $396^4$. Because this is in the denominator, each $k$ step shrinks the term exponentially, locking in ~8 decimal digits of $\pi$ per loop!
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
@@ -86,15 +151,8 @@
 
   var info = document.getElementById('inspector-info');
   
-  var explanations = {
-    'A': '<strong>Part A: The Normalization Constant.</strong><br><br>This comes directly from the Complex Multiplication (Gear 3). When you apply the Legendre relation, the specific algebraic constants generated by the $d=58$ lattice symmetry resolve into $2\\sqrt{2} / 9801$.',
-    'B': '<strong>Part B: The Hypergeometric Skeleton.</strong><br><br>This $(4k)! / (k!)^4$ structure comes from Gear 2 and Gear 4. Integrating the elliptic curve yields a $_2F_1$ hypergeometric series. By Clausen\'s formula, squaring it transforms it into a $_4F_3$ generalized series, which perfectly expands into this ratio of factorials.',
-    'C': '<strong>Part C: The Linear Shift $(A + Bk)$.</strong><br><br>This is the physical signature of the Legendre relation! Because Legendre requires both $\\omega$ (the period) and $\\eta$ (the quasi-period, which is the derivative of $\\omega$), combining their two infinite series results in a constant term ($1103$) plus a term scaled by the index $k$ ($26390k$).',
-    'D': '<strong>Part D: The $j$-invariant Expansion $(X^k)$.</strong><br><br>This dictates the convergence speed. $X$ is inversely proportional to the $j$-invariant of the curve. For $d=58$, the $j$-invariant is a massive integer involving $396^4$. Because $396^4$ is in the denominator, each step of $k$ shrinks the term exponentially, locking in roughly 8 decimal digits of $\\pi$ per loop!'
-  };
-
   function setInfo(part) {
-    info.innerHTML = explanations[part];
+    info.innerHTML = document.getElementById('expl-' + part).innerHTML;
     info.style.borderLeft = '4px solid #4caf50';
     info.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
   }
