@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 6: Deriving Ramanujan's π</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="lib/katex/katex.min.css">
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>Into the Weeds: Deriving the Formula</h1>
+
+  <p>In Module 5, we saw Ramanujan's terrifyingly precise formula. But where does $\pi$ actually come from? And why is there a sum of factorials? To derive this, we need to look at the calculus of elliptic curves. The derivation relies on four "gears" turning together.</p>
+
+  <h2>Gear 1: The Origin of π (Legendre's Relation)</h2>
+  <p>If we want to calculate $\pi$, we need an equation that inherently contains $\pi$. In elliptic curve theory, $\pi$ is hiding in the curve's periods.</p>
+  
+  <p>Recall that an elliptic curve is made by folding a lattice with periods $\omega_1$ and $\omega_2$. In calculus, there are also "quasi-periods" $\eta_1$ and $\eta_2$ associated with the integrals of the second kind (measuring the surface area/flux). In 1811, Legendre proved a fundamental topological law relating these four numbers:</p>
+
+  <div class="math-block">$$\omega_1 \eta_2 - \omega_2 \eta_1 = 2\pi i$$</div>
+
+  <p>This is the anchor. If we can calculate $\omega$ and $\eta$, we can isolate $\pi$. </p>
+
+  <h2>Gear 2: Calculating Periods (Hypergeometric Series)</h2>
+  <p>How do we actually compute the period $\omega$? By integrating the differential $dx/y$ over the elliptic curve $y^2 = 4x^3 - g_2x - g_3$.</p>
+  <p>Through a Taylor expansion of the integral, the period $\omega$ can be expressed as a <strong>Hypergeometric Series</strong> — an infinite sum built out of ascending factorials. For a specific curve parameterization (using a variable $x$ related to the $j$-invariant), the period looks like:</p>
+
+  <div class="math-block">$$\omega \propto \sum_{k=0}^\infty \frac{\left(\frac{1}{4}\right)_k \left(\frac{1}{2}\right)_k \left(\frac{3}{4}\right)_k}{(k!)^3} x^k$$</div>
+  
+  <p><em>(Note: $(a)_k$ is the Pochhammer symbol, meaning $a(a+1)(a+2)\dots(a+k-1)$. This evaluates to heavily nested factorials like $(4k)! / (k!)^4$.)</em></p>
+
+  <p>Because $\eta$ is related to the derivative of $\omega$, the quasi-period $\eta$ is just a variation of this same sum, but with an extra "$k$" multiplied into the terms.</p>
+
+  <h2>Gear 3: Complex Multiplication (The Algebraic Lock)</h2>
+  <p>Normally, $\omega_1$, $\omega_2$, $\eta_1$, and $\eta_2$ are four completely independent, messy transcendental numbers. Legendre's relation ($\omega_1 \eta_2 - \omega_2 \eta_1 = 2\pi i$) is useless if you have four unknowns.</p>
+
+  <p>This is where <strong>Complex Multiplication (CM)</strong> saves us. Remember from Module 5 that for special Heegner numbers (like $d=58$ or $163$), the lattice has rotational symmetry. Mathematically, this forces $\omega_2$ to be an exact algebraic multiple of $\omega_1$. It also locks $\eta$ and $\omega$ together via algebraic constants!</p>
+
+  <div class="note success">
+    <strong>The CM Miracle:</strong> At a CM point, the left side of Legendre's relation simplifies from a mess of four variables into exactly: <strong>$\omega^2 \times \text{(An Algebraic Number)} = \pi$</strong>
+  </div>
+
+  <h2>Gear 4: Clausen's Formula (Squaring the Sum)</h2>
+  <p>Legendre + CM tells us that $\omega^2 \propto \pi$. But our series from Gear 2 only computes $\omega$. How do we square an infinite hypergeometric sum?</p>
+  
+  <p>In 1828, Thomas Clausen proved a bizarre identity: the square of a hypergeometric series is just another, generalized hypergeometric series! When you square the series for $\omega$ and combine it with the derivative series for $\eta$, the result collapses into a single, unified infinite sum of the form:</p>
+
+  <div class="math-block">$$\frac{1}{\pi} = \sum_{k=0}^\infty \frac{(4k)!}{(k!)^4} (A + B \cdot k) X^k$$</div>
+
+  <p><strong>This is the skeleton of Ramanujan's formula!</strong> The $(4k)! / (k!)^4$ comes from Clausen's hypergeometric squaring. The $(A + B \cdot k)$ comes from combining the $\omega$ (constant) and $\eta$ (derivative, $k$) series. The $X$ is related to $1/j(\tau)$.</p>
+
+  <h2>6.5 — Interactive: Anatomy of Ramanujan's Formula</h2>
+  <p>Click on the components of Ramanujan's $d=58$ formula to see exactly which "Gear" of the derivation produced them.</p>
+
+  <div class="formula-inspector">
+    <div class="math-block" style="font-size: 1.5em; cursor: pointer;">
+      $$\frac{1}{\pi} = \underbrace{\frac{2\sqrt{2}}{9801}}_{\text{A}} \sum_{k=0}^\infty \underbrace{\frac{(4k)!}{(k!)^4}}_{\text{B}} \underbrace{(1103 + 26390k)}_{\text{C}} \underbrace{\left(\frac{1}{396^4}\right)^k}_{\text{D}}$$
+    </div>
+    
+    <div class="controls" style="display: flex; gap: 10px; margin-bottom: 20px;">
+      <button class="preset-btn" id="btn-A">Part A</button>
+      <button class="preset-btn" id="btn-B">Part B</button>
+      <button class="preset-btn" id="btn-C">Part C</button>
+      <button class="preset-btn" id="btn-D">Part D</button>
+    </div>
+
+    <div id="inspector-info" class="note" style="min-height: 100px;">
+      <em>Select a part of the formula above to see its mathematical origin.</em>
+    </div>
+  </div>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="lib/katex/katex.min.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/math-render.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  var info = document.getElementById('inspector-info');
+  
+  var explanations = {
+    'A': '<strong>Part A: The Normalization Constant.</strong><br><br>This comes directly from the Complex Multiplication (Gear 3). When you apply the Legendre relation, the specific algebraic constants generated by the $d=58$ lattice symmetry resolve into $2\\sqrt{2} / 9801$.',
+    'B': '<strong>Part B: The Hypergeometric Skeleton.</strong><br><br>This $(4k)! / (k!)^4$ structure comes from Gear 2 and Gear 4. Integrating the elliptic curve yields a $_2F_1$ hypergeometric series. By Clausen\'s formula, squaring it transforms it into a $_4F_3$ generalized series, which perfectly expands into this ratio of factorials.',
+    'C': '<strong>Part C: The Linear Shift $(A + Bk)$.</strong><br><br>This is the physical signature of the Legendre relation! Because Legendre requires both $\\omega$ (the period) and $\\eta$ (the quasi-period, which is the derivative of $\\omega$), combining their two infinite series results in a constant term ($1103$) plus a term scaled by the index $k$ ($26390k$).',
+    'D': '<strong>Part D: The $j$-invariant Expansion $(X^k)$.</strong><br><br>This dictates the convergence speed. $X$ is inversely proportional to the $j$-invariant of the curve. For $d=58$, the $j$-invariant is a massive integer involving $396^4$. Because $396^4$ is in the denominator, each step of $k$ shrinks the term exponentially, locking in roughly 8 decimal digits of $\\pi$ per loop!'
+  };
+
+  function setInfo(part) {
+    info.innerHTML = explanations[part];
+    info.style.borderLeft = '4px solid #4caf50';
+    info.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+  }
+
+  document.getElementById('btn-A').addEventListener('click', function() { setInfo('A'); });
+  document.getElementById('btn-B').addEventListener('click', function() { setInfo('B'); });
+  document.getElementById('btn-C').addEventListener('click', function() { setInfo('C'); });
+  document.getElementById('btn-D').addEventListener('click', function() { setInfo('D'); });
+
+})();
+</script>
+</body>
+</html>
