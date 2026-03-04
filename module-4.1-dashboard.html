@@ -34,18 +34,28 @@
   
   [Image of the mapping from the upper half-plane to a torus and an elliptic curve]
 
-  <div class="canvas-wrap" style="margin-bottom: 15px;">
-    <canvas id="c-upper" style="cursor: crosshair; touch-action: none;"></canvas>
-    <span class="canvas-label">1. Pick τ in the Upper Half-Plane</span>
+  <div class="split-view" style="margin-bottom: 10px;">
+    <div class="canvas-wrap">
+      <canvas id="c-upper" style="cursor: crosshair; touch-action: none;"></canvas>
+      <span class="canvas-label">1. Pick τ in the Upper Half-Plane</span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="c-lattice"></canvas>
+      <span class="canvas-label">2. Complex Lattice ℤ + ℤτ</span>
+    </div>
+  </div>
+
+  <div class="controls" style="margin-bottom: 10px;">
+    <div class="control-group">
+      <label>Special lattices:</label>
+      <button class="preset-btn" data-x="0" data-y="1">τ = i &nbsp;(square)</button>
+      <button class="preset-btn" data-x="-0.5" data-y="0.8660">τ = ρ &nbsp;(hexagonal)</button>
+      <button class="preset-btn" data-x="0.5" data-y="6.3835">τ = Ramanujan &nbsp;(d=163)</button>
+    </div>
   </div>
 
   <div id="unification-info" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 10px; margin-bottom: 15px; font-family: monospace; font-size: 14px; text-align: center;">
     Loading mapping engine...
-  </div>
-
-  <div class="canvas-wrap" style="margin-bottom: 15px;">
-    <canvas id="c-lattice"></canvas>
-    <span class="canvas-label">2. Complex Lattice ℤ + ℤτ</span>
   </div>
 
   <div class="split-view">
@@ -77,16 +87,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // --- 1. Upper Half Plane Setup ---
   var cUp = document.getElementById('c-upper');
-  var dprUp = UI.fitCanvas(cUp, 0.6); // Wider aspect ratio for the top
+  var dprUp = UI.fitCanvas(cUp, 1.0); // Square when side-by-side
   var ctxUp = cUp.getContext('2d');
   var wUp = cUp.width, hUp = cUp.height;
 
-  var viewXMin = -2, viewXMax = 2, viewYMin = 0, viewYMax = 3;
+  var viewXMin = -2, viewXMax = 2, viewYMin = 0, viewYMax = 3; // viewYMax expands dynamically
   var tau = {x: 0, y: 1}; // Start at i
 
   // --- 2. Flat Lattice Setup ---
   var cLat = document.getElementById('c-lattice');
-  var dprLat = UI.fitCanvas(cLat, 0.6); // Same aspect as UHP
+  var dprLat = UI.fitCanvas(cLat, 1.0); // Square when side-by-side
   var ctxLat = cLat.getContext('2d');
 
   function drawLattice() {
@@ -94,9 +104,10 @@ document.addEventListener('DOMContentLoaded', function() {
     ctxLat.fillStyle = '#0d1117';
     ctxLat.fillRect(0, 0, w, h);
 
-    // Isometric square view centred on origin; x and y scale equally
-    var vr = 2.7; // half-range
-    var xMid = tau.x / 2, yMid = tau.y / 2; // centre on mid-parallelogram
+    // Isometric view centred on the middle of the fundamental parallelogram;
+    // vr expands so the full parallelogram is always visible
+    var vr = Math.max(1.8, tau.y * 0.8);
+    var xMid = tau.x / 2, yMid = tau.y / 2;
     var xMin = xMid - vr, xMax = xMid + vr;
     var yMin = yMid - vr * (h / w), yMax = yMid + vr * (h / w);
     var xR = xMax - xMin, yR = yMax - yMin;
@@ -193,6 +204,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Draw UHP
   function drawUpper() {
+    // Expand view to always show current τ with margin
+    viewYMax = Math.max(3, tau.y * 1.15 + 0.3);
+
     ctxUp.fillStyle = '#0d1117';
     ctxUp.fillRect(0, 0, wUp, hUp);
 
@@ -202,7 +216,8 @@ document.addEventListener('DOMContentLoaded', function() {
       var p = toScr(x, 0);
       ctxUp.beginPath(); ctxUp.moveTo(p.x, 0); ctxUp.lineTo(p.x, hUp); ctxUp.stroke();
     }
-    for (var y = 0; y <= viewYMax; y += 0.5) {
+    var yStep = viewYMax > 5 ? 1.0 : 0.5;
+    for (var y = 0; y <= viewYMax; y += yStep) {
       var p = toScr(0, y);
       ctxUp.beginPath(); ctxUp.moveTo(0, p.y); ctxUp.lineTo(wUp, p.y); ctxUp.stroke();
     }
@@ -242,17 +257,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Calculate J (with snapping for exact integers)
   function computeJ(tauX, tauY) {
-    if (Math.hypot(tauX, tauY - 1) < 0.05) return {r: 1728, i: 0}; 
-    if (Math.hypot(tauX + 0.5, tauY - Math.sqrt(3)/2) < 0.05) return {r: 0, i: 0}; 
-    if (Math.hypot(tauX - 0.5, tauY - Math.sqrt(3)/2) < 0.05) return {r: 0, i: 0}; 
+    if (Math.hypot(tauX, tauY - 1) < 0.05) return {r: 1728, i: 0};
+    if (Math.hypot(tauX + 0.5, tauY - Math.sqrt(3)/2) < 0.05) return {r: 0, i: 0};
+    if (Math.hypot(tauX - 0.5, tauY - Math.sqrt(3)/2) < 0.05) return {r: 0, i: 0};
+    if (Math.hypot(tauX - 0.5, tauY - Math.sqrt(163)/2) < 0.05) return {r: -262537412640768000, i: 0};
 
-    var qr = Math.exp(-2 * Math.PI * tauY) * Math.cos(2 * Math.PI * tauX);
-    var qi = Math.exp(-2 * Math.PI * tauY) * Math.sin(2 * Math.PI * tauX);
     var qmag = Math.exp(-2 * Math.PI * tauY);
-    if (qmag > 0.95) return {r: NaN, i: NaN}; 
+    if (qmag > 0.95) return {r: NaN, i: NaN};
 
+    // For very large tauY, q underflows to 0. Use 1/q = exp(+2πy)·e^{-2πix} directly.
+    if (qmag < 1e-15) {
+      var invMag = Math.exp(2 * Math.PI * tauY);
+      return {r: invMag * Math.cos(-2 * Math.PI * tauX) + 744,
+              i: invMag * Math.sin(-2 * Math.PI * tauX)};
+    }
+
+    var qr = qmag * Math.cos(2 * Math.PI * tauX);
+    var qi = qmag * Math.sin(2 * Math.PI * tauX);
     var denom = qr*qr + qi*qi;
-    if (denom < 1e-30) return {r: NaN, i: NaN};
     var invQr = qr / denom, invQi = -qi / denom;
 
     function cMul(a, b) { return { r: a.r*b.r - a.i*b.i, i: a.r*b.i + a.i*b.r }; }
@@ -348,14 +370,23 @@ document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('touchmove', function(e) { if(cUp.isDragging) { e.preventDefault(); onDragTau(e.touches[0]); }}, {passive: false});
   window.addEventListener('touchend', function() { cUp.isDragging = false; });
 
+  // Preset buttons
+  document.querySelectorAll('.preset-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      tau.x = parseFloat(this.dataset.x);
+      tau.y = parseFloat(this.dataset.y);
+      drawUpper(); updateUnification();
+    });
+  });
+
   // Init
   drawUpper();
   updateUnification();
   scene.animate(drawTorus);
 
   UI.onResize(function() {
-    dprUp = UI.fitCanvas(cUp, 0.6); wUp = cUp.width; hUp = cUp.height;
-    dprLat = UI.fitCanvas(cLat, 0.6);
+    dprUp = UI.fitCanvas(cUp, 1.0); wUp = cUp.width; hUp = cUp.height;
+    dprLat = UI.fitCanvas(cLat, 1.0);
     dprTor = UI.fitCanvas(cTor, 1.0); scene.w = cTor.width; scene.h = cTor.height; scene.scale = Math.min(scene.w, scene.h)*0.35; scene.cx = scene.w/2; scene.cy = scene.h/2;
     dprCur = UI.fitCanvas(cCur, 1.0); plot.w = cCur.width; plot.h = cCur.height;
     drawUpper(); drawLattice(); drawCurve();
