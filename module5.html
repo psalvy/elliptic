@@ -10,16 +10,31 @@
 <body>
 <div class="container">
 
-  <nav class="nav-top">
-    <a href="module-4.1-dashboard.html">← Prev</a>
-    <span>Module 5 of 5</span>
-    <a href="index.html">Home →</a>
-  </nav>
+  <nav class="nav-top"></nav>
 
   <h1>Complex Multiplication &amp; Ramanujan's π</h1>
 
   <h2>5.1 — The Grand Unified View of Point Addition</h2>
   <p>We are finally ready to unite everything. Below, the same mathematical operation happens in three spaces simultaneously.</p>
+
+  <p>Here is how everything connects. We travel from a single complex number $\tau$ all the way to an algebraic curve, with the $j$-invariant tying it all together:</p>
+
+  <div class="math-block" style="overflow-x: auto; padding: 20px 0; font-size: 1.1em;">
+    $$
+    \begin{CD}
+    \mathbb{H} @>{\tau \mapsto \mathbb{C}/(\mathbb{Z} + \tau\mathbb{Z})}>> \mathbb{C}/\Lambda \\
+    @V{j(\tau)}VV @VV{z \mapsto (\wp(z), \wp'(z))}V \\
+    \mathbb{C} @<<{\text{Classifies (Isomorphism)}}< E(\mathbb{C})
+    \end{CD}
+    $$
+  </div>
+
+  <ul style="line-height: 1.6;">
+    <li><strong>Top Wall (Geometry):</strong> We pick a point in the Upper Half-Plane ($\mathbb{H}$), use it to generate a lattice, and fold the complex plane to create a Torus ($\mathbb{C}/\Lambda$).</li>
+    <li><strong>Right Wall (The Bridge):</strong> The Weierstrass $\wp$-function maps the flat torus directly onto an algebraic Elliptic Curve $E(\mathbb{C})$.</li>
+    <li><strong>Left Wall (The Shortcut):</strong> The $j$-invariant maps that original point $\tau$ directly to a single complex number.</li>
+    <li><strong>Bottom Wall (Algebra):</strong> That single number uniquely identifies the exact Elliptic Curve we ended up with!</li>
+  </ul>
 
   <p><strong>The Real vs. Complex Slice:</strong> The two horizontal tracks on the flat lattice correspond to the two real branches of the algebraic curve — the green track ($v=0$) maps to the open branch, and the orange track ($v=0.5$) maps to the closed loop. Moving off these tracks would send points into imaginary dimensions, out of the 2D screen.</p>
 
@@ -148,14 +163,12 @@
     <strong>The full circle:</strong> We started with quotient spaces (Module 1), learned the group law on elliptic curves (Module 2), connected tori to curves via $\wp$ (Module 3), classified curves by $j$ (Module 4), watched $\tau$ shape the curve live (Interlude), and now see how special CM values of $j$ unlock formulas that compute $\pi$ at breathtaking speed. The geometry of lattices, the algebra of elliptic curves, and the analysis of modular forms all converge on a single transcendental number.
   </div>
 
-  <nav class="nav-bottom">
-    <a href="module-4.1-dashboard.html">← Interlude: Grand Unification</a>
-    <a href="index.html">Back to Home →</a>
-  </nav>
+  <nav class="nav-bottom"></nav>
 
 </div>
 
 <script src="lib/katex/katex.min.js"></script>
+<script src="js/nav.js"></script>
 <script src="js/math-render.js"></script>
 <script src="js/plot2d.js"></script>
 <script src="js/canvas3d.js"></script>

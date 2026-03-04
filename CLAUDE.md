@@ -1,25 +1,41 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with this repository.
 
-## Project Overview
+## Project
 
-This repository is an interactive web course on **Elliptic Curves and Ramanujan's Approximations of π**. The full specification is in `README.md`.
+Interactive web course on Elliptic Curves and Ramanujan's π. See `README.md` for the user-facing overview.
 
-The course has 5 modules, each a standalone HTML/JS/CSS page with interactive 3D visualizations:
+## Implementation status
 
-1. **Quotient Spaces** — lattice visualization, torus gluing animation (Three.js)
-2. **Elliptic Curves over ℝ** — Weierstrass form explorer with point addition (2D, Plotly.js or similar)
-3. **Elliptic Curves over ℂ** — split-screen linking flat lattice to 3D torus (Three.js/MathBox)
-4. **j-invariant & Modular Forms** — Poincaré disk / upper half-plane explorer (Three.js)
-5. **Complex Multiplication & Ramanujan's π** — series convergence visualizer
+All 7 entries (6 modules + 1 interlude) are implemented as standalone HTML pages:
 
-## Tech Stack
+- `index.html` — course home / module list
+- `module1.html` — Quotient Spaces (Three.js torus gluing)
+- `module2.html` — Elliptic Curves over ℝ (Plotly.js, point addition)
+- `module3.html` — Elliptic Curves over ℂ (split-screen lattice ↔ torus)
+- `module4.html` — j-invariant & Modular Forms (upper half-plane explorer)
+- `module-4.1-dashboard.html` — Interlude: The Grand Unification (live τ explorer)
+- `module5.html` — Complex Multiplication & Ramanujan's π (series visualizer)
+- `module6.html` — Deriving the Formula (Legendre's relation, periods)
 
-- **Rendering:** Three.js, MathBox, or Plotly.js for interactive 3D elements
-- **Math typesetting:** MathJax or KaTeX for LaTeX equations
-- **Structure:** Static HTML/JS/CSS — no build system required
+## Tech stack
 
-## Target Audience
+- **Rendering:** Three.js for 3D, Plotly.js for 2D curves
+- **Math typesetting:** KaTeX (bundled under `lib/katex/`)
+- **Structure:** Static HTML/JS/CSS, no build system
 
-STEM-educated learner comfortable with complex numbers, Euler's formula, and Riemann surfaces, but needing visual intuition for quotient spaces. Prefers fast progression with heavy use of interactive visualizations.
+## Conventions
+
+- Each module is self-contained — shared styles live in `css/style.css`
+- Math is rendered via KaTeX with `<div class="math-block">` for display math
+
+## Navigation
+
+Navigation is centralised in `js/nav.js`. **Never hardcode nav links in module HTML.**
+
+- `MODULES` array in `nav.js` is the single source of truth for module order, labels, titles, and index-page descriptions.
+- To add or reorder a module: edit `MODULES` only — all counters, prev/next links, and the index page update automatically.
+- Each module HTML has empty `<nav class="nav-top"></nav>` and `<nav class="nav-bottom"></nav>` shells that `nav.js` populates at runtime.
+- `index.html` has an empty `<ul class="module-list"></ul>` that `nav.js` populates from the `desc` field.
+- Script order in every page: `katex.min.js` → `nav.js` → `math-render.js` (so nav content is in the DOM before KaTeX scans it).
