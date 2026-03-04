@@ -11,9 +11,9 @@
 <div class="container">
 
   <nav class="nav-top">
-    <a href="module5.html">← Prev</a>
-    <span>Bonus Module</span>
-    <span style="visibility: hidden;">Next →</span>
+    <a href="module4.html">← Prev</a>
+    <span>Interlude: 4→5</span>
+    <a href="module5.html">Next →</a>
   </nav>
 
   <h1>Bonus: The Grand Unification</h1>
@@ -43,19 +43,25 @@
     Loading mapping engine...
   </div>
 
+  <div class="canvas-wrap" style="margin-bottom: 15px;">
+    <canvas id="c-lattice"></canvas>
+    <span class="canvas-label">2. Complex Lattice ℤ + ℤτ</span>
+  </div>
+
   <div class="split-view">
     <div class="canvas-wrap">
       <canvas id="c-torus"></canvas>
-      <span class="canvas-label">2. Complex Torus</span>
+      <span class="canvas-label">3. Complex Torus</span>
     </div>
     <div class="canvas-wrap">
       <canvas id="c-curve"></canvas>
-      <span class="canvas-label">3. 2D Algebraic Curve</span>
+      <span class="canvas-label">4. 2D Algebraic Curve</span>
     </div>
   </div>
 
   <nav class="nav-bottom">
-    <a href="module5.html">← Back to Course</a>
+    <a href="module4.html">← Module 4: j-invariant</a>
+    <a href="module5.html">Module 5: Ramanujan's π →</a>
   </nav>
 
 </div>
@@ -78,7 +84,92 @@ document.addEventListener('DOMContentLoaded', function() {
   var viewXMin = -2, viewXMax = 2, viewYMin = 0, viewYMax = 3;
   var tau = {x: 0, y: 1}; // Start at i
 
-  // --- 2. Torus Setup ---
+  // --- 2. Flat Lattice Setup ---
+  var cLat = document.getElementById('c-lattice');
+  var dprLat = UI.fitCanvas(cLat, 0.6); // Same aspect as UHP
+  var ctxLat = cLat.getContext('2d');
+
+  function drawLattice() {
+    var w = cLat.width, h = cLat.height;
+    ctxLat.fillStyle = '#0d1117';
+    ctxLat.fillRect(0, 0, w, h);
+
+    // Isometric square view centred on origin; x and y scale equally
+    var vr = 2.7; // half-range
+    var xMid = tau.x / 2, yMid = tau.y / 2; // centre on mid-parallelogram
+    var xMin = xMid - vr, xMax = xMid + vr;
+    var yMin = yMid - vr * (h / w), yMax = yMid + vr * (h / w);
+    var xR = xMax - xMin, yR = yMax - yMin;
+
+    function lx(wx) { return (wx - xMin) / xR * w; }
+    function ly(wy) { return (yMax - wy) / yR * h; }
+
+    // ω₁ = (1, 0)  ω₂ = (τ.x, τ.y)
+    // Lattice lines parallel to ω₁: horizontal at y = n*τ.y (shifted by n*τ.x)
+    // Lattice lines parallel to ω₂: slope τ.y / τ.x, through (m, 0)
+    ctxLat.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctxLat.lineWidth = 1;
+
+    var nRange = Math.ceil(vr / Math.max(tau.y, 0.1)) + 2;
+    for (var n = -nRange; n <= nRange + 3; n++) {
+      // Line through n*ω₂ in direction ω₁: y = n*τ.y, x arbitrary
+      var ny = n * tau.y;
+      if (ny < yMin - 0.5 || ny > yMax + 0.5) continue;
+      var nx0 = -vr * 3 + n * tau.x, nx1 = vr * 3 + n * tau.x;
+      ctxLat.beginPath(); ctxLat.moveTo(lx(nx0), ly(ny)); ctxLat.lineTo(lx(nx1), ly(ny)); ctxLat.stroke();
+    }
+
+    var mRange = Math.ceil(vr * 2) + 2;
+    for (var m = -mRange; m <= mRange; m++) {
+      // Line through m*ω₁ = (m, 0) in direction ω₂
+      // Parametric: (m + t*τ.x, t*τ.y), t ∈ ℝ
+      // At t = (yMin - 0) / τ.y → (m + t*τ.x, yMin)
+      var tBot = (yMin - 0.5) / tau.y, tTop = (yMax + 0.5) / tau.y;
+      var x1 = m + tBot * tau.x, x2 = m + tTop * tau.x;
+      ctxLat.beginPath(); ctxLat.moveTo(lx(x1), ly(yMin - 0.5)); ctxLat.lineTo(lx(x2), ly(yMax + 0.5)); ctxLat.stroke();
+    }
+
+    // Fundamental parallelogram: 0, ω₁, ω₁+ω₂, ω₂
+    ctxLat.fillStyle = 'rgba(233,69,96,0.12)';
+    ctxLat.strokeStyle = 'rgba(233,69,96,0.6)';
+    ctxLat.lineWidth = 2 * dprLat;
+    ctxLat.beginPath();
+    ctxLat.moveTo(lx(0),           ly(0));
+    ctxLat.lineTo(lx(1),           ly(0));
+    ctxLat.lineTo(lx(1 + tau.x),   ly(tau.y));
+    ctxLat.lineTo(lx(tau.x),       ly(tau.y));
+    ctxLat.closePath();
+    ctxLat.fill(); ctxLat.stroke();
+
+    // Basis vectors as arrows
+    function arrow(x1, y1, x2, y2, col) {
+      ctxLat.strokeStyle = col; ctxLat.lineWidth = 2 * dprLat;
+      ctxLat.beginPath(); ctxLat.moveTo(lx(x1), ly(y1)); ctxLat.lineTo(lx(x2), ly(y2)); ctxLat.stroke();
+      var angle = Math.atan2(ly(y2) - ly(y1), lx(x2) - lx(x1));
+      var as = 7 * dprLat;
+      ctxLat.beginPath();
+      ctxLat.moveTo(lx(x2), ly(y2));
+      ctxLat.lineTo(lx(x2) - as * Math.cos(angle - 0.4), ly(y2) - as * Math.sin(angle - 0.4));
+      ctxLat.lineTo(lx(x2) - as * Math.cos(angle + 0.4), ly(y2) - as * Math.sin(angle + 0.4));
+      ctxLat.closePath(); ctxLat.fillStyle = col; ctxLat.fill();
+    }
+
+    arrow(0, 0, 1, 0, '#4caf50');
+    arrow(0, 0, tau.x, tau.y, '#ff9800');
+
+    // Labels
+    ctxLat.font = (12 * dprLat) + 'px sans-serif';
+    ctxLat.fillStyle = '#4caf50';
+    ctxLat.fillText('\u03c9\u2081=1', lx(0.45), ly(0) - 8 * dprLat);
+    ctxLat.fillStyle = '#ff9800';
+    ctxLat.fillText('\u03c9\u2082=\u03c4', lx(tau.x / 2) + 8 * dprLat, ly(tau.y / 2) + 4 * dprLat);
+
+    // Origin dot
+    ctxLat.beginPath(); ctxLat.arc(lx(0), ly(0), 4 * dprLat, 0, Math.PI * 2);
+    ctxLat.fillStyle = 'rgba(255,255,255,0.5)'; ctxLat.fill();
+  }
+
+  // --- 3. Torus Setup ---
   var cTor = document.getElementById('c-torus');
   var dprTor = UI.fitCanvas(cTor, 1.0); // Square aspect
   var scene = new Canvas3D(cTor, {
@@ -86,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
     rotX: -0.4, rotY: 0.6, autoRotate: true
   });
 
-  // --- 3. 2D Curve Setup ---
+  // --- 4. 2D Curve Setup ---
   var cCur = document.getElementById('c-curve');
   var dprCur = UI.fitCanvas(cCur, 1.0); // Square aspect
   var plot = new Plot2D(cCur, {xMin: -4, xMax: 4, yMin: -4, yMax: 4});
@@ -204,6 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
       '<span style="color:#64b5f6">j(τ) = ' + jStr + '</span> &nbsp;|&nbsp; ' +
       '<span style="color:#4caf50">' + eqStr + '</span>';
 
+    drawLattice();
     drawCurve();
   }
 
@@ -263,9 +355,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   UI.onResize(function() {
     dprUp = UI.fitCanvas(cUp, 0.6); wUp = cUp.width; hUp = cUp.height;
+    dprLat = UI.fitCanvas(cLat, 0.6);
     dprTor = UI.fitCanvas(cTor, 1.0); scene.w = cTor.width; scene.h = cTor.height; scene.scale = Math.min(scene.w, scene.h)*0.35; scene.cx = scene.w/2; scene.cy = scene.h/2;
     dprCur = UI.fitCanvas(cCur, 1.0); plot.w = cCur.width; plot.h = cCur.height;
-    drawUpper(); drawCurve();
+    drawUpper(); drawLattice(); drawCurve();
   });
 
 });
