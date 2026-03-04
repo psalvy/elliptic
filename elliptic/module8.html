@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 8: Elliptic Curves in Cryptography</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>Elliptic Curves in the Real World: Cryptography</h1>
+
+  <p>The group law from Module 2 — "draw a line through two points, reflect the third intersection" — turns out to be the security primitive protecting most of the internet's encrypted traffic. This module shows how the same geometric structure becomes a one-way trapdoor when you move from the real line to a finite field.</p>
+
+  <h2 id="fp">From $\mathbb{R}$ to $\mathbb{F}_p$</h2>
+
+  <p>Take the Weierstrass equation $y^2 = x^3 + ax + b$ and replace $\mathbb{R}$ with the finite field $\mathbb{F}_p = \{0, 1, \ldots, p-1\}$ for a large prime $p$. All arithmetic is modulo $p$: $13 + 5 \equiv 3 \pmod 5$, and division becomes multiplication by the modular inverse ($a^{-1} \equiv a^{p-2} \pmod p$ by Fermat's little theorem).</p>
+
+  <p>The curve $E(\mathbb{F}_p)$ is now a <em>finite</em> set of points — the pairs $(x, y)$ with $x, y \in \mathbb{F}_p$ satisfying the equation, plus the point at infinity $\mathcal{O}$. You cannot draw it continuously; it appears as a scatter of discrete dots on a $p \times p$ grid.</p>
+
+  <p>The point addition formula is identical to the real case (same algebra, same slope calculation) — just with all arithmetic reduced mod $p$:</p>
+
+  <div class="math-block">$$\lambda = \begin{cases} \dfrac{y_Q - y_P}{x_Q - x_P} \pmod{p} & P \neq Q \\[6pt] \dfrac{3x_P^2 + a}{2y_P} \pmod{p} & P = Q \end{cases}$$</div>
+  <div class="math-block">$$x_R = \lambda^2 - x_P - x_Q \pmod{p}, \qquad y_R = \lambda(x_P - x_R) - y_P \pmod{p}$$</div>
+
+  <p>The group axioms still hold: addition is associative, $\mathcal{O}$ is the identity, and every point has an inverse $(x, y)^{-1} = (x, p-y)$.</p>
+
+  <h2 id="order">Group Order and Hasse's Theorem</h2>
+
+  <p>How many points does $E(\mathbb{F}_p)$ have? Hasse's theorem (1933) gives the tight bound:</p>
+
+  <div class="math-block">$$\left|\,\#E(\mathbb{F}_p) - (p + 1)\,\right| \leq 2\sqrt{p}$$</div>
+
+  <p>So the group has roughly $p$ elements — close to $p$, but not exactly. The deviation $t = p + 1 - \#E(\mathbb{F}_p)$ is called the <em>trace of Frobenius</em> and encodes deep arithmetic information about the curve.</p>
+
+  <h2 id="ecdlp">Scalar Multiplication and the Hard Problem</h2>
+
+  <p>Fix a public base point $G \in E(\mathbb{F}_p)$, called the <strong>generator</strong>. Define scalar multiplication:</p>
+
+  <div class="math-block">$$nG = \underbrace{G + G + \cdots + G}_{n \text{ times}}$$</div>
+
+  <p>This is computed efficiently in $O(\log n)$ operations using <em>double-and-add</em> — the same idea as fast exponentiation. With $p \approx 2^{256}$, computing $nG$ from $n$ takes microseconds even for $n$ with 256 bits.</p>
+
+  <p>The <strong>Elliptic Curve Discrete Logarithm Problem (ECDLP)</strong> is the reverse: given $G$ and $Q = nG$, find $n$. No polynomial-time algorithm is known. The best classical attack (Pollard's rho) runs in $O(\sqrt{p})$ time — for $p \approx 2^{256}$ that is $2^{128}$ operations, computationally infeasible.</p>
+
+  <p><em>Why is this hard?</em> Unlike ordinary discrete logarithms (where the structure of $\mathbb{Z}/p\mathbb{Z}^*$ allows sub-exponential attacks via index calculus), the group $E(\mathbb{F}_p)$ has no obvious sub-group structure to exploit. The points jump around the grid apparently at random as $n$ increases.</p>
+
+  <h2 id="scatter">Interactive: The Scalar Multiplication Scatter</h2>
+
+  <p>Below: curve $y^2 \equiv x^3 + 7 \pmod{p}$ (the Bitcoin equation) with a small prime. Grey dots are all points on the curve. The orange dot is $nG$ for the current $n$; the blue trail shows the path from $G$ to $nG$. Notice how the sequence hops around with no visible pattern — given only the orange dot and $G$, you cannot tell what $n$ is without stepping through all possibilities.</p>
+
+  <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin:20px 0;">
+    <canvas id="c-ecc" style="background:#0d1117;border:1px solid rgba(255,255,255,0.1);border-radius:4px;max-width:100%;"></canvas>
+    <div style="min-width:180px;">
+      <div style="margin-bottom:12px;">
+        <label style="display:block;margin-bottom:4px;color:#aaa;">$n$ =</label>
+        <input type="range" id="n-slider" min="1" max="30" step="1" value="1" style="width:100%;">
+        <span id="n-val" style="font-size:1.4em;font-weight:bold;color:#ff9800;">1</span>
+      </div>
+      <div id="ng-label" style="font-family:monospace;font-size:0.85em;color:#ccc;word-break:break-all;"></div>
+      <div id="order-label" style="margin-top:12px;font-size:0.8em;color:#aaa;"></div>
+      <div style="margin-top:16px;font-size:0.8em;color:#aaa;line-height:1.5;">
+        <span style="color:#4caf50;">●</span> Generator $G$<br>
+        <span style="color:#ff9800;">●</span> Current $nG$<br>
+        <span style="color:#64b5f6;opacity:0.5;">●</span> Previous multiples<br>
+        <span style="color:rgba(255,255,255,0.3);">●</span> All curve points
+      </div>
+    </div>
+  </div>
+
+  <h2 id="ecdh">ECDH Key Exchange</h2>
+
+  <p>The ECDLP hardness enables a secure key exchange over a public channel:</p>
+
+  <ol style="line-height:2;">
+    <li><strong>Public parameters:</strong> everyone knows the curve $E(\mathbb{F}_p)$ and generator $G$.</li>
+    <li><strong>Alice</strong> picks a secret integer $a$, computes $A = aG$, and publishes $A$.</li>
+    <li><strong>Bob</strong> picks a secret integer $b$, computes $B = bG$, and publishes $B$.</li>
+    <li><strong>Alice</strong> computes $a \cdot B = a(bG) = abG$.</li>
+    <li><strong>Bob</strong> computes $b \cdot A = b(aG) = abG$.</li>
+    <li>Both arrive at the same shared secret $abG$ — which Eve cannot compute from $A = aG$ and $B = bG$ alone without solving the ECDLP.</li>
+  </ol>
+
+  <p>This is <strong>ECDH</strong> (Elliptic Curve Diffie-Hellman). It is used in TLS 1.3, SSH, Signal, and most modern encrypted connections.</p>
+
+  <h2 id="real-curves">Real Curves</h2>
+
+  <p>Two curves dominate practice:</p>
+
+  <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+    <thead>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.2);">
+        <th style="text-align:left;padding:8px;">Curve</th>
+        <th style="text-align:left;padding:8px;">Equation</th>
+        <th style="text-align:left;padding:8px;">Prime $p$</th>
+        <th style="text-align:left;padding:8px;">Used in</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;font-weight:bold;">secp256k1</td>
+        <td style="padding:8px;">$y^2 = x^3 + 7$</td>
+        <td style="padding:8px;">$2^{256} - 2^{32} - 977$</td>
+        <td style="padding:8px;">Bitcoin, Ethereum</td>
+      </tr>
+      <tr>
+        <td style="padding:8px;font-weight:bold;">NIST P-256</td>
+        <td style="padding:8px;">$y^2 = x^3 - 3x + b$</td>
+        <td style="padding:8px;">$2^{256} - 2^{224} + 2^{192} + 2^{96} - 1$</td>
+        <td style="padding:8px;">TLS, HTTPS, passkeys</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>For both curves, the group order $\#E(\mathbb{F}_p)$ is a 256-bit prime (or very close to one), ensuring the strongest possible resistance to ECDLP attacks.</p>
+
+  <h2 id="why-ecc">Why ECC Beats RSA</h2>
+
+  <p>RSA security rests on the hardness of <em>integer factorization</em>. The best known classical algorithm (General Number Field Sieve) runs in sub-exponential time $O\!\left(\exp\left(c \cdot n^{1/3} (\log n)^{2/3}\right)\right)$ in the key length $n$. ECDLP has no sub-exponential attack — the best is $O(\sqrt{p})$, which is fully exponential in the key length.</p>
+
+  <p>The practical consequence:</p>
+
+  <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+    <thead>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.2);">
+        <th style="text-align:left;padding:8px;">Security level</th>
+        <th style="text-align:left;padding:8px;">RSA key size</th>
+        <th style="text-align:left;padding:8px;">ECC key size</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">80-bit</td><td style="padding:8px;">1024 bits</td><td style="padding:8px;">160 bits</td>
+      </tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">128-bit</td><td style="padding:8px;">3072 bits</td><td style="padding:8px;">256 bits</td>
+      </tr>
+      <tr>
+        <td style="padding:8px;">256-bit</td><td style="padding:8px;">15360 bits</td><td style="padding:8px;">512 bits</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Smaller keys mean faster handshakes, smaller certificates, and less computation — critical for mobile devices and embedded systems.</p>
+
+  <div class="note success">
+    <strong>The thread from Module 1 to Module 8:</strong> We started with a flat torus $\mathbb{C}/\Lambda$, learned that it is secretly an algebraic curve, studied its symmetries via $j$ and $\lambda$, and used those symmetries to derive Ramanujan's $\pi$ formula. The same group law — addition of points on a curve — is also the mathematical engine securing your browser, your phone's messages, and every Bitcoin transaction. It is not a coincidence: both applications exploit the rigidity and richness of the same algebraic structure.
+  </div>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ── Curve parameters: y² = x³ + 7 (mod p) — the Bitcoin equation ── */
+  var p = 23, a = 0, b = 7;
+
+  /* ── Modular arithmetic helpers ── */
+  function mod(x) { return ((x % p) + p) % p; }
+
+  function modpow(base, exp) {
+    var result = 1;
+    base = mod(base);
+    while (exp > 0) {
+      if (exp & 1) result = mod(result * base);
+      base = mod(base * base);
+      exp = exp >>> 1;
+    }
+    return result;
+  }
+
+  function modinv(x) { return modpow(mod(x), p - 2); }
+
+  /* ── Enumerate all affine points on E(𝔽_p) ── */
+  function getPoints() {
+    var pts = [];
+    for (var x = 0; x < p; x++) {
+      var rhs = mod(modpow(x, 3) + a * x + b);
+      for (var y = 0; y < p; y++) {
+        if (mod(y * y) === rhs) pts.push([x, y]);
+      }
+    }
+    return pts;
+  }
+
+  /* ── Point addition over 𝔽_p ── */
+  var INF = null;
+
+  function addPts(P, Q) {
+    if (P === INF) return Q;
+    if (Q === INF) return P;
+    var x1 = P[0], y1 = P[1], x2 = Q[0], y2 = Q[1];
+    if (x1 === x2 && mod(y1 + y2) === 0) return INF;  /* P + (-P) = O */
+    var lam;
+    if (x1 === x2 && y1 === y2) {
+      lam = mod((3 * x1 * x1 + a) * modinv(2 * y1));
+    } else {
+      lam = mod((y2 - y1) * modinv(x2 - x1));
+    }
+    var x3 = mod(lam * lam - x1 - x2);
+    var y3 = mod(lam * (x1 - x3) - y1);
+    return [x3, y3];
+  }
+
+  /* ── Pre-compute sequence G, 2G, 3G, ... until we cycle back ── */
+  var allPts  = getPoints();
+  var G       = allPts[0];          /* pick first affine point as generator */
+  var multiples = [INF, G];         /* multiples[n] = nG */
+  var cur = G;
+  for (var i = 2; i <= allPts.length + 2; i++) {
+    cur = addPts(cur, G);
+    multiples.push(cur);
+    if (cur === INF) break;
+  }
+  var groupOrder = multiples.length - 1; /* last index where we hit INF */
+
+  /* ── Canvas setup ── */
+  var canvas  = document.getElementById('c-ecc');
+  var ctx     = canvas.getContext('2d');
+  var SIZE    = 320;
+  canvas.width  = SIZE;
+  canvas.height = SIZE;
+
+  var MARGIN = 24;
+  var CELL   = (SIZE - 2 * MARGIN) / p;
+
+  function ptToXY(px, py) {
+    return [
+      MARGIN + (px + 0.5) * CELL,
+      SIZE - MARGIN - (py + 0.5) * CELL
+    ];
+  }
+
+  /* ── Current n ── */
+  var n = 1;
+
+  document.getElementById('order-label').textContent =
+    'p = ' + p + ',  |E(\u{1D53D}p)| = ' + (allPts.length + 1) +
+    ' (+ \u{1D4AA}),  ord(G) = ' + groupOrder;
+
+  function draw() {
+    ctx.fillStyle = '#0d1117';
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    /* Grid */
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 0.5;
+    for (var i = 0; i <= p; i++) {
+      var gx = MARGIN + i * CELL;
+      var gy = SIZE - MARGIN - i * CELL;
+      ctx.beginPath(); ctx.moveTo(gx, MARGIN); ctx.lineTo(gx, SIZE - MARGIN); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(MARGIN, gy); ctx.lineTo(SIZE - MARGIN, gy); ctx.stroke();
+    }
+
+    /* All curve points (grey) */
+    allPts.forEach(function (pt) {
+      var xy = ptToXY(pt[0], pt[1]);
+      ctx.beginPath();
+      ctx.arc(xy[0], xy[1], 3, 0, 2 * Math.PI);
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.fill();
+    });
+
+    /* Trail from 1G to nG */
+    if (n > 1) {
+      ctx.strokeStyle = 'rgba(100,181,246,0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (var i = 1; i <= n; i++) {
+        if (multiples[i] === INF) break;
+        var xy = ptToXY(multiples[i][0], multiples[i][1]);
+        if (i === 1) ctx.moveTo(xy[0], xy[1]); else ctx.lineTo(xy[0], xy[1]);
+      }
+      ctx.stroke();
+    }
+
+    /* Previous multiples 1G...(n-1)G (blue) */
+    for (var i = 1; i < n; i++) {
+      if (multiples[i] === INF) break;
+      var xy = ptToXY(multiples[i][0], multiples[i][1]);
+      ctx.beginPath();
+      ctx.arc(xy[0], xy[1], 4, 0, 2 * Math.PI);
+      ctx.fillStyle = 'rgba(100,181,246,0.45)';
+      ctx.fill();
+    }
+
+    /* Generator G (green) */
+    var xyG = ptToXY(G[0], G[1]);
+    ctx.beginPath(); ctx.arc(xyG[0], xyG[1], 6, 0, 2 * Math.PI);
+    ctx.fillStyle = '#4caf50'; ctx.fill();
+
+    /* Current nG (orange) */
+    var nG = multiples[n];
+    if (nG !== INF && nG !== undefined) {
+      var xyN = ptToXY(nG[0], nG[1]);
+      ctx.beginPath(); ctx.arc(xyN[0], xyN[1], 6, 0, 2 * Math.PI);
+      ctx.fillStyle = '#ff9800'; ctx.fill();
+      document.getElementById('ng-label').textContent =
+        n + 'G\u2009=\u2009(' + nG[0] + ',\u2009' + nG[1] + ')';
+    } else {
+      document.getElementById('ng-label').textContent = n + 'G\u2009=\u2009\u{1D4AA} (identity)';
+    }
+  }
+
+  /* ── Slider ── */
+  var slider = document.getElementById('n-slider');
+  slider.max = Math.min(groupOrder, 40);
+  slider.addEventListener('input', function () {
+    n = parseInt(this.value, 10);
+    document.getElementById('n-val').textContent = n;
+    draw();
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>

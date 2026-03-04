@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 7: Why 163?</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>Why 163? Class Numbers and CM Fields</h1>
+
+  <p>Module 6 used the CM point $\tau = \frac{1+\sqrt{-58}}{2}$ to pin $\lambda$ to an algebraic number, and the Chudnovsky formula — used by every modern $\pi$-computing record — uses the discriminant $-163$. Neither number is arbitrary. Both sit at "class-number-1" points of a specific algebraic structure. This module explains what that means and why the list ends at 163.</p>
+
+  <h2 id="cm-always">The CM Theorem: $j$ is Always Algebraic at CM Points</h2>
+
+  <p>The first thing to know: <em>all</em> CM points give algebraic $j$. If $\tau$ satisfies a quadratic equation over $\mathbb{Z}$ — that is, $a\tau^2 + b\tau + c = 0$ for some integers $a,b,c$ — then $j(\tau)$ is automatically an algebraic integer.</p>
+
+  <p>The geometric reason: a CM lattice $\Lambda$ carries <strong>extra endomorphisms</strong>. For an ordinary torus, the only maps sending $\Lambda$ to itself are multiplication by integers ($\mathrm{End}(E) = \mathbb{Z}$). For a CM torus, multiplication by certain algebraic numbers also preserves $\Lambda$, so $\mathrm{End}(E)$ is an order in an imaginary quadratic field $\mathbb{Q}(\sqrt{-d})$. This extra symmetry rigidly pins the torus to a specific, algebraically constrained point in the moduli space.</p>
+
+  <p>This result — that $j$-values of CM points generate the maximal abelian extensions of imaginary quadratic fields — is Kronecker's <em>Jugendtraum</em> ("dream of youth"), formalised as Hilbert's 12th Problem and solved by the theory of complex multiplication developed by Kronecker, Weber, Hilbert, Takagi, and Shimura.</p>
+
+  <h2 id="class-number">Class Number = Degree of $j$ over $\mathbb{Q}$</h2>
+
+  <p>The interesting question is not <em>whether</em> $j(\tau)$ is algebraic, but <em>how complicated</em> an algebraic number it is. The answer is the <strong>class number</strong> $h(-D)$ of the imaginary quadratic field.</p>
+
+  <p>For $\mathbb{Q}(\sqrt{-d})$ with ring of integers $\mathcal{O}_K$ and discriminant $D$, the class number counts the number of inequivalent ideal classes — it measures how far $\mathcal{O}_K$ is from having unique factorization. $h = 1$ means every ideal is principal (unique factorization holds); $h > 1$ means some ideals need more than one generator.</p>
+
+  <p>For CM theory this has a direct consequence. The $h$ inequivalent ideal classes correspond to $h$ non-isomorphic CM elliptic curves with that discriminant. Galois conjugation permutes them. So:</p>
+
+  <div class="math-block">$$\left[\mathbb{Q}\!\left(j(\tau)\right) : \mathbb{Q}\right] = h(-D)$$</div>
+
+  <p>When $h = 1$ there is only one CM curve in its isomorphism class. Galois has nothing to permute, so $j(\tau)$ has no conjugates — it lies in $\mathbb{Q}$. Since it is also an algebraic integer, it lies in $\mathbb{Z}$.</p>
+
+  <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+    <thead>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.2);">
+        <th style="text-align:left;padding:8px;">$h(-D)$</th>
+        <th style="text-align:left;padding:8px;">What $j(\tau)$ is</th>
+        <th style="text-align:left;padding:8px;">Example</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">$1$</td>
+        <td style="padding:8px;">A rational integer</td>
+        <td style="padding:8px;">$j(i) = 1728$</td>
+      </tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">$2$</td>
+        <td style="padding:8px;">A quadratic irrational (root of a degree-2 polynomial over $\mathbb{Q}$)</td>
+        <td style="padding:8px;">$j(i\sqrt{5})$</td>
+      </tr>
+      <tr>
+        <td style="padding:8px;">$h$</td>
+        <td style="padding:8px;">Root of a degree-$h$ polynomial with integer coefficients</td>
+        <td style="padding:8px;"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="heegner">The 9 Heegner Numbers</h2>
+
+  <p>Gauss observed in the <em>Disquisitiones Arithmeticae</em> (1801) that $h(-D) = 1$ is extremely rare, and conjectured there are only finitely many such fields. He found 9 candidates. The complete list of positive integers $d$ for which $\mathbb{Q}(\sqrt{-d})$ has class number 1 is:</p>
+
+  <div class="math-block">$$d = 1,\ 2,\ 3,\ 7,\ 11,\ 19,\ 43,\ 67,\ 163$$</div>
+
+  <p>These are the <strong>Heegner numbers</strong>. Proving the list is complete took 150 years. Kurt Heegner gave a proof in 1952 that was initially dismissed as flawed; Alan Baker and Harold Stark independently gave accepted proofs in 1966–67 using Baker's theorem on linear forms in logarithms.</p>
+
+  <p>For each Heegner number the relevant CM point is $\tau_d = \frac{-1 + i\sqrt{d}}{2}$, and $j(\tau_d) \in \mathbb{Z}$. The values are spectacularly simple — all perfect cubes:</p>
+
+  <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+    <thead>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.2);">
+        <th style="text-align:left;padding:8px;">$d$</th>
+        <th style="text-align:left;padding:8px;">$j(\tau_d)$</th>
+        <th style="text-align:left;padding:8px;">$e^{\pi\sqrt{d}} \approx 744 + |j(\tau_d)|$</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">1</td><td style="padding:8px;">$12^3 = 1728$</td><td style="padding:8px;">—</td>
+      </tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">2</td><td style="padding:8px;">$20^3 = 8000$</td><td style="padding:8px;">—</td>
+      </tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">3</td><td style="padding:8px;">$0$</td><td style="padding:8px;">—</td>
+      </tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">7</td><td style="padding:8px;">$-15^3 = -3375$</td><td style="padding:8px;">—</td>
+      </tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">11</td><td style="padding:8px;">$-32^3 = -32768$</td><td style="padding:8px;">—</td>
+      </tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">19</td><td style="padding:8px;">$-96^3 = -884736$</td><td style="padding:8px;">$885479.78\ldots$ (not very close)</td>
+      </tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">43</td><td style="padding:8px;">$-960^3 = -884736000$</td><td style="padding:8px;">$884736743.9997\ldots$ (4 nines)</td>
+      </tr>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+        <td style="padding:8px;">67</td><td style="padding:8px;">$-5280^3 = -147197952000$</td><td style="padding:8px;">$147197952743.999999\ldots$ (6 nines)</td>
+      </tr>
+      <tr style="font-weight:bold;color:#64b5f6;">
+        <td style="padding:8px;">163</td><td style="padding:8px;">$-640320^3 = -262537412640768000$</td><td style="padding:8px;">$262537412640768743.9999999999992\ldots$ (12 nines)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="math-details" style="margin:20px 0;padding:15px;background:rgba(255,255,255,0.05);border-left:4px solid #64b5f6;border-radius:4px;">
+    <summary style="cursor:pointer;font-weight:bold;color:#64b5f6;">Why the near-integers? — a quick derivation</summary>
+    <div style="margin-top:15px;">
+      <p>The $j$ q-expansion is $j(\tau) = q^{-1} + 744 + 196884q + \cdots$ where $q = e^{2\pi i\tau}$. For $\tau_d = \frac{-1+i\sqrt{d}}{2}$:</p>
+      <div class="math-block">$$q = e^{2\pi i \tau_d} = e^{\pi i(-1+i\sqrt{d})} = -e^{-\pi\sqrt{d}}$$</div>
+      <p>So $q^{-1} = -e^{\pi\sqrt{d}}$, and the expansion becomes:</p>
+      <div class="math-block">$$j(\tau_d) = -e^{\pi\sqrt{d}} + 744 - 196884\,e^{-\pi\sqrt{d}} + \cdots$$</div>
+      <p>Since $j(\tau_d) \in \mathbb{Z}$ (call it $J$), rearranging gives:</p>
+      <div class="math-block">$$e^{\pi\sqrt{d}} = 744 - J + 196884\,e^{-\pi\sqrt{d}} - \cdots \approx 744 + |J|$$</div>
+      <p>The correction term is $196884\,e^{-\pi\sqrt{d}}$. For $d = 163$: $e^{-\pi\sqrt{163}} \approx e^{-40.1} \approx 4.4 \times 10^{-18}$, so the correction is $\approx 8.7 \times 10^{-13}$ — giving 12 decimal nines. The larger $d$, the tinier the correction.</p>
+    </div>
+  </details>
+
+  <h2 id="why163">Why 163 Dominates</h2>
+
+  <p>The Chudnovsky algorithm is:</p>
+
+  <div class="math-block">$$\frac{1}{\pi} = \frac{12}{640320^{3/2}} \sum_{k=0}^{\infty} \frac{(6k)!}{(3k)!\,(k!)^3} \frac{13591409 + 545140134k}{(-640320^3)^k}$$</div>
+
+  <p>The ratio between successive terms is roughly $\frac{1728}{640320^3} \approx 6.6 \times 10^{-15}$, so each term adds approximately $\log_{10}(1.5 \times 10^{14}) \approx \mathbf{14.2}$ correct decimal digits of $\pi$. No other known series based on a Heegner number does better — because 163 is the <em>last</em> Heegner number, and a larger $d$ would give a tinier $|q|$ and more digits per term. The Heegner number list is provably finite and complete. 163 is its ceiling.</p>
+
+  <p>For comparison: the series based on $d = 67$ gives about 12 digits per term, and $d = 43$ gives about 9. The exponential growth of $|j|$ as a function of $d$ is why the progression 43 → 67 → 163 is so dramatic.</p>
+
+  <h2 id="level4">Why 58? — Level-4 Ring Class Numbers</h2>
+
+  <p>For Ramanujan's $(4k)!/(k!)^4$ series (Module 6), the relevant modular function is not $j$ but the <strong>singular modulus</strong> $\alpha_r$, which lives on the modular curve $X_0(4)$. This is a level-4 modular function, symmetric under the congruence subgroup $\Gamma_0(4) \subset \mathrm{SL}_2(\mathbb{Z})$ — a strict subgroup of the full modular group.</p>
+
+  <p>For a level-4 function evaluated at a CM point $\tau = i\sqrt{r}$, the degree of the value over $\mathbb{Q}$ is the <strong>ring class number</strong> of a certain order inside $\mathbb{Q}(\sqrt{-r})$ — specifically the order of conductor 2. This is generally a different (and larger) number than $h(\mathbb{Q}(\sqrt{-r}))$.</p>
+
+  <p>For $r = 58$: the ordinary class number is $h(\mathbb{Q}(\sqrt{-58})) = 2$, so $j(i\sqrt{58})$ is only a quadratic irrational. But the ring class number of the level-4 order at $r = 58$ equals 1, which forces $\alpha_{58} \in \mathbb{Q}$. The Borwein brothers proved this in <em>Pi and the AGM</em> (1987) and used it to verify all of Ramanujan's series.</p>
+
+  <p>The set of $r$ values for which Ramanujan's $(4k)!$ series has fully rational (integer) coefficients is a strictly larger collection than the 9 Heegner numbers, but still finite. Among these, $r = 58$ gives the fastest-converging series in that family.</p>
+
+  <div class="note success">
+    <strong>The common structure:</strong> Both 163 and 58 are the largest values, at their respective levels of modular symmetry, for which a ring class number drops to 1. That single arithmetic condition — unique factorization in the relevant ideal class group — is what forces every algebraic irrational in the derivation to collapse into a clean rational integer.
+  </div>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+</body>
+</html>
