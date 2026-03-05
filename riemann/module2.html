@@ -14,25 +14,207 @@
 
   <h1>Riemann's Extension to ℂ</h1>
 
-  <!-- PLAN ---------------------------------------------------------------
-  1. Riemann's 1859 paper — context and importance
-  2. Analytic continuation via the integral representation:
-       ζ(s) = (1/Γ(s)) ∫₀^∞ t^{s-1}/(e^t - 1) dt
-  3. The pole at s=1: residue 1 (harmonic series diverges)
-  4. Trivial zeros at s = -2,-4,-6,... from the Γ-factor; not number-theoretic
-  5. The functional equation: ξ(s) = ξ(1-s)
-     ξ(s) = ½s(s-1)π^{-s/2}Γ(s/2)ζ(s)
-     Symmetry about Re(s) = ½ is the key structural fact
-  INTERACTIVE: colour-map of |ζ(s)| on ℂ — pole, trivial zeros, critical strip
-  See PLAN.md for full details.
-  ---------------------------------------------------------------------- -->
+  <h2>2.1 — Nine Pages That Reshaped Mathematics</h2>
+
+  <p>In 1859, Bernhard Riemann submitted a short paper to the Berlin Academy of Sciences. Nine pages. Titled <em>"Über die Anzahl der Primzahlen unter einer gegebenen Grösse"</em> (On the Number of Primes Less Than a Given Magnitude). It would become the most influential paper in the history of number theory.</p>
+
+  <p>Riemann's central move: take Euler's $\zeta(s) = \sum n^{-s}$, which only makes sense for real $s > 1$, and extend it to <em>complex</em> $s$. The zeros of this extended function, it turns out, encode the distribution of every prime.</p>
+
+  <h2>2.2 — Analytic Continuation</h2>
+
+  <p>The Dirichlet series $\sum n^{-s}$ converges for $\text{Re}(s) > 1$ but diverges for $\text{Re}(s) \leq 1$. Does $\zeta$ simply cease to exist to the left of this boundary? No — the <em>formula</em> breaks down, but the <em>function</em> can be extended.</p>
+
+  <p>The key principle of complex analysis: if a function is analytic (complex-differentiable) on some region, there is <em>at most one</em> way to extend it analytically to any larger connected domain. So if we find <em>any</em> formula that agrees with $\sum n^{-s}$ for $\text{Re}(s) > 1$ and is analytic on a wider domain, that formula <em>is</em> the unique extension of $\zeta$.</p>
+
+  <p><strong>Extension to $\text{Re}(s) > 0$ via the alternating series.</strong> Define the Dirichlet eta function:</p>
+  <div class="math-block">$$\eta(s) = \sum_{n=1}^\infty \frac{(-1)^{n+1}}{n^s} = 1 - \frac{1}{2^s} + \frac{1}{3^s} - \frac{1}{4^s} + \cdots$$</div>
+  <p>This alternating series converges for all $\text{Re}(s) > 0$ (by a generalised alternating-series test). It relates to $\zeta$ by subtracting the even-indexed terms twice:</p>
+  <div class="math-block">$$\eta(s) = \zeta(s) - \frac{2}{2^s}\,\zeta(s) = \bigl(1 - 2^{1-s}\bigr)\zeta(s)$$</div>
+  <p>Therefore, for $\text{Re}(s) > 0$, $s \neq 1$:</p>
+  <div class="math-block">$$\zeta(s) = \frac{1}{1 - 2^{1-s}} \sum_{n=1}^\infty \frac{(-1)^{n+1}}{n^s}$$</div>
+  <p>This formula is analytic for all $\text{Re}(s) > 0$ except at $s = 1$, where the denominator $1 - 2^{1-s}$ vanishes but $\eta(1) = \log 2 \neq 0$, giving a simple pole with residue $1$.</p>
+
+  <p><strong>Extension to all of $\mathbb{C}$ via the integral representation.</strong> For $\text{Re}(s) > 1$, Riemann showed:</p>
+  <div class="math-block">$$\zeta(s) = \frac{1}{\Gamma(s)} \int_0^\infty \frac{t^{s-1}}{e^t - 1}\,dt$$</div>
+  <p>By deforming the integration contour to a Hankel contour around the negative real axis, this integral converges for <em>all</em> $s \in \mathbb{C} \setminus \{1\}$, giving the unique meromorphic continuation of $\zeta$ to the entire complex plane.</p>
+
+  <h2>2.3 — The Pole at $s = 1$</h2>
+
+  <p>Near $s = 1$:</p>
+  <div class="math-block">$$\zeta(s) = \frac{1}{s-1} + \gamma + O(s-1)$$</div>
+  <p>where $\gamma \approx 0.5772$ is the Euler–Mascheroni constant. The singularity is a <strong>simple pole</strong> with residue $1$. This single pole is the only singularity of $\zeta$ in all of $\mathbb{C}$ — everywhere else $\zeta$ is analytic.</p>
+
+  <h2>2.4 — The Functional Equation</h2>
+
+  <p>Riemann's deepest result: $\zeta(s)$ satisfies a perfect symmetry about the line $\text{Re}(s) = \tfrac{1}{2}$. Define the <strong>completed zeta function</strong>:</p>
+  <div class="math-block">$$\xi(s) = \tfrac{1}{2}s(s-1)\,\pi^{-s/2}\,\Gamma\!\bigl(\tfrac{s}{2}\bigr)\,\zeta(s)$$</div>
+  <p>The prefactors remove the pole and the trivial zeros (see below), leaving $\xi$ entire. Then:</p>
+  <div class="math-block">$$\boxed{\xi(s) = \xi(1-s)}$$</div>
+  <p>The substitution $s \mapsto 1-s$ reflects the complex plane across $\text{Re}(s) = \tfrac{1}{2}$. The zeros of $\xi$ — and therefore the non-trivial zeros of $\zeta$ — are symmetric about this critical line.</p>
+
+  <details class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: Proof Sketch of the Functional Equation</summary>
+    <div style="margin-top: 15px;">
+      <p>Starting from the integral representation and applying the Poisson summation formula to the theta function $\theta(\tau) = \sum_{n=-\infty}^\infty e^{-\pi n^2 \tau}$, one proves that $\theta(1/\tau) = \tau^{1/2}\theta(\tau)$. Writing $\zeta(s)$ as a Mellin transform of $\theta$, this theta-inversion gives the functional equation after splitting the integral at $\tau = 1$.</p>
+      <p>Concretely, the completed form $\pi^{-s/2}\Gamma(s/2)\zeta(s) = \int_1^\infty (\theta(\tau)-1)/2 \cdot (\tau^{s/2} + \tau^{(1-s)/2})\,d\tau/\tau$, which is manifestly symmetric under $s \mapsto 1-s$.</p>
+    </div>
+  </details>
+
+  <h2>2.5 — Trivial and Non-Trivial Zeros</h2>
+
+  <p>The functional equation $\zeta(s) = 2^s \pi^{s-1} \sin(\pi s/2)\,\Gamma(1-s)\,\zeta(1-s)$ forces zeros at $s = -2, -4, -6, \ldots$ (where $\sin(\pi s/2) = 0$). These are the <strong>trivial zeros</strong> — they encode no information about primes.</p>
+
+  <p>All remaining zeros of $\zeta(s)$ are called <strong>non-trivial</strong>. The functional equation + the Euler product (which shows $\zeta(s) \neq 0$ for $\text{Re}(s) > 1$) force all non-trivial zeros to lie in the <strong>critical strip</strong> $0 < \text{Re}(s) < 1$. The Riemann Hypothesis says they all lie on $\text{Re}(s) = \tfrac{1}{2}$.</p>
+
+  <h2>2.6 — Interactive: The Complex Plane of ζ</h2>
+
+  <p>Below is a map of $\mathbb{C}$ annotated with the key features of $\zeta(s)$. Click any marked point to learn about it.</p>
+
+  <div class="canvas-wrap" style="margin-bottom: 20px;">
+    <canvas id="c-zeta-map"></canvas>
+    <span class="canvas-label">The complex $s$-plane: pole, trivial zeros, critical strip, and the first five non-trivial zeros of $\zeta(s)$</span>
+  </div>
+
+  <div id="zeta-detail" style="min-height:44px; font-family: monospace; font-size: 13px; padding: 8px 12px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 20px;">
+    Click any marked point for details.
+  </div>
+
+  <div class="note">
+    <strong>Zero symmetry.</strong> The functional equation $\xi(s)=\xi(1-s)$ pairs zeros: if $\rho$ is a non-trivial zero, so is $1-\rho$. Since $\zeta(\bar s) = \overline{\zeta(s)}$, zeros also come in conjugate pairs. The four zeros $\{\rho, \bar\rho, 1-\rho, 1-\bar\rho\}$ are pinned symmetrically about both the real axis and the critical line. If RH holds, $\text{Re}(\rho) = \tfrac{1}{2}$ and the quadruple collapses to just $\tfrac{1}{2} \pm i\gamma$.
+  </div>
 
   <nav class="nav-bottom"></nav>
 
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/zeta-utils.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('c-zeta-map');
+  var dpr = UI.fitCanvas(canvas, 0.9);
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var detail = document.getElementById('zeta-detail');
+
+  // Viewport: Re(s) ∈ [−8, 3], Im(s) ∈ [−5, 55]
+  var RE_MIN = -8, RE_MAX = 3, IM_MIN = -5, IM_MAX = 55;
+
+  function sx(re) { return (re - RE_MIN) / (RE_MAX - RE_MIN) * W; }
+  function sy(im) { return H - (im - IM_MIN) / (IM_MAX - IM_MIN) * H; }
+  function fromScr(px, py) {
+    return {
+      re: RE_MIN + px / W * (RE_MAX - RE_MIN),
+      im: IM_MIN + (H - py) / H * (IM_MAX - IM_MIN)
+    };
+  }
+
+  var FEATURES = [
+    { re: 1, im: 0, color: '#ff4444', type: 'pole', label: 'Pole at s = 1', info: 'Simple pole, residue 1. ζ(s) ≈ 1/(s−1) near here. Reflects the divergence of the harmonic series Σ 1/n.' },
+    { re: -2, im: 0, color: '#888', type: 'trivial', label: 'Trivial zero s = −2', info: 'Trivial zero at s=−2. Comes from sin(πs/2)=0 in the functional equation. No arithmetic content.' },
+    { re: -4, im: 0, color: '#888', type: 'trivial', label: 'Trivial zero s = −4', info: 'Trivial zero at s=−4.' },
+    { re: -6, im: 0, color: '#888', type: 'trivial', label: 'Trivial zero s = −6', info: 'Trivial zero at s=−6.' },
+    { re: 0.5, im: 14.135, color: '#4caf50', type: 'nontrivial', label: 'ρ₁ = ½ + 14.135i', info: 'First non-trivial zero: ½ + 14.1347…i. Riemann computed several by hand in 1859. Each zero contributes an oscillating correction to the prime-counting function.' },
+    { re: 0.5, im: 21.022, color: '#4caf50', type: 'nontrivial', label: 'ρ₂ = ½ + 21.022i', info: 'Second non-trivial zero: ½ + 21.0220…i.' },
+    { re: 0.5, im: 25.011, color: '#4caf50', type: 'nontrivial', label: 'ρ₃ = ½ + 25.011i', info: 'Third non-trivial zero: ½ + 25.0109…i.' },
+    { re: 0.5, im: 30.425, color: '#4caf50', type: 'nontrivial', label: 'ρ₄ = ½ + 30.425i', info: 'Fourth non-trivial zero: ½ + 30.4249…i.' },
+    { re: 0.5, im: 32.935, color: '#4caf50', type: 'nontrivial', label: 'ρ₅ = ½ + 32.935i', info: 'Fifth non-trivial zero: ½ + 32.9351…i.' },
+  ];
+
+  function draw() {
+    ctx.fillStyle = '#0d1117';
+    ctx.fillRect(0, 0, W, H);
+
+    // Critical strip shading
+    ctx.fillStyle = 'rgba(74,184,255,0.06)';
+    ctx.fillRect(sx(0), 0, sx(1) - sx(0), H);
+
+    // Critical line Re(s) = ½
+    ctx.strokeStyle = 'rgba(74,184,255,0.45)'; ctx.lineWidth = 1.5 * dpr;
+    ctx.setLineDash([6 * dpr, 4 * dpr]);
+    ctx.beginPath(); ctx.moveTo(sx(0.5), 0); ctx.lineTo(sx(0.5), H); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Strip borders
+    ctx.strokeStyle = 'rgba(74,184,255,0.18)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(sx(0), 0); ctx.lineTo(sx(0), H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx(1), 0); ctx.lineTo(sx(1), H); ctx.stroke();
+
+    // Real axis
+    var yR = sy(0);
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, yR); ctx.lineTo(W, yR); ctx.stroke();
+
+    // Axis ticks + labels
+    ctx.fillStyle = '#555'; ctx.font = (10 * dpr) + 'px sans-serif';
+    ctx.textAlign = 'center';
+    for (var re = -8; re <= 3; re++) {
+      if (re === 0) continue;
+      ctx.fillText(re, sx(re), yR + 14 * dpr);
+    }
+    ctx.textAlign = 'right';
+    for (var im = 0; im <= 50; im += 10) {
+      ctx.fillText(im + 'i', sx(RE_MIN) - 3, sy(im) + 4);
+    }
+
+    // Critical strip label
+    ctx.fillStyle = 'rgba(74,184,255,0.5)'; ctx.font = (10 * dpr) + 'px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Critical', sx(0.5), 14 * dpr);
+    ctx.fillText('Strip', sx(0.5), 25 * dpr);
+    ctx.fillText('Re(s)=½', sx(0.5), H - 8 * dpr);
+
+    // Features
+    FEATURES.forEach(function (f) {
+      var x = sx(f.re), y = sy(f.im);
+      if (f.type === 'pole') {
+        var r = 7 * dpr;
+        ctx.strokeStyle = f.color; ctx.lineWidth = 2.5 * dpr;
+        ctx.beginPath();
+        ctx.moveTo(x - r, y - r); ctx.lineTo(x + r, y + r);
+        ctx.moveTo(x + r, y - r); ctx.lineTo(x - r, y + r);
+        ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.arc(x, y, 5 * dpr, 0, Math.PI * 2);
+        ctx.fillStyle = f.color; ctx.fill();
+        // Conjugate
+        if (f.im !== 0) {
+          var yc = sy(-f.im);
+          ctx.beginPath(); ctx.arc(x, yc, 4 * dpr, 0, Math.PI * 2);
+          ctx.fillStyle = f.color + '66'; ctx.fill();
+        }
+      }
+    });
+  }
+
+  canvas.addEventListener('click', function (e) {
+    var pos = UI.canvasPos(canvas, e);
+    var best = null, bestD = Infinity;
+    FEATURES.forEach(function (f) {
+      var d = Math.hypot(pos.x - sx(f.re), pos.y - sy(f.im));
+      if (d < bestD) { bestD = d; best = f; }
+    });
+    if (best && bestD < 20 * dpr) {
+      detail.innerHTML = '<strong>' + best.label + '</strong> — ' + best.info;
+    } else {
+      var c = fromScr(pos.x, pos.y);
+      detail.innerHTML = 'Clicked s = ' + c.re.toFixed(2) + (c.im >= 0 ? ' + ' : ' − ') + Math.abs(c.im).toFixed(2) + 'i';
+    }
+  });
+
+  draw();
+
+  UI.onResize(function () {
+    dpr = UI.fitCanvas(canvas, 0.9);
+    W = canvas.width; H = canvas.height; ctx = canvas.getContext('2d');
+    draw();
+  });
+})();
+</script>
 </body>
 </html>

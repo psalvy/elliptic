@@ -2,7 +2,7 @@
 // Our own files: network-first, fall back to cache.
 // CDN resources (KaTeX): cache-first (version-pinned, never change).
 
-const CACHE = 'math-v1';
+const CACHE = 'math-v2';
 
 const PRECACHE = [
   'index.html',
@@ -27,6 +27,7 @@ const PRECACHE = [
   // Riemann course
   'riemann/index.html',
   'riemann/js/nav.js',
+  'riemann/js/zeta-utils.js',
   'riemann/module1.html',
   'riemann/module2.html',
   'riemann/module3.html',

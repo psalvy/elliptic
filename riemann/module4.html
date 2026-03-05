@@ -14,26 +14,191 @@
 
   <h1>Zeros Determine Everything</h1>
 
-  <!-- PLAN ---------------------------------------------------------------
-  1. Analogy: a polynomial is determined by its roots (up to scaling)
-  2. Hadamard's theorem (1893): an entire function of finite order is
-     completely determined by its zeros — the infinite-dimensional analogue
-  3. The completed zeta function ξ(s) = ½s(s-1)π^{-s/2}Γ(s/2)ζ(s) is entire of order 1
-  4. Its Hadamard product:
-       ξ(s) = e^{A+Bs} ∏_ρ (1 - s/ρ) e^{s/ρ}
-  5. Consequence: the zeros completely determine ζ(s); to understand primes,
-     you must understand the zeros
-  6. Parallel to elliptic course: the j-invariant fingerprints a torus;
-     zeros fingerprint the distribution of primes
-  See PLAN.md for full details.
-  ---------------------------------------------------------------------- -->
+  <h2>4.1 — From Polynomials to Entire Functions</h2>
+
+  <p>A degree-$n$ polynomial is <em>completely determined</em> by its $n$ roots (plus one scaling constant). That is, if I tell you that $p(x) = 0$ at $x = r_1, r_2, \ldots, r_n$ and $p(0) = c$, you can reconstruct $p$ exactly:</p>
+  <div class="math-block">$$p(x) = c \cdot \frac{(x - r_1)(x - r_2) \cdots (x - r_n)}{(-r_1)(-r_2)\cdots(-r_n)}$$</div>
+
+  <p>Can the same be true for infinite-degree "polynomials" — i.e., entire functions? Hadamard's theorem says: <em>yes, under a finite-order growth condition</em>.</p>
+
+  <p>An entire function $f$ has <strong>finite order</strong> $\rho$ if $|f(z)| = O(e^{|z|^\rho})$ for large $|z|$. Polynomials have order $0$. The function $e^z$ has order $1$. $\sin z$ has order $1$.</p>
+
+  <h2>4.2 — Hadamard's Product Theorem (1893)</h2>
+
+  <p>Let $f$ be an entire function of finite order $\rho$, with zeros $z_1, z_2, z_3, \ldots$ (listed with multiplicity, $z_n \neq 0$). Then:</p>
+  <div class="math-block">$$f(z) = z^m e^{g(z)} \prod_{n=1}^\infty E_p\!\left(\frac{z}{z_n}\right)$$</div>
+  <p>where $m$ is the order of zero at $z = 0$, $g(z)$ is a polynomial of degree $\leq \rho$, and $E_p$ is the Weierstrass elementary factor:</p>
+  <div class="math-block">$$E_p(u) = (1-u)\exp\!\left(u + \frac{u^2}{2} + \cdots + \frac{u^p}{p}\right)$$</div>
+
+  <p>The key upshot: <strong>an entire function of finite order is completely determined by its zeros</strong> (plus the polynomial exponential factor $e^{g(z)}$, which encodes the growth rate, not more zeros).</p>
+
+  <details class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: Why the Exponential Factors?</summary>
+    <div style="margin-top: 15px;">
+      <p>The infinite product $\prod (1 - z/z_n)$ might not converge if $\sum 1/|z_n|$ diverges. The exponential "compensating factors" $e^{z/z_n + z^2/(2z_n^2) + \cdots}$ are added to each term to force convergence without adding new zeros. For order-1 functions, we only need $E_1(u) = (1-u)e^u$, which is why the Hadamard product for $\xi$ takes the form it does.</p>
+      <p>For the sine function: $\sin \pi z = \pi z \prod_{n \neq 0} (1 - z/n)e^{z/n} = \pi z \prod_{n=1}^\infty (1 - z^2/n^2)$. The paired $\pm n$ zeros allow the simpler form — exactly Euler's product from Module 1.</p>
+    </div>
+  </details>
+
+  <h2>4.3 — The Hadamard Product for $\xi(s)$</h2>
+
+  <p>The completed zeta function $\xi(s) = \tfrac{1}{2}s(s-1)\pi^{-s/2}\Gamma(s/2)\zeta(s)$ is an entire function of order $1$ (growth bounded by $e^{C|s|\log|s|}$, a bit faster than order $1$ but satisfying the product theorem). Its zeros are exactly the non-trivial zeros $\rho$ of $\zeta$.</p>
+
+  <p>The Hadamard product:</p>
+  <div class="math-block">$$\xi(s) = e^{A + Bs} \prod_\rho \left(1 - \frac{s}{\rho}\right) e^{s/\rho}$$</div>
+  <p>where $A, B$ are computable constants ($B = -\sum_\rho \text{Re}(1/\rho) \approx -0.0231$) and the product runs over all non-trivial zeros $\rho$.</p>
+
+  <p><strong>This is not an approximation.</strong> It is an exact identity — $\xi(s)$ is completely and uniquely determined by the zeros $\{\rho\}$. To understand $\zeta$, you <em>must</em> understand its zeros.</p>
+
+  <h2>4.4 — The Logarithmic Derivative</h2>
+
+  <p>Taking the logarithmic derivative of the Hadamard product gives an expansion for $\zeta'/\zeta$ in terms of the zeros:</p>
+  <div class="math-block">$$\frac{\zeta'(s)}{\zeta(s)} = B - \frac{1}{s-1} + \frac{1}{2}\log\pi - \frac{1}{2}\frac{\Gamma'(s/2)}{\Gamma(s/2)} + \sum_\rho \left(\frac{1}{s-\rho} + \frac{1}{\rho}\right)$$</div>
+  <p>Each zero $\rho$ contributes a simple pole to $\zeta'/\zeta$. This sum will be the key object in Module 5, where Perron's formula extracts the prime-counting function by integrating $-\zeta'/\zeta$ along a vertical line.</p>
+
+  <h2>4.5 — Parallel with the Elliptic Course</h2>
+
+  <p>If you followed the elliptic curve course, this should feel familiar. There, the $j$-invariant was the "fingerprint" of a torus — knowing $j(\tau)$ determined the torus up to isomorphism. Here, the zeros $\{\rho\}$ are the fingerprint of $\zeta$ — they determine $\zeta$ up to the exponential factor.</p>
+
+  <p>In both cases, a discrete set of "special values" (CM points giving integer $j$-values; non-trivial zeros) encodes global arithmetic information (class numbers; prime distribution). The Hadamard product is the analytic mechanism by which the local data (zero locations) reconstructs the global function.</p>
+
+  <h2>4.6 — Interactive: Polynomials from Roots</h2>
+
+  <p>Drag the roots of a cubic polynomial. Watch the polynomial graph update in real time — illustrating how zeros completely determine a function. This is the finite-dimensional analogue of Hadamard's theorem.</p>
+
+  <div class="canvas-wrap" style="margin-bottom: 8px;">
+    <canvas id="c-roots"></canvas>
+    <span class="canvas-label">Drag the green dots (roots) and watch the cubic $f(x) = (x-r_1)(x-r_2)(x-r_3)$ update. Zeros determine the function.</span>
+  </div>
+
+  <div id="roots-info" style="font-family: monospace; font-size: 13px; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 20px;"></div>
+
+  <div class="note">
+    <strong>Hadamard's analogy:</strong> For the Riemann $\xi$ function, the "roots" are the non-trivial zeros $\rho_n = \tfrac{1}{2} + i\gamma_n$. If you know all the $\gamma_n$, you can reconstruct $\xi(s)$ exactly via the product $e^{A+Bs}\prod(1-s/\rho_n)e^{s/\rho_n}$. Riemann's Hypothesis says all roots are on the imaginary axis of the shifted plane — but we can't prove it yet.
+  </div>
 
   <nav class="nav-bottom"></nav>
 
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="../js/interactive.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('c-roots');
+  var dpr = UI.fitCanvas(canvas, 0.9);
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var info = document.getElementById('roots-info');
+
+  // Roots stored in "data" coords: x ∈ [-4, 4]
+  var roots = [-2.0, 0.5, 2.5];
+  var dragging = -1;
+
+  var X_MIN = -5, X_MAX = 5, Y_MIN = -30, Y_MAX = 30;
+
+  function sx(x) { return (x - X_MIN) / (X_MAX - X_MIN) * W; }
+  function sy(y) { return H - (y - Y_MIN) / (Y_MAX - Y_MIN) * H; }
+  function fromSx(px) { return X_MIN + px / W * (X_MAX - X_MIN); }
+
+  function poly(x) {
+    return (x - roots[0]) * (x - roots[1]) * (x - roots[2]);
+  }
+
+  function draw() {
+    ctx.fillStyle = '#0d1117';
+    ctx.fillRect(0, 0, W, H);
+
+    // Grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+    for (var x = X_MIN; x <= X_MAX; x++) {
+      ctx.beginPath(); ctx.moveTo(sx(x), 0); ctx.lineTo(sx(x), H); ctx.stroke();
+    }
+    for (var y = Y_MIN; y <= Y_MAX; y += 5) {
+      ctx.beginPath(); ctx.moveTo(0, sy(y)); ctx.lineTo(W, sy(y)); ctx.stroke();
+    }
+
+    // Axes
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, sy(0)); ctx.lineTo(W, sy(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx(0), 0); ctx.lineTo(sx(0), H); ctx.stroke();
+
+    // Axis labels
+    ctx.fillStyle = '#555'; ctx.font = (10 * dpr) + 'px sans-serif'; ctx.textAlign = 'center';
+    for (var x = -4; x <= 4; x++) {
+      if (x !== 0) ctx.fillText(x, sx(x), sy(0) + 14 * dpr);
+    }
+    ctx.textAlign = 'right';
+    for (var y = -25; y <= 25; y += 5) {
+      if (y !== 0) ctx.fillText(y, sx(0) - 4, sy(y) + 4);
+    }
+
+    // Polynomial curve
+    ctx.strokeStyle = '#4ab8ff'; ctx.lineWidth = 2 * dpr;
+    ctx.beginPath();
+    var started = false;
+    for (var px = 0; px <= W; px++) {
+      var x = fromSx(px);
+      var y = poly(x);
+      if (y < Y_MIN * 1.5 || y > Y_MAX * 1.5) { started = false; continue; }
+      var py = sy(y);
+      if (!started) { ctx.moveTo(px, py); started = true; }
+      else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    // Root markers
+    roots.forEach(function (r, i) {
+      var x = sx(r), y = sy(0);
+      ctx.beginPath(); ctx.arc(x, y, 7 * dpr, 0, Math.PI * 2);
+      ctx.fillStyle = '#4caf50'; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5 * dpr; ctx.stroke();
+      ctx.fillStyle = '#fff'; ctx.font = (11 * dpr) + 'px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('r' + (i + 1), x, y - 10 * dpr);
+    });
+
+    info.textContent =
+      'f(x) = (x − ' + roots[0].toFixed(2) + ')(x − ' + roots[1].toFixed(2) + ')(x − ' + roots[2].toFixed(2) + ')' +
+      ' = x³ − ' + (roots[0] + roots[1] + roots[2]).toFixed(2) + 'x² + …';
+  }
+
+  function hitTest(px, py) {
+    for (var i = 0; i < roots.length; i++) {
+      var rx = sx(roots[i]), ry = sy(0);
+      if (Math.hypot(px - rx, py - ry) < 12 * dpr) return i;
+    }
+    return -1;
+  }
+
+  function onDown(px, py) { dragging = hitTest(px, py); }
+  function onMove(px, py) {
+    if (dragging < 0) return;
+    var x = Math.max(X_MIN + 0.2, Math.min(X_MAX - 0.2, fromSx(px)));
+    roots[dragging] = x;
+    draw();
+  }
+  function onUp() { dragging = -1; }
+
+  canvas.addEventListener('mousedown', function (e) { var p = UI.canvasPos(canvas, e); onDown(p.x, p.y); });
+  canvas.addEventListener('mousemove', function (e) { var p = UI.canvasPos(canvas, e); onMove(p.x, p.y); });
+  window.addEventListener('mouseup', onUp);
+  canvas.addEventListener('touchstart', function (e) { e.preventDefault(); var p = UI.canvasPos(canvas, e.touches[0]); onDown(p.x, p.y); }, { passive: false });
+  canvas.addEventListener('touchmove', function (e) { e.preventDefault(); var p = UI.canvasPos(canvas, e.touches[0]); onMove(p.x, p.y); }, { passive: false });
+  window.addEventListener('touchend', onUp);
+
+  draw();
+
+  UI.onResize(function () {
+    dpr = UI.fitCanvas(canvas, 0.9);
+    W = canvas.width; H = canvas.height; ctx = canvas.getContext('2d');
+    draw();
+  });
+})();
+</script>
 </body>
 </html>

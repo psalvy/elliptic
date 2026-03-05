@@ -14,45 +14,238 @@
 
   <h1>The Explicit Formula: Primes from Zeros</h1>
 
-  <!-- PLAN ---------------------------------------------------------------
-  THIS IS THE KEY MODULE — the moment the user described as
-  "primes emerge as the only ones that don't become zero after a smart integration"
+  <h2>5.1 — The Von Mangoldt Function</h2>
 
-  Step-by-step derivation:
+  <p>To connect $\zeta$ to the primes, we need a function that counts prime powers with a convenient weight. Define:</p>
+  <div class="math-block">$$\Lambda(n) = \begin{cases} \log p & \text{if } n = p^k \text{ for some prime } p, k \geq 1 \\ 0 & \text{otherwise} \end{cases}$$</div>
+  <p>This is the <strong>von Mangoldt function</strong>. It weights each prime power by $\log p$ (its "size") and ignores composite numbers. The associated counting function:</p>
+  <div class="math-block">$$\psi(x) = \sum_{n \leq x} \Lambda(n) = \sum_{p^k \leq x} \log p$$</div>
+  <p>is the <strong>Chebyshev function</strong> $\psi(x)$. It grows approximately like $x$ (this is equivalent to the Prime Number Theorem: $\psi(x) \sim x$). Recovering $\psi$ from $\zeta$ will be the goal.</p>
 
-  1. The logarithmic derivative of the Euler product:
-       -ζ'(s)/ζ(s) = Σ Λ(n) n^{-s}
-     where Λ(n) = log p if n = p^k, else 0 (von Mangoldt function)
-     Composite integers vanish; prime powers survive.
-     Derive this explicitly: log ζ = -Σ_p log(1-p^{-s}) = Σ_p Σ_k p^{-ks}/k,
-     then differentiate.
+  <p>The key relation: the logarithmic derivative of the Euler product is a Dirichlet series for $-\Lambda$:</p>
+  <div class="math-block">$$-\frac{\zeta'(s)}{\zeta(s)} = \sum_{n=1}^\infty \frac{\Lambda(n)}{n^s}$$</div>
+  <p>Proof: $\log \zeta(s) = -\sum_p \log(1-p^{-s}) = \sum_p \sum_{k=1}^\infty \frac{p^{-ks}}{k}$. Differentiating: $\frac{\zeta'(s)}{\zeta(s)} = -\sum_p \sum_{k=1}^\infty \frac{\log p}{p^{ks}} = -\sum_n \frac{\Lambda(n)}{n^s}$.</p>
 
-  2. Perron's formula — "the smart integration":
-       (1/2πi) ∫_{c-i∞}^{c+i∞} x^s/s ds = 1 if x>1, = 0 if 0<x<1
-     A vertical-line contour integral acts as a step-function selector.
-     Derive this via residue at s=0 for x>1 and closure to the right for x<1.
+  <p><strong>This is the magic:</strong> the Euler product has "filtered out" all composite integers. Only prime powers appear in $-\zeta'/\zeta$. The question is: how do we extract $\psi(x)$ from this Dirichlet series?</p>
 
-  3. Insert -ζ'/ζ into Perron's formula to get ψ(x) = Σ_{n≤x} Λ(n).
-     Move the contour left: pick up residues at
-       - s=1       → contributes x          (the main term, from the pole of ζ)
-       - each zero ρ → contributes -x^ρ/ρ   (oscillatory corrections)
-       - s=0 and trivial zeros → small correction terms
+  <h2>5.2 — Perron's Formula: Integration as a Selector</h2>
 
-  4. Riemann's explicit formula:
-       ψ(x) = x - Σ_ρ x^ρ/ρ - log(2π) - ½log(1 - x^{-2})
-     An exact identity — primes entirely encoded by zeros.
+  <p>The key tool is Perron's formula. For $c > 1$ and $x > 0$, $x \neq 1$:</p>
+  <div class="math-block">$$\frac{1}{2\pi i} \int_{c - i\infty}^{c + i\infty} \frac{x^s}{s}\,ds = \begin{cases} 1 & x > 1 \\ \frac{1}{2} & x = 1 \\ 0 & 0 < x < 1 \end{cases}$$</div>
+  <p>A vertical-line integral acts as a <strong>step-function selector</strong>: it picks out $1$ when $x > 1$ and $0$ when $x < 1$.</p>
 
-  INTERACTIVE: animate partial sum x - Σ_{|Im(ρ)|≤T} x^ρ/ρ as T increases.
-               Watch ψ(x) materialise from the oscillatory zero-contributions.
-  See PLAN.md for full details.
-  ---------------------------------------------------------------------- -->
+  <p>Using this: multiply the Dirichlet series $-\zeta'/\zeta = \sum_n \Lambda(n) n^{-s}$ by $x^s/s$ and integrate term-by-term:</p>
+  <div class="math-block">$$\frac{1}{2\pi i}\int_{c-i\infty}^{c+i\infty} \left(-\frac{\zeta'(s)}{\zeta(s)}\right)\frac{x^s}{s}\,ds = \sum_{n=1}^\infty \Lambda(n) \cdot \frac{1}{2\pi i}\int_{c-i\infty}^{c+i\infty}\!\!\left(\frac{x}{n}\right)^{\!\!s}\frac{ds}{s}$$</div>
+  <p>By Perron's formula, the integral picks out $\Lambda(n)$ when $n < x$ and $0$ when $n > x$. The left side therefore equals $\psi(x) = \sum_{n \leq x} \Lambda(n)$.</p>
+
+  <h2>5.3 — Moving the Contour: Poles Become Primes</h2>
+
+  <p>We now evaluate the contour integral $\frac{1}{2\pi i}\int_{c-i\infty}^{c+i\infty} (-\zeta'/\zeta)(s) \cdot x^s/s \,ds$ by moving the vertical line to the left. As we cross poles of $-\zeta'/\zeta$, the residue theorem contributes one term per pole.</p>
+
+  <p>The poles of $-\zeta'/\zeta(s) \cdot x^s/s$ are at:</p>
+
+  <ul>
+    <li><strong>$s = 1$:</strong> $\zeta$ has a simple pole with residue $1$, so $\zeta'/\zeta$ has a simple pole with residue $-1$. The integrand has residue $x^1/1 = x$. <em>This is the main term.</em></li>
+    <li><strong>Each non-trivial zero $\rho$:</strong> $\zeta(\rho) = 0$ means $\zeta'(\rho)/\zeta(\rho)$ has a simple pole. The residue of the integrand is $x^\rho/\rho$. <em>These are the oscillatory correction terms.</em></li>
+    <li><strong>$s = 0$:</strong> contributes $-\log(2\pi)$.</li>
+    <li><strong>Trivial zeros $s = -2k$:</strong> contribute $\sum_{k=1}^\infty x^{-2k}/(-2k) = \frac{1}{2}\log(1 - x^{-2})$ (a small correction).</li>
+  </ul>
+
+  <h2>5.4 — Riemann's Explicit Formula</h2>
+
+  <p>Adding all residues gives the exact identity:</p>
+  <div class="math-block">$$\boxed{\psi(x) = x - \sum_\rho \frac{x^\rho}{\rho} - \log(2\pi) - \tfrac{1}{2}\log(1 - x^{-2})}$$</div>
+  <p>where the sum runs over all non-trivial zeros $\rho$ of $\zeta$, ordered by $|\text{Im}(\rho)|$.</p>
+
+  <p>This is <strong>Riemann's explicit formula</strong>. It is not an approximation — it is an exact identity. The prime-counting function $\psi(x)$ is expressed precisely in terms of the zeros $\rho$.</p>
+
+  <p>For the conjugate pair $\rho = \tfrac{1}{2} + i\gamma$ and $\bar\rho = \tfrac{1}{2} - i\gamma$:</p>
+  <div class="math-block">$$\frac{x^\rho}{\rho} + \frac{x^{\bar\rho}}{\bar\rho} = 2\,\text{Re}\!\left(\frac{x^{1/2+i\gamma}}{\tfrac{1}{2}+i\gamma}\right) = \frac{2\sqrt{x}\,\bigl(\tfrac{1}{2}\cos(\gamma\log x) + \gamma\sin(\gamma\log x)\bigr)}{\tfrac{1}{4}+\gamma^2}$$</div>
+  <p>So each zero pair contributes an oscillation of amplitude $\sim \sqrt{x}/\gamma$ to $\psi(x)$.</p>
+
+  <p><strong>Primes emerge, composites cancel.</strong> The von Mangoldt function filtered out composites (via the Euler product). Perron's formula extracted the partial sum from the Dirichlet series. The residues at $\zeta$-zeros provide the exact corrections that turn the smooth main term $x$ into the irregular step-function $\psi(x)$.</p>
+
+  <h2>5.5 — Interactive: The Staircase Materialising from Zeros</h2>
+
+  <p>Below, the blue staircase is the true $\psi(x) = \sum_{n \leq x}\Lambda(n)$ — jumping by $\log p$ at each prime power. The orange curve is the partial explicit formula approximation using $N$ conjugate zero pairs:</p>
+  <div class="math-block">$$\psi_N(x) = x - \sum_{k=1}^N \frac{2\sqrt{x}\,\bigl(\frac{1}{2}\cos(\gamma_k \log x)+\gamma_k\sin(\gamma_k \log x)\bigr)}{\frac{1}{4}+\gamma_k^2} - \log(2\pi) - \tfrac{1}{2}\log\!\left(1-\frac{1}{x^2}\right)$$</div>
+  <p>Drag the slider to add more zeros. Watch the oscillations interfere <em>constructively</em> at the prime jumps and <em>destructively</em> elsewhere — carving the staircase out of smooth waves.</p>
+
+  <div style="margin: 15px 0; display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+    <label style="font-size: 15px;">
+      Zeros included: <strong id="n-val">0</strong>
+      <input type="range" id="n-slider" min="0" max="50" value="0" style="width:220px; margin-left:10px; vertical-align:middle;">
+    </label>
+  </div>
+
+  <div id="expl-info" style="font-family: monospace; font-size: 13px; min-height: 32px; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 10px;"></div>
+
+  <div class="canvas-wrap" style="margin-bottom: 20px;">
+    <canvas id="c-explicit"></canvas>
+    <span class="canvas-label">True $\psi(x)$ (blue staircase) vs partial explicit formula $\psi_N(x)$ (orange). Main term $x$ shown in grey.</span>
+  </div>
+
+  <div class="note success">
+    <strong>The central miracle:</strong> The zeros of $\zeta$ have no obvious connection to prime numbers. Yet their imaginary parts $\gamma_k$, fed into the oscillating terms $\sqrt{x}\cos(\gamma_k \log x)$, conspire to reconstruct the exact positions of every prime. Primes and zeros are two descriptions of the same arithmetic reality.
+  </div>
 
   <nav class="nav-bottom"></nav>
 
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/zeta-utils.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('c-explicit');
+  var dpr = UI.fitCanvas(canvas, 0.9);
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var nSlider = document.getElementById('n-slider');
+  var nVal = document.getElementById('n-val');
+  var info = document.getElementById('expl-info');
+
+  // --- Precompute ---
+  var LIMIT = 200;
+  var PRIMES = Z.sieve(LIMIT);
+  var psiTable = Z.buildPsiTable(LIMIT, PRIMES);
+  var ZEROS = Z.ZEROS; // 50 values
+  var NZEROS = ZEROS.length;
+
+  // x grid: 200 evenly spaced points from 2.5 to 150
+  var NX = 300;
+  var X_MIN = 2.5, X_MAX = 150;
+  var xArr = [];
+  for (var i = 0; i < NX; i++) xArr.push(X_MIN + (X_MAX - X_MIN) * i / (NX - 1));
+
+  // Precompute pairContrib[k][i] = contribution of zero k at x index i
+  var pairC = new Array(NZEROS);
+  for (var k = 0; k < NZEROS; k++) {
+    pairC[k] = new Float64Array(NX);
+    for (var i = 0; i < NX; i++) {
+      pairC[k][i] = Z.pairContrib(xArr[i], ZEROS[k]);
+    }
+  }
+
+  // Constant tail correction at each x
+  var tailCorr = new Float64Array(NX);
+  var LOG2PI = Math.log(2 * Math.PI);
+  for (var i = 0; i < NX; i++) {
+    var x = xArr[i];
+    var invx2 = 1 / (x * x);
+    tailCorr[i] = LOG2PI + 0.5 * Math.log(1 - invx2);
+  }
+
+  // psiApprox[N][i]: N zero pairs used
+  var psiApprox = new Array(NZEROS + 1);
+  for (var N = 0; N <= NZEROS; N++) {
+    psiApprox[N] = new Float64Array(NX);
+    for (var i = 0; i < NX; i++) {
+      var val = xArr[i] - tailCorr[i];
+      for (var k = 0; k < N; k++) val += pairC[k][i];
+      psiApprox[N][i] = val;
+    }
+  }
+
+  function draw() {
+    var N = parseInt(nSlider.value);
+    nVal.textContent = N;
+
+    var approx = psiApprox[N];
+    var yMax = psiTable[LIMIT] * 0.95;
+    var yMin = -yMax * 0.1;
+
+    ctx.fillStyle = '#0d1117';
+    ctx.fillRect(0, 0, W, H);
+
+    var PAD_L = 45, PAD_R = 15, PAD_T = 15, PAD_B = 30;
+    var plotW = W - PAD_L - PAD_R;
+    var plotH = H - PAD_T - PAD_B;
+
+    function sx(x) { return PAD_L + (x - X_MIN) / (X_MAX - X_MIN) * plotW; }
+    function sy(y) { return PAD_T + plotH - (y - yMin) / (yMax - yMin) * plotH; }
+
+    // Grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 1;
+    for (var x = 0; x <= X_MAX; x += 25) {
+      ctx.beginPath(); ctx.moveTo(sx(x), PAD_T); ctx.lineTo(sx(x), H - PAD_B); ctx.stroke();
+    }
+    for (var y = 0; y <= yMax; y += 20) {
+      ctx.beginPath(); ctx.moveTo(PAD_L, sy(y)); ctx.lineTo(W - PAD_R, sy(y)); ctx.stroke();
+    }
+
+    // Axes labels
+    ctx.fillStyle = '#555'; ctx.font = (10 * dpr) + 'px sans-serif'; ctx.textAlign = 'center';
+    for (var x = 25; x <= X_MAX; x += 25) ctx.fillText(x, sx(x), H - PAD_B + 14 * dpr);
+    ctx.textAlign = 'right';
+    for (var y = 20; y <= yMax; y += 20) ctx.fillText(Math.round(y), PAD_L - 4, sy(y) + 4);
+
+    // Main term x (grey reference)
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1.5 * dpr;
+    ctx.beginPath();
+    for (var i = 0; i < NX; i++) {
+      var x = xArr[i];
+      if (x < X_MIN) continue;
+      var pt = { x: sx(x), y: sy(x) };
+      if (i === 0) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y);
+    }
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = (10 * dpr) + 'px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('y = x', sx(X_MAX) - 35, sy(X_MAX) - 5);
+
+    // True ψ(x): blue staircase
+    ctx.strokeStyle = '#4ab8ff'; ctx.lineWidth = 2 * dpr;
+    ctx.beginPath();
+    for (var x = 3; x <= X_MAX; x++) {
+      var pv = psiTable[Math.floor(x)];
+      var px_ = sx(x), py_ = sy(pv);
+      if (x === 3) ctx.moveTo(px_, py_); else ctx.lineTo(px_, py_);
+    }
+    ctx.stroke();
+
+    // Partial approximation ψ_N(x): orange
+    ctx.strokeStyle = '#ff9800'; ctx.lineWidth = 2 * dpr;
+    ctx.beginPath();
+    for (var i = 0; i < NX; i++) {
+      var v = Math.max(yMin - 5, Math.min(yMax + 5, approx[i]));
+      var pt = { x: sx(xArr[i]), y: sy(v) };
+      if (i === 0) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y);
+    }
+    ctx.stroke();
+
+    // Legend
+    var ly = PAD_T + 15 * dpr;
+    ctx.fillStyle = '#4ab8ff'; ctx.fillRect(PAD_L + 5, ly, 20 * dpr, 3 * dpr);
+    ctx.fillStyle = '#ccc'; ctx.font = (11 * dpr) + 'px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('true ψ(x)', PAD_L + 30, ly + 4);
+    ly += 18 * dpr;
+    ctx.fillStyle = '#ff9800'; ctx.fillRect(PAD_L + 5, ly, 20 * dpr, 3 * dpr);
+    ctx.fillStyle = '#ccc'; ctx.fillText('ψ_' + N + '(x) — ' + N + ' zero pair' + (N !== 1 ? 's' : ''), PAD_L + 30, ly + 4);
+
+    // Info
+    var trueVal = psiTable[Math.floor(50)];
+    var approxVal = approx[Math.round((50 - X_MIN) / (X_MAX - X_MIN) * (NX - 1))];
+    info.innerHTML =
+      'At x = 50: &nbsp; &psi;(x) = ' + trueVal.toFixed(3) +
+      ' &nbsp;|&nbsp; &psi;<sub>' + N + '</sub>(x) = ' + approxVal.toFixed(3) +
+      (N > 0 ? ' &nbsp;|&nbsp; error = ' + Math.abs(trueVal - approxVal).toFixed(3) : '');
+  }
+
+  nSlider.addEventListener('input', draw);
+  draw();
+
+  UI.onResize(function () {
+    dpr = UI.fitCanvas(canvas, 0.9);
+    W = canvas.width; H = canvas.height; ctx = canvas.getContext('2d');
+    draw();
+  });
+})();
+</script>
 </body>
 </html>

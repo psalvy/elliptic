@@ -14,36 +14,230 @@
 
   <h1>The Prime Number Theorem and the Riemann Hypothesis</h1>
 
-  <!-- PLAN ---------------------------------------------------------------
-  1. The Prime Number Theorem (PNT):
-       π(x) ~ x / log x   as x → ∞
-     Proved independently in 1896 by Hadamard and de la Vallée-Poussin.
-     Key step: show there are no zeros on Re(s) = 1 (the boundary of the critical strip).
+  <h2>6.1 — From the Explicit Formula to the PNT</h2>
 
-  2. From the explicit formula: the error in π(x) ≈ Li(x) is controlled by
-     zero real parts:
-       π(x) = Li(x) - Σ_ρ Li(x^ρ) + O(small)
-     Each zero ρ contributes oscillatory error of size ~ x^{Re(ρ)} / log x.
+  <p>The explicit formula from Module 5:</p>
+  <div class="math-block">$$\psi(x) = x - \sum_\rho \frac{x^\rho}{\rho} - \log(2\pi) - \tfrac{1}{2}\log(1-x^{-2})$$</div>
+  <p>is exact. But for the <strong>Prime Number Theorem</strong> — $\pi(x) \sim x/\log x$, or equivalently $\psi(x) \sim x$ — we only need the leading behaviour. The question becomes: how large are the zero terms $\sum x^\rho/\rho$?</p>
 
-  3. RH: all zeros have Re(ρ) = ½, giving error O(√x log x) — the best possible.
-     Primes are as regularly distributed as they can be; no "conspiracy."
+  <p>Each term $x^\rho/\rho$ has magnitude $|x^\rho/\rho| = x^{\text{Re}(\rho)} / |\rho|$. If all zeros had $\text{Re}(\rho) = \tfrac{1}{2}$, every term would have magnitude $\sqrt{x}/|\rho|$, giving a total oscillation of size $O(\sqrt{x}\log^2 x)$ — negligible compared to $x$.</p>
 
-  4. Why it matters beyond number theory:
-     - Generalised RH for L-functions of elliptic curves
-     - Birch–Swinnerton-Dyer conjecture (another Millennium Problem)
-     - Langlands program: all these zero-counting questions are part of one framework
-     - Connection back to elliptic course: L-functions of CM curves have zeros
-       whose distribution is controlled by CM class field theory
+  <p>But to prove even $\psi(x) \sim x$, we only need the weaker statement: <em>there are no zeros with $\text{Re}(\rho) = 1$</em>. This is what Hadamard and de la Vallée-Poussin proved in 1896.</p>
 
-  See PLAN.md for full details.
-  ---------------------------------------------------------------------- -->
+  <h2>6.2 — The Zero-Free Region and the PNT</h2>
+
+  <p><strong>Theorem (Hadamard, de la Vallée-Poussin, 1896):</strong> $\zeta(1 + it) \neq 0$ for all real $t \neq 0$.</p>
+
+  <p>The proof uses a beautiful trigonometric inequality: $3 + 4\cos\theta + \cos 2\theta \geq 0$ for all $\theta$. If $\zeta$ had a zero at $1 + it_0$, the Euler product would force a logarithmic singularity that contradicts this inequality via the identity $\text{Re}(-\zeta'/\zeta(\sigma)) \geq 0$ and the behaviour of $\zeta$ near $s = 1$.</p>
+
+  <p>Once we know zeros are bounded away from $\text{Re}(s) = 1$, we can estimate the sum in the explicit formula and show $\psi(x)/x \to 1$. Equivalently:</p>
+  <div class="math-block">$$\boxed{\pi(x) \sim \frac{x}{\log x}} \qquad \text{(Prime Number Theorem)}$$</div>
+
+  <h2>6.3 — A Better Approximation: $\text{Li}(x)$</h2>
+
+  <p>The logarithmic integral $\text{Li}(x) = \int_2^x dt/\log t$ is a better approximation to $\pi(x)$ than $x/\log x$. In the explicit formula language, the main term at $s = 1$ contributes $\text{Li}(x)$ to $\pi(x)$ (after accounting for the change of variables from $\psi$ to $\pi$):</p>
+  <div class="math-block">$$\pi(x) = \text{Li}(x) - \sum_\rho \text{Li}(x^\rho) + O\bigl(\sqrt{x}\,e^{-c\sqrt{\log x}}\bigr)$$</div>
+  <p>where the sum is over non-trivial zeros. Each zero contributes a term $\text{Li}(x^\rho) \approx x^{\text{Re}(\rho)} / (|\rho| \log x)$.</p>
+
+  <h2>6.4 — What the Riemann Hypothesis Implies</h2>
+
+  <p>If all non-trivial zeros have $\text{Re}(\rho) = \tfrac{1}{2}$, each zero contribution to $\pi(x)$ has magnitude $\sim x^{1/2}/(|\rho| \log x)$. The error term becomes:</p>
+  <div class="math-block">$$\pi(x) = \text{Li}(x) + O\bigl(\sqrt{x}\,\log x\bigr)$$</div>
+  <p>This is the <strong>best possible error bound</strong> consistent with the prime distribution (no square-root cancellation can do better given that zeros have real part $\tfrac{1}{2}$). The Riemann Hypothesis says: the primes are as uniformly distributed as they could possibly be — no unexpected clumping or gaps beyond what $\sqrt{x}\log x$ allows.</p>
+
+  <p>Conversely, if any zero had $\text{Re}(\rho) = \sigma_0 > \tfrac{1}{2}$, that zero would contribute an error term of size $x^{\sigma_0}/(\text{something})$, noticeably larger than $\sqrt{x}$, revealing a subtle bias in the primes.</p>
+
+  <div class="note success">
+    <strong>The Riemann Hypothesis in one sentence:</strong> The primes are as regular as possible — their fluctuations around $\text{Li}(x)$ are bounded by $O(\sqrt{x}\log x)$, no larger.
+  </div>
+
+  <h2>6.5 — Why It Matters</h2>
+
+  <p>Beyond prime distribution, RH has hundreds of consequences across mathematics:</p>
+  <ul>
+    <li><strong>Arithmetic:</strong> RH implies sharp error bounds in the prime number theorem, Goldbach-type estimates, gaps between consecutive primes</li>
+    <li><strong>Cryptography:</strong> Algorithms whose complexity analyses assume RH (e.g., primality testing, lattice problems)</li>
+    <li><strong>L-functions:</strong> The Generalised Riemann Hypothesis (GRH) extends the conjecture to L-functions of all Dirichlet characters — consequences include bounds on least non-residues, zero-free regions for automorphic forms</li>
+    <li><strong>Random matrix theory:</strong> Montgomery's conjecture (1973) says the pair correlation of zeros matches the eigenvalue statistics of random Hermitian matrices (GUE ensemble) — a mysterious link to quantum chaos</li>
+  </ul>
+
+  <h2>6.6 — The Road Forward</h2>
+
+  <p>This course traced one arc: from Euler's Basel sum through Riemann's extension to the explicit formula and PNT. But the story continues in several directions:</p>
+
+  <ul>
+    <li><strong>L-functions of elliptic curves</strong> (see the elliptic curve course): the Birch–Swinnerton-Dyer conjecture predicts the rank of $E(\mathbb{Q})$ from the order of vanishing of $L(E,s)$ at $s=1$ — the exact same zero-counting philosophy applied to a richer object</li>
+    <li><strong>Langlands program:</strong> a vast generalisation connecting Galois representations to automorphic forms and their L-functions — the frontier of 21st-century number theory</li>
+    <li><strong>Modularity (Wiles 1995):</strong> all elliptic curves over $\mathbb{Q}$ are modular, meaning their L-functions are L-functions of modular forms — which have their own Euler products, functional equations, and zeros</li>
+  </ul>
+
+  <p>Every thread leads back to the same structure: an L-function, a functional equation, non-trivial zeros, and the question of where those zeros live.</p>
+
+  <h2>6.7 — Interactive: $\pi(x)$, $\text{Li}(x)$, and $x/\log x$</h2>
+
+  <p>Compare the three approximations to the prime-counting function $\pi(x)$: the true count (blue staircase), the logarithmic integral $\text{Li}(x)$ (green), and Gauss's simpler estimate $x/\log x$ (red). Use the slider to zoom out and see how much better $\text{Li}(x)$ performs.</p>
+
+  <div style="margin: 15px 0; display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+    <label style="font-size: 15px;">
+      $x$ max = <strong id="xmax-val">200</strong>
+      <input type="range" id="xmax-slider" min="1" max="10" value="4" style="width:200px; margin-left:10px; vertical-align:middle;">
+    </label>
+  </div>
+
+  <div class="canvas-wrap" style="margin-bottom: 20px;">
+    <canvas id="c-pnt"></canvas>
+    <span class="canvas-label">$\pi(x)$ (blue staircase) vs $\text{Li}(x)$ (green) vs $x/\log x$ (red)</span>
+  </div>
+
+  <div id="pnt-info" style="font-family: monospace; font-size: 13px; min-height: 40px; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 20px;"></div>
+
+  <div class="note">
+    <strong>Li(x) is remarkably accurate.</strong> At $x = 1000$, $\pi(1000) = 168$, $\text{Li}(1000) \approx 177.6$, $1000/\log 1000 \approx 144.8$. The relative error of $\text{Li}$ is about $5.7\%$; for $x/\log x$ it's $13.8\%$. This gap widens as $x$ grows — $\text{Li}(x)$ beats $x/\log x$ uniformly. The question the RH answers is exactly <em>how close</em> $\text{Li}(x)$ can get: no better than $O(\sqrt{x}\log x)$, but (conditional on RH) no worse either.
+  </div>
 
   <nav class="nav-bottom"></nav>
 
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/zeta-utils.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('c-pnt');
+  var dpr = UI.fitCanvas(canvas, 0.9);
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var slider = document.getElementById('xmax-slider');
+  var xmaxLabel = document.getElementById('xmax-val');
+  var info = document.getElementById('pnt-info');
+
+  var LIMITS = [50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000];
+  var MAX_SIEVE = 50000;
+  var PRIMES = Z.sieve(MAX_SIEVE);
+
+  function getXmax() { return LIMITS[parseInt(slider.value) - 1]; }
+
+  function draw() {
+    var xMax = getXmax();
+    xmaxLabel.textContent = xMax.toLocaleString();
+
+    ctx.fillStyle = '#0d1117';
+    ctx.fillRect(0, 0, W, H);
+
+    var PAD_L = 55, PAD_R = 15, PAD_T = 20, PAD_B = 35;
+    var plotW = W - PAD_L - PAD_R;
+    var plotH = H - PAD_T - PAD_B;
+
+    var piMax = Z.piCount(xMax, PRIMES);
+    var yMax = piMax * 1.05;
+    var yMin = 0;
+
+    function sx(x) { return PAD_L + x / xMax * plotW; }
+    function sy(y) { return PAD_T + plotH - (y - yMin) / (yMax - yMin) * plotH; }
+
+    // Grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 1;
+    var nGridX = 5;
+    for (var g = 0; g <= nGridX; g++) {
+      var x = g / nGridX * xMax;
+      ctx.beginPath(); ctx.moveTo(sx(x), PAD_T); ctx.lineTo(sx(x), H - PAD_B); ctx.stroke();
+    }
+    var nGridY = 5;
+    for (var g = 0; g <= nGridY; g++) {
+      var y = g / nGridY * yMax;
+      ctx.beginPath(); ctx.moveTo(PAD_L, sy(y)); ctx.lineTo(W - PAD_R, sy(y)); ctx.stroke();
+    }
+
+    // Axis labels
+    ctx.fillStyle = '#555'; ctx.font = (10 * dpr) + 'px sans-serif'; ctx.textAlign = 'center';
+    for (var g = 0; g <= nGridX; g++) {
+      var x = Math.round(g / nGridX * xMax);
+      ctx.fillText(x >= 1000 ? (x / 1000) + 'k' : x, sx(x), H - PAD_B + 14 * dpr);
+    }
+    ctx.textAlign = 'right';
+    for (var g = 0; g <= nGridY; g++) {
+      var y = Math.round(g / nGridY * yMax);
+      if (y > 0) ctx.fillText(y >= 1000 ? (y / 1000) + 'k' : y, PAD_L - 4, sy(y) + 4);
+    }
+
+    // x/log(x) — red
+    ctx.strokeStyle = '#e94560'; ctx.lineWidth = 1.5 * dpr;
+    ctx.beginPath();
+    var started = false;
+    for (var px = 0; px <= plotW; px += 2) {
+      var x = Math.max(2.1, px / plotW * xMax);
+      var y = x / Math.log(x);
+      if (y < 0) continue;
+      var pt = { x: PAD_L + px, y: sy(y) };
+      if (!started) { ctx.moveTo(pt.x, pt.y); started = true; } else ctx.lineTo(pt.x, pt.y);
+    }
+    ctx.stroke();
+
+    // Li(x) — green
+    ctx.strokeStyle = '#4caf50'; ctx.lineWidth = 2 * dpr;
+    ctx.beginPath(); started = false;
+    for (var px = 0; px <= plotW; px += 2) {
+      var x = Math.max(2.5, px / plotW * xMax);
+      var y = Z.li(x);
+      var pt = { x: PAD_L + px, y: sy(y) };
+      if (!started) { ctx.moveTo(pt.x, pt.y); started = true; } else ctx.lineTo(pt.x, pt.y);
+    }
+    ctx.stroke();
+
+    // π(x) staircase — blue (draw at prime positions)
+    ctx.strokeStyle = '#4ab8ff'; ctx.lineWidth = 2 * dpr;
+    ctx.beginPath();
+    ctx.moveTo(sx(2), sy(0));
+    var count = 0;
+    for (var i = 0; i < PRIMES.length && PRIMES[i] <= xMax; i++) {
+      var p = PRIMES[i];
+      ctx.lineTo(sx(p), sy(count));    // horizontal up to prime
+      count++;
+      ctx.lineTo(sx(p), sy(count));    // jump
+    }
+    ctx.lineTo(sx(xMax), sy(count));
+    ctx.stroke();
+
+    // Legend
+    var lx = PAD_L + 8, ly = PAD_T + 12 * dpr;
+    function legend(color, text) {
+      ctx.fillStyle = color; ctx.fillRect(lx, ly - 4, 20 * dpr, 3 * dpr);
+      ctx.fillStyle = '#bbb'; ctx.font = (11 * dpr) + 'px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText(text, lx + 24, ly + 1);
+      ly += 16 * dpr;
+    }
+    legend('#4ab8ff', 'π(x) — true prime count');
+    legend('#4caf50', 'Li(x) — logarithmic integral');
+    legend('#e94560', 'x / log x — Gauss estimate');
+
+    // Info at xMax
+    var piX = Z.piCount(xMax, PRIMES);
+    var liX = Z.li(xMax);
+    var xlxX = xMax / Math.log(xMax);
+    info.innerHTML =
+      'At x = ' + xMax.toLocaleString() + ':' +
+      ' &nbsp; &pi;(x) = ' + piX.toLocaleString() +
+      ' &nbsp;|&nbsp; Li(x) = ' + liX.toFixed(1) +
+      ' (err ' + ((liX - piX) / piX * 100).toFixed(1) + '%)' +
+      ' &nbsp;|&nbsp; x/log x = ' + xlxX.toFixed(1) +
+      ' (err ' + ((xlxX - piX) / piX * 100).toFixed(1) + '%)';
+  }
+
+  slider.addEventListener('input', draw);
+  draw();
+
+  UI.onResize(function () {
+    dpr = UI.fitCanvas(canvas, 0.9);
+    W = canvas.width; H = canvas.height; ctx = canvas.getContext('2d');
+    draw();
+  });
+})();
+</script>
 </body>
 </html>

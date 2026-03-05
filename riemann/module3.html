@@ -14,24 +14,202 @@
 
   <h1>The Critical Strip</h1>
 
-  <!-- PLAN ---------------------------------------------------------------
-  1. Functional equation + Euler product rule out non-trivial zeros outside 0 < Re(s) < 1
-  2. Symmetry of the zero set: ρ zero ⟹ 1-ρ, ρ̄, 1-ρ̄ also zeros
-  3. First non-trivial zero: ρ₁ = ½ + 14.134...i (Riemann computed several by hand)
-  4. The Riemann Hypothesis: all non-trivial zeros have Re(s) = ½
-     - One of the Millennium Prize Problems (unsolved, $1M prize)
-     - Numerical evidence: first 10¹³ zeros verified on the line
-  INTERACTIVE: plot of first ~30 zeros on the critical strip
-               symmetry lines marked; zoom into individual zeros
-  See PLAN.md for full details.
-  ---------------------------------------------------------------------- -->
+  <h2>3.1 — Where the Non-Trivial Zeros Must Live</h2>
+
+  <p>In Module 2 we established that $\zeta(s)$ extends to all of $\mathbb{C}$ except $s=1$, and that non-trivial zeros must lie in the critical strip $0 < \text{Re}(s) < 1$. Let's see why they can't escape.</p>
+
+  <p><strong>They can't be at $\text{Re}(s) > 1$:</strong> The Euler product $\zeta(s) = \prod_p (1-p^{-s})^{-1}$ converges absolutely and each factor is non-zero for $\text{Re}(s) > 1$. So $\zeta(s) \neq 0$ in this half-plane.</p>
+
+  <p><strong>They can't be at $\text{Re}(s) < 0$:</strong> The functional equation $\zeta(s) = 2^s \pi^{s-1} \sin(\pi s/2)\,\Gamma(1-s)\,\zeta(1-s)$ maps zeros in $\text{Re}(s) < 0$ to zeros in $\text{Re}(1-s) > 1$. But we just showed there are none there — except at the trivial zeros $s = -2,-4,-6,\ldots$ where $\sin(\pi s/2) = 0$.</p>
+
+  <p>The non-trivial zeros are therefore confined to $0 \leq \text{Re}(s) \leq 1$. The functional equation further forces $\text{Re}(s) = 0$ and $\text{Re}(s) = 1$ to be zero-free (shown by Hadamard and de la Vallée-Poussin in 1896 — their proof of the Prime Number Theorem). So we have:</p>
+  <div class="math-block">$$\text{All non-trivial zeros lie in the open strip } 0 < \text{Re}(s) < 1.$$</div>
+
+  <h2>3.2 — Symmetry: Zeros Come in Quadruples</h2>
+
+  <p>Two symmetries govern the location of non-trivial zeros:</p>
+  <ul>
+    <li><strong>Complex conjugation:</strong> Since $\zeta(\bar s) = \overline{\zeta(s)}$ (the coefficients $n^{-s}$ are real), zeros come in conjugate pairs: $\rho$ and $\bar\rho$.</li>
+    <li><strong>Functional equation:</strong> $\xi(s) = \xi(1-s)$ means zeros come in pairs $\rho$ and $1-\rho$.</li>
+  </ul>
+  <p>Together: the four points $\rho, \bar\rho, 1-\rho, 1-\bar\rho$ are all zeros whenever any one is. These form a rectangle symmetric about both the real axis and the critical line $\text{Re}(s) = \tfrac{1}{2}$.</p>
+
+  <p>If $\rho = \tfrac{1}{2} + i\gamma$ (on the critical line), then $1 - \rho = \tfrac{1}{2} - i\gamma = \bar\rho$, and the rectangle collapses to just the pair $\tfrac{1}{2} \pm i\gamma$.</p>
+
+  <h2>3.3 — The First Zeros: Riemann's Calculation</h2>
+
+  <p>In his 1859 paper, Riemann computed the first few non-trivial zeros and found them — to his apparent lack of surprise — on the critical line. Using the Riemann-Siegel formula (which he derived but never published in full), he found:</p>
+
+  <div style="overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin: 15px 0;">
+    <thead><tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+      <th style="text-align: left; padding: 8px;">$n$</th>
+      <th style="text-align: left; padding: 8px;">$\rho_n$ (on critical line)</th>
+      <th style="text-align: left; padding: 8px;">$\gamma_n = \text{Im}(\rho_n)$</th>
+    </tr></thead>
+    <tbody>
+      <tr><td style="padding:8px">1</td><td style="padding:8px">$\frac{1}{2} + 14.1347\ldots i$</td><td style="padding:8px">14.1347…</td></tr>
+      <tr><td style="padding:8px">2</td><td style="padding:8px">$\frac{1}{2} + 21.0220\ldots i$</td><td style="padding:8px">21.0220…</td></tr>
+      <tr><td style="padding:8px">3</td><td style="padding:8px">$\frac{1}{2} + 25.0109\ldots i$</td><td style="padding:8px">25.0109…</td></tr>
+      <tr><td style="padding:8px">4</td><td style="padding:8px">$\frac{1}{2} + 30.4249\ldots i$</td><td style="padding:8px">30.4249…</td></tr>
+      <tr><td style="padding:8px">5</td><td style="padding:8px">$\frac{1}{2} + 32.9351\ldots i$</td><td style="padding:8px">32.9351…</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>All on the critical line $\text{Re}(s) = \tfrac{1}{2}$, exactly as the Riemann Hypothesis predicts.</p>
+
+  <h2>3.4 — The Riemann Hypothesis</h2>
+
+  <p>Riemann stated his conjecture briefly, almost as an aside: <em>"…es ist sehr wahrscheinlich, daß alle Wurzeln reell sind"</em> ("it is very probable that all roots are real"), where he meant that all non-trivial zeros of $\xi(s)$ are real, equivalently all zeros of $\zeta$ lie on $\text{Re}(s) = \tfrac{1}{2}$.</p>
+
+  <div class="note success">
+    <strong>The Riemann Hypothesis (1859):</strong> All non-trivial zeros of $\zeta(s)$ lie on the <em>critical line</em> $\text{Re}(s) = \frac{1}{2}$.
+  </div>
+
+  <p>It is one of the seven Millennium Prize Problems (Clay Mathematics Institute, \$1 million reward). It has been unproven for 167 years.</p>
+
+  <h2>3.5 — Numerical Evidence</h2>
+
+  <p>The first systematic numerical verification was done by Gram (1903), Backlund (1914), and Titchmarsh (1930s). Today:</p>
+  <ul>
+    <li>The first $10^{13}$ non-trivial zeros have been verified to lie on the critical line (Platt, 2011)</li>
+    <li>Individual zeros have been found as high as $\text{Im}(\rho) \sim 10^{22}$ (Odlyzko)</li>
+    <li>No exception has ever been found</li>
+  </ul>
+
+  <p>Yet the hypothesis remains unproven. The numerical evidence is overwhelming, but mathematics requires proof, not evidence.</p>
+
+  <details class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: The Density of Zeros</summary>
+    <div style="margin-top: 15px;">
+      <p>How many zeros are there with $0 < \text{Im}(\rho) < T$? The answer is given by the <strong>Riemann-von Mangoldt formula</strong>:</p>
+      <div class="math-block">$$N(T) = \frac{T}{2\pi}\log\frac{T}{2\pi} - \frac{T}{2\pi} + O(\log T)$$</div>
+      <p>The zeros become denser as $T$ grows, with average spacing $\sim 2\pi/\log T$ near height $T$. Near $T = 14$, the first zero, spacing is about $7$; near $T = 1000$, spacing is about $0.9$.</p>
+      <p>The density of zeros determines how accurate the explicit formula is — more zeros means finer control over the prime-counting function.</p>
+    </div>
+  </details>
+
+  <h2>3.6 — Interactive: The Zero Landscape</h2>
+
+  <p>Below are the first 50 known non-trivial zeros of $\zeta(s)$, all lying on the critical line $\text{Re}(s) = \tfrac{1}{2}$. Each dot represents a zero $\rho_n = \tfrac{1}{2} + i\gamma_n$. Hover to see the imaginary part $\gamma_n$.</p>
+
+  <div class="canvas-wrap" style="margin-bottom: 20px;">
+    <canvas id="c-zeros"></canvas>
+    <span class="canvas-label">First 50 non-trivial zeros of $\zeta(s)$, all on the critical line $\text{Re}(s) = \frac{1}{2}$</span>
+  </div>
+
+  <div id="zero-info" style="font-family: monospace; font-size: 13px; min-height: 32px; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 20px;">
+    Hover over a zero to see details.
+  </div>
+
+  <div class="note">
+    <strong>Pattern:</strong> Zeros are distributed along the critical line with gradually increasing density. There are no regularity or arithmetic patterns in their spacing — they look random, yet they are precisely determined by the functional equation and the Euler product. This tension between apparent randomness and deep structure is what makes the Riemann Hypothesis so profound.
+  </div>
 
   <nav class="nav-bottom"></nav>
 
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/zeta-utils.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('c-zeros');
+  var dpr = UI.fitCanvas(canvas, 0.9);
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var info = document.getElementById('zero-info');
+
+  var ZEROS = Z.ZEROS; // 50 values
+
+  // Layout: show critical strip Re ∈ [0,1], Im ∈ [0,150]
+  var RE_MIN = 0, RE_MAX = 1;
+  var IM_MIN = 10, IM_MAX = 150;
+
+  var PAD_L = 45, PAD_R = 30, PAD_T = 20, PAD_B = 30;
+
+  function sx(re) { return PAD_L + (re - RE_MIN) / (RE_MAX - RE_MIN) * (W - PAD_L - PAD_R); }
+  function sy(im) { return PAD_T + (1 - (im - IM_MIN) / (IM_MAX - IM_MIN)) * (H - PAD_T - PAD_B); }
+
+  function draw() {
+    ctx.fillStyle = '#0d1117';
+    ctx.fillRect(0, 0, W, H);
+
+    // Critical strip shading
+    ctx.fillStyle = 'rgba(74,184,255,0.06)';
+    ctx.fillRect(sx(0), PAD_T, sx(1) - sx(0), H - PAD_T - PAD_B);
+
+    // Strip borders
+    ctx.strokeStyle = 'rgba(74,184,255,0.2)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(sx(0), PAD_T); ctx.lineTo(sx(0), H - PAD_B); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx(1), PAD_T); ctx.lineTo(sx(1), H - PAD_B); ctx.stroke();
+
+    // Critical line Re = 1/2
+    ctx.strokeStyle = 'rgba(74,184,255,0.5)'; ctx.lineWidth = 2 * dpr;
+    ctx.setLineDash([6 * dpr, 4 * dpr]);
+    ctx.beginPath(); ctx.moveTo(sx(0.5), PAD_T); ctx.lineTo(sx(0.5), H - PAD_B); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Im axis labels
+    ctx.fillStyle = '#555'; ctx.font = (10 * dpr) + 'px sans-serif'; ctx.textAlign = 'right';
+    for (var im = 20; im <= 140; im += 20) {
+      ctx.fillText(im + 'i', PAD_L - 5, sy(im) + 4);
+    }
+
+    // Re axis labels
+    ctx.textAlign = 'center';
+    ctx.fillText('0', sx(0), H - PAD_B + 14 * dpr);
+    ctx.fillText('½', sx(0.5), H - PAD_B + 14 * dpr);
+    ctx.fillText('1', sx(1), H - PAD_B + 14 * dpr);
+    ctx.fillStyle = 'rgba(74,184,255,0.5)';
+    ctx.fillText('Re(s)=½', sx(0.5), PAD_T - 6);
+
+    // Zero dots
+    ZEROS.forEach(function (gamma, idx) {
+      if (gamma < IM_MIN || gamma > IM_MAX) return;
+      var x = sx(0.5), y = sy(gamma);
+      ctx.beginPath(); ctx.arc(x, y, 5 * dpr, 0, Math.PI * 2);
+      ctx.fillStyle = '#4caf50'; ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 1; ctx.stroke();
+
+      // Index label for first 10
+      if (idx < 10) {
+        ctx.fillStyle = '#aaa'; ctx.font = (9 * dpr) + 'px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('ρ' + (idx + 1), x + 7 * dpr, y + 4);
+      }
+    });
+  }
+
+  canvas.addEventListener('mousemove', function (e) {
+    var pos = UI.canvasPos(canvas, e);
+    var best = -1, bestD = Infinity;
+    ZEROS.forEach(function (gamma, idx) {
+      if (gamma < IM_MIN || gamma > IM_MAX) return;
+      var d = Math.hypot(pos.x - sx(0.5), pos.y - sy(gamma));
+      if (d < bestD) { bestD = d; best = idx; }
+    });
+    if (best >= 0 && bestD < 15 * dpr) {
+      info.textContent = 'ρ' + (best + 1) + ' = ½ + ' + ZEROS[best].toFixed(6) + 'i';
+    } else {
+      info.textContent = 'Hover over a zero to see details.';
+    }
+  });
+
+  draw();
+
+  UI.onResize(function () {
+    dpr = UI.fitCanvas(canvas, 0.9);
+    W = canvas.width; H = canvas.height; ctx = canvas.getContext('2d');
+    draw();
+  });
+})();
+</script>
 </body>
 </html>

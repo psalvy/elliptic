@@ -14,25 +14,229 @@
 
   <h1>The Sum That Started Everything</h1>
 
-  <!-- PLAN ---------------------------------------------------------------
-  1. Euler's Basel problem: Σ 1/n² = π²/6
-     - Euler's proof via infinite product for sin(πx)/(πx)
-     - Compare coefficients to identify the sum
-  2. Natural generalisation: ζ(s) = Σ n^{-s}, converges for Re(s) > 1
-  3. The Euler product formula: ζ(s) = Π_p (1 - p^{-s})^{-1}
-     - Derive via geometric series + unique factorisation
-     - Every integer appears exactly once — no double-counting
-  4. Consequence: the product diverging at s=1 proves infinitely many primes
-  INTERACTIVE: slider for cutoff prime P; show Π_{p≤P} converging to ζ(s)
-  See PLAN.md for full details.
-  ---------------------------------------------------------------------- -->
+  <h2>1.1 — Euler's Solution to the Basel Problem</h2>
+
+  <p>In 1644, Pietro Mengoli asked a deceptively simple question: what is the <em>exact</em> value of the sum of the reciprocals of all perfect squares?</p>
+  <div class="math-block">$$\sum_{n=1}^\infty \frac{1}{n^2} = 1 + \frac{1}{4} + \frac{1}{9} + \frac{1}{16} + \frac{1}{25} + \cdots = \;?$$</div>
+
+  <p>The series clearly converges (partial sums approach ≈ 1.6449) but no one could find what it converged <em>to</em>. The problem sat open for 90 years. In 1734, Leonhard Euler, aged 26, solved it — and opened a door that would lead directly to the deepest questions in mathematics.</p>
+
+  <p>Euler's key insight: the sine function has zeros at every integer $x = 0, \pm 1, \pm 2, \ldots$, so, just as a polynomial is determined by its roots, the sine function has an infinite product representation:</p>
+  <div class="math-block">$$\sin(\pi x) = \pi x \prod_{n=1}^\infty \!\left(1 - \frac{x^2}{n^2}\right)$$</div>
+  <p>The $\pi x$ factor accounts for the zero at $x = 0$ with the correct slope; the $(1 - x^2/n^2)$ factors pair up the symmetric zeros at $\pm n$. Dividing by $\pi x$:</p>
+  <div class="math-block">$$\frac{\sin(\pi x)}{\pi x} = \prod_{n=1}^\infty \!\left(1 - \frac{x^2}{n^2}\right) = 1 - \left(\sum_{n=1}^\infty \frac{1}{n^2}\right)x^2 + \cdots$$</div>
+  <p>The left side has a perfectly ordinary Taylor expansion:</p>
+  <div class="math-block">$$\frac{\sin(\pi x)}{\pi x} = 1 - \frac{\pi^2 x^2}{6} + \frac{\pi^4 x^4}{120} - \cdots$$</div>
+  <p>Matching the coefficient of $x^2$ on both sides:</p>
+  <div class="math-block">$$\boxed{\sum_{n=1}^\infty \frac{1}{n^2} = \frac{\pi^2}{6}}$$</div>
+
+  <div class="note success">
+    <strong>The Basel problem is solved.</strong> Euler also found $\sum 1/n^4 = \pi^4/90$, $\sum 1/n^6 = \pi^6/945$, and all even powers — each a rational multiple of the corresponding power of $\pi$. The integers are woven into $\pi$ in a completely unexpected way.
+  </div>
+
+  <details class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: Is Euler's Product Rigorous?</summary>
+    <div style="margin-top: 15px;">
+      <p>Euler's argument was criticised at the time as non-rigorous: he assumed the sine function has a product expansion in the same way a polynomial does, without proof. This gap was later closed by Weierstrass (1876) and more generally by Hadamard (1893), whose product theorem we will meet in Module 4.</p>
+      <p>The key condition is that $\sin(\pi x) / (\pi x)$ is an <em>entire function of finite order</em>, which ensures the product converges and the coefficient comparison is valid. Euler's intuition was correct — he just lacked the 19th-century machinery to make it precise.</p>
+      <p>A rigorous modern proof of $\zeta(2) = \pi^2/6$ uses Parseval's identity: for $f(x) = x$ on $[-\pi, \pi]$, the Fourier series gives $\sum_{n=1}^\infty 1/n^2 = \pi^2/6$ directly.</p>
+    </div>
+  </details>
+
+  <h2>1.2 — The Riemann Zeta Function</h2>
+
+  <p>Euler's trick works for any exponent. Replace $2$ with any real number $s > 1$:</p>
+  <div class="math-block">$$\zeta(s) = \sum_{n=1}^\infty \frac{1}{n^s} = 1 + \frac{1}{2^s} + \frac{1}{3^s} + \frac{1}{4^s} + \cdots$$</div>
+  <p>This is the <strong>Riemann zeta function</strong>. The condition $s > 1$ ensures convergence. At $s = 1$, the sum is the harmonic series $1 + \tfrac{1}{2} + \tfrac{1}{3} + \cdots$, which diverges. Special values:</p>
+
+  <div style="overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 14px;">
+    <thead><tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+      <th style="text-align: left; padding: 8px;">$s$</th>
+      <th style="text-align: left; padding: 8px;">$\zeta(s)$</th>
+      <th style="text-align: left; padding: 8px;">Exact form</th>
+    </tr></thead>
+    <tbody>
+      <tr><td style="padding:8px">2</td><td style="padding:8px">1.6449…</td><td style="padding:8px">$\pi^2/6$</td></tr>
+      <tr><td style="padding:8px">3</td><td style="padding:8px">1.2021…</td><td style="padding:8px">Apéry's constant (irrational, no $\pi^3$ formula known)</td></tr>
+      <tr><td style="padding:8px">4</td><td style="padding:8px">1.0823…</td><td style="padding:8px">$\pi^4/90$</td></tr>
+      <tr><td style="padding:8px">1</td><td style="padding:8px">$\infty$</td><td style="padding:8px">Harmonic series diverges (simple pole)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>1.3 — The Euler Product: A Bridge to the Primes</h2>
+
+  <p>$\zeta(s)$ looks like a sum over all integers. But Euler discovered it can be written as a product over primes <em>alone</em> — the key bridge from analysis to number theory.</p>
+
+  <p>For each prime $p$, factor out its contribution by observing:</p>
+  <div class="math-block">$$\frac{1}{1-p^{-s}} = 1 + p^{-s} + p^{-2s} + p^{-3s} + \cdots = \sum_{k=0}^\infty p^{-ks}$$</div>
+  <p>Multiply over all primes. By the <strong>Fundamental Theorem of Arithmetic</strong> (unique factorisation), every positive integer $n = 2^{a_2} 3^{a_3} 5^{a_5} \cdots$ appears in this product exactly once, as the term $2^{-a_2 s} \cdot 3^{-a_3 s} \cdots = n^{-s}$. Therefore:</p>
+  <div class="math-block">$$\zeta(s) = \prod_{p\,\text{prime}} \frac{1}{1 - p^{-s}}$$</div>
+
+  <p>This is the <strong>Euler product formula</strong>. It encodes the Fundamental Theorem of Arithmetic in a single equation — and it means that to understand $\zeta(s)$, you need to understand how the primes distribute.</p>
+
+  <details class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: The Sieve Derivation</summary>
+    <div style="margin-top: 15px;">
+      <p>Here is the cleanest proof of the Euler product. Start by multiplying $\zeta(s)$ by $2^{-s}$:</p>
+      <div class="math-block">$$2^{-s}\zeta(s) = \frac{1}{2^s} + \frac{1}{4^s} + \frac{1}{6^s} + \frac{1}{8^s} + \cdots$$</div>
+      <p>Subtracting kills all even-$n$ terms:</p>
+      <div class="math-block">$$(1-2^{-s})\zeta(s) = 1 + \frac{1}{3^s} + \frac{1}{5^s} + \frac{1}{7^s} + \cdots$$</div>
+      <p>Multiply by $3^{-s}$ and subtract again — kills all remaining multiples of 3. Continue for every prime $p$. By the Fundamental Theorem, after sieving out all primes, only the $n=1$ term survives:</p>
+      <div class="math-block">$$\prod_p (1 - p^{-s}) \cdot \zeta(s) = 1 \qquad \Longrightarrow \qquad \zeta(s) = \prod_p \frac{1}{1-p^{-s}}$$</div>
+    </div>
+  </details>
+
+  <h2>1.4 — Infinitely Many Primes (Euler's Proof)</h2>
+
+  <p>Euclid proved infinitely many primes by contradiction (assume finitely many, derive absurdity). The Euler product gives a more quantitative version:</p>
+
+  <p>At $s = 1$: $\zeta(1) = \sum 1/n = \infty$ (harmonic series). But the Euler product at $s=1$ would be $\prod_p (1-1/p)^{-1}$. If there were only finitely many primes, this finite product would be finite — contradiction. So there are infinitely many primes.</p>
+
+  <p>More precisely, taking logarithms: $\log \zeta(s) = -\sum_p \log(1 - p^{-s}) \approx \sum_p p^{-s}$ as $s \to 1^+$. Since the left side diverges, the sum $\sum_p p^{-s}$ diverges — which means there are not only infinitely many primes, but they are "thick enough" in the integers for this sum to blow up. This observation seeds everything that follows.</p>
+
+  <h2>1.5 — Interactive: Watching the Product Converge</h2>
+
+  <p>Select an exponent $s$ and watch the partial product $\prod_{p \leq P}(1-p^{-s})^{-1}$ converge toward $\zeta(s)$ as more primes are included. The red dashed line shows the true value $\zeta(s)$.</p>
+
+  <div style="margin: 15px 0; display: flex; gap: 30px; flex-wrap: wrap; align-items: center;">
+    <label style="font-size: 15px;">
+      $s$ = <strong id="s-val">2.00</strong>
+      <input type="range" id="s-slider" min="115" max="500" value="200" style="width:200px; margin-left:10px; vertical-align:middle;">
+    </label>
+  </div>
+
+  <div id="euler-info" style="font-family: monospace; font-size: 13px; margin-bottom: 10px; padding: 8px 12px; background: rgba(255,255,255,0.05); border-radius: 4px;"></div>
+
+  <div class="canvas-wrap" style="margin-bottom: 20px;">
+    <canvas id="c-euler"></canvas>
+    <span class="canvas-label">Partial Euler product $\prod_{p \leq P}(1-p^{-s})^{-1}$ (blue) approaching $\zeta(s)$ (red dashed) as primes accumulate</span>
+  </div>
+
+  <div class="note">
+    <strong>Try $s$ near 1:</strong> convergence is extremely slow — even hundreds of primes leave a visible gap. This reflects the fact that the primes are dense enough to make $\sum p^{-s}$ diverge as $s \to 1$. For large $s$, convergence is rapid: each new prime contributes a negligible factor.
+  </div>
 
   <nav class="nav-bottom"></nav>
 
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/zeta-utils.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var PRIMES = Z.sieve(600);
+  var canvas = document.getElementById('c-euler');
+  var dpr = UI.fitCanvas(canvas, 0.9);
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var sSlider = document.getElementById('s-slider');
+  var sVal = document.getElementById('s-val');
+  var info = document.getElementById('euler-info');
+
+  function getS() { return parseInt(sSlider.value) / 100; }
+
+  // ζ(s) via large partial Dirichlet sum (accurate for s > 1.1)
+  function zeta(s) { return Z.zetaDirichlet(s, 80000); }
+
+  function draw() {
+    var s = getS();
+    sVal.textContent = s.toFixed(2);
+    var target = zeta(s);
+
+    ctx.fillStyle = '#0d1117';
+    ctx.fillRect(0, 0, W, H);
+
+    var PAD_L = 45, PAD_R = 30, PAD_T = 20, PAD_B = 35;
+    var plotW = W - PAD_L - PAD_R;
+    var plotH = H - PAD_T - PAD_B;
+
+    // Build partial product for each prime
+    var points = [];
+    var prod = 1;
+    for (var i = 0; i < PRIMES.length; i++) {
+      prod *= 1 / (1 - Math.pow(PRIMES[i], -s));
+      points.push({ p: PRIMES[i], v: prod });
+    }
+
+    // x scale: linear prime count (up to 100 primes shown)
+    var NSHOW = Math.min(100, points.length);
+    var yMin = 1, yMax = Math.max(target * 1.05, points[0].v * 1.05);
+
+    function sx(i) { return PAD_L + (i / (NSHOW - 1)) * plotW; }
+    function sy(v) { return PAD_T + plotH - ((v - yMin) / (yMax - yMin)) * plotH; }
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 1;
+    var nGridY = 5;
+    for (var g = 0; g <= nGridY; g++) {
+      var v = yMin + (g / nGridY) * (yMax - yMin);
+      var y = sy(v);
+      ctx.beginPath(); ctx.moveTo(PAD_L, y); ctx.lineTo(W - PAD_R, y); ctx.stroke();
+      ctx.fillStyle = '#555'; ctx.font = (10 * dpr) + 'px sans-serif'; ctx.textAlign = 'right';
+      ctx.fillText(v.toFixed(3), PAD_L - 5, y + 4);
+    }
+
+    // x-axis labels (prime values)
+    ctx.fillStyle = '#555'; ctx.font = (10 * dpr) + 'px sans-serif'; ctx.textAlign = 'center';
+    for (var i = 0; i < NSHOW; i += 10) {
+      var x = sx(i);
+      ctx.fillText('p=' + points[i].p, x, H - 8);
+    }
+
+    // Target line ζ(s)
+    var ty = sy(target);
+    ctx.save();
+    ctx.strokeStyle = '#e94560'; ctx.lineWidth = 1.5 * dpr;
+    ctx.setLineDash([6 * dpr, 4 * dpr]);
+    ctx.beginPath(); ctx.moveTo(PAD_L, ty); ctx.lineTo(W - PAD_R, ty); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+    ctx.fillStyle = '#e94560'; ctx.font = (11 * dpr) + 'px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('ζ(' + s.toFixed(2) + ') = ' + target.toFixed(5), PAD_L + 4, ty - 5 * dpr);
+
+    // Partial product curve
+    ctx.strokeStyle = '#4ab8ff'; ctx.lineWidth = 2 * dpr;
+    ctx.beginPath();
+    for (var i = 0; i < NSHOW; i++) {
+      var x = sx(i), y = sy(Math.min(points[i].v, yMax * 1.05));
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Dots for first few primes
+    ctx.fillStyle = '#4ab8ff';
+    for (var i = 0; i < Math.min(15, NSHOW); i++) {
+      var x = sx(i), y = sy(Math.min(points[i].v, yMax));
+      ctx.beginPath(); ctx.arc(x, y, 3 * dpr, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Info bar
+    var last = points[NSHOW - 1];
+    var pct = (last.v / target * 100).toFixed(2);
+    info.innerHTML =
+      '&zeta;(' + s.toFixed(2) + ') &asymp; ' + target.toFixed(6) +
+      ' &nbsp;&nbsp; Partial product (first ' + NSHOW + ' primes, p &le; ' + last.p + '): ' +
+      last.v.toFixed(6) + ' &nbsp;(' + pct + '% of target)';
+  }
+
+  sSlider.addEventListener('input', draw);
+  draw();
+
+  UI.onResize(function () {
+    dpr = UI.fitCanvas(canvas, 0.9);
+    W = canvas.width; H = canvas.height; ctx = canvas.getContext('2d');
+    draw();
+  });
+})();
+</script>
 </body>
 </html>
