@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 4: Solvability</title>
+  <title>Module 4: Solvability — Why the Quintic Breaks</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 </head>
@@ -14,24 +14,74 @@
 
   <h1>Solvability: Why the Quintic Breaks</h1>
 
-  <!-- PLAN ---------------------------------------------------------------
-  1. Solvable group: subnormal series G = G₀ ⊃ G₁ ⊃ ... ⊃ {e}
-     where each quotient Gᵢ/Gᵢ₊₁ is abelian
-     Intuition: the group can be "dismantled" into commutative layers
-  2. Solvable cases:
-     - S₂ ≅ ℤ/2: trivially abelian → quadratic formula
-     - S₃: {e} ◁ A₃ ◁ S₃, quotients ℤ/3 and ℤ/2 → cubic formula (Cardano)
-     - S₄: {e} ◁ V₄ ◁ A₄ ◁ S₄, all abelian quotients → quartic formula (Ferrari)
-  3. S₅ is NOT solvable:
-     - A₅ is the unique normal subgroup and is simple (no proper normal subgroups)
-     - The derived series stops: [S₅,S₅] = A₅, [A₅,A₅] = A₅ — never reaches {e}
-  4. Abel-Ruffini theorem: no general solution by radicals for degree ≥ 5
-  5. Galois's criterion: f(x) solvable by radicals ⟺ Gal(f) is a solvable group
-     (specific degree-5 polynomials with Galois group ℤ/5 ARE solvable;
-      it's x⁵-x-1 type polynomials with Galois group S₅ that aren't)
-  INTERACTIVE: commutator tower visualised for S₄ (terminates) vs S₅ (loops)
-  See PLAN.md for full details.
-  ---------------------------------------------------------------------- -->
+  <h2>4.1 — Solving by Radicals</h2>
+
+  <p>The quadratic formula $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$ expresses the roots using only arithmetic and square roots. For cubics (Cardano, 1545) and quartics (Ferrari, 1540s), similar formulas exist using nested radicals. The natural question: is there a formula for degree 5?</p>
+
+  <p>Abel (1824) proved: no. Galois (1832) explained exactly <em>why</em> — and the answer is group-theoretic.</p>
+
+  <p>A polynomial $f(x)$ is <strong>solvable by radicals</strong> if its roots can be expressed by a finite chain of additions, subtractions, multiplications, divisions, and $n$-th root extractions starting from the coefficients. In terms of field extensions: the splitting field $K$ is contained in a tower $F = F_0 \subset F_1 \subset \cdots \subset F_m$ where each step $F_{i+1} = F_i(\alpha_i)$ with $\alpha_i^{n_i} \in F_i$ (a radical extension).</p>
+
+  <h2>4.2 — Solvable Groups</h2>
+
+  <p>A group $G$ is <strong>solvable</strong> if there is a subnormal series:</p>
+  <div class="math-block">$$G = G_0 \supset G_1 \supset G_2 \supset \cdots \supset G_k = \{e\}$$</div>
+  <p>where each quotient $G_i/G_{i+1}$ is abelian. Equivalently: $G$ can be "dismantled" into commutative layers. The <strong>derived series</strong> is the canonical choice: $G^{(0)} = G$, $G^{(i+1)} = [G^{(i)}, G^{(i)}]$ (the commutator subgroup). $G$ is solvable iff $G^{(k)} = \{e\}$ for some $k$.</p>
+
+  <p><strong>Galois's criterion:</strong> $f(x)$ is solvable by radicals over $\mathbb{Q}$ $\Leftrightarrow$ $\text{Gal}(f) = \text{Gal}(K/\mathbb{Q})$ is a solvable group.</p>
+
+  <h2>4.3 — Lower Degrees Are Solvable</h2>
+
+  <ul>
+    <li><strong>Degree 2:</strong> $\text{Gal}(f) \leq S_2 \cong \mathbb{Z}/2$ (abelian) → solvable → quadratic formula</li>
+    <li><strong>Degree 3:</strong> $\text{Gal}(f) \leq S_3$. The derived series: $[S_3, S_3] = A_3 \cong \mathbb{Z}/3$, $[A_3, A_3] = \{e\}$. The quotients are $S_3/A_3 \cong \mathbb{Z}/2$ and $A_3/\{e\} \cong \mathbb{Z}/3$ — both abelian → solvable → Cardano's cubic formula</li>
+    <li><strong>Degree 4:</strong> $\text{Gal}(f) \leq S_4$. Derived series: $[S_4,S_4] = A_4$, $[A_4,A_4] = V_4 = \{e,(12)(34),(13)(24),(14)(23)\}$, $[V_4,V_4] = \{e\}$. All quotients abelian → solvable → Ferrari's quartic formula</li>
+  </ul>
+
+  <h2>4.4 — The Quintic is Not Solvable: $A_5$ is Simple</h2>
+
+  <p>For degree 5, a "generic" polynomial (one with no special symmetries) has $\text{Gal}(f) = S_5$. The derived series of $S_5$:</p>
+  <div class="math-block">$$S_5 \supset A_5 \supset A_5 \supset A_5 \supset \cdots$$</div>
+  <p>The derived series gets stuck at $A_5$ because $[A_5, A_5] = A_5$ — the alternating group $A_5$ is <strong>perfect</strong> (equals its own commutator subgroup). In fact, $A_5$ is <strong>simple</strong>: it has no proper normal subgroups at all.</p>
+
+  <p>Proof that $A_5$ is simple (sketch): $A_5$ has order 60. A normal subgroup would have order dividing 60. The 5-cycles, 3-cycles, and double transpositions each form conjugacy classes of sizes 24, 20, 15, and 1. A normal subgroup is a union of conjugacy classes including $\{e\}$. Checking all subsets: no union of those class sizes (1, 15, 20, 24) adds to a proper divisor of 60. Therefore no proper normal subgroup exists.</p>
+
+  <p>Since $A_5$ is non-abelian and simple, the derived series of $S_5$ never reaches $\{e\}$. So $S_5$ is not solvable. Therefore a generic degree-5 polynomial with Galois group $S_5$ is not solvable by radicals.</p>
+
+  <div class="note success">
+    <strong>Abel–Ruffini theorem:</strong> There is no general formula (using radicals) for the roots of a degree-5 polynomial. This is a theorem about groups, not polynomials — the obstruction is the simplicity of $A_5$.
+  </div>
+
+  <details class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: Specific Quintics That Are Solvable</summary>
+    <div style="margin-top: 15px;">
+      <p>Not every quintic is unsolvable — only those with Galois group $S_5$ or $A_5$. A quintic with Galois group $\mathbb{Z}/5$ (a cyclic group) IS solvable. For example, $x^5 - 2$ has Galois group a subgroup of $\text{AGL}(1, \mathbb{F}_5) \cong \mathbb{Z}/5 \rtimes \mathbb{Z}/4$ — solvable. The roots $\sqrt[5]{2} \cdot \zeta_5^k$ can be expressed using 5th and 4th roots: that's a solvable tower.</p>
+      <p>The "generic" quintic $x^5 + ax + b$ for most choices of $a, b$ has Galois group $S_5$, which is the unsolvable case. It is a theorem that solvable quintics are the exception, not the rule.</p>
+    </div>
+  </details>
+
+  <h2>4.5 — Interactive: The Derived Series Tower</h2>
+
+  <p>The derived series $G \supset [G,G] \supset [[G,G],[G,G]] \supset \cdots$ shows whether a group is solvable. For $S_4$, the chain terminates at $\{e\}$. For $S_5$, it gets stuck at $A_5$ and loops forever. Click to step through the derived series.</p>
+
+  <div style="margin: 15px 0; display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 220px;">
+      <h3 style="color:#4caf50; font-size:15px; margin-bottom:8px;">$S_4$ — Solvable</h3>
+      <div id="chain-s4" style="font-family: monospace; font-size: 14px; line-height: 2.2;"></div>
+      <button id="step-s4" style="margin-top:8px; padding:7px 16px; background:rgba(76,175,80,0.2); border:1px solid #4caf50; color:#4caf50; border-radius:4px; cursor:pointer;">Step →</button>
+      <button id="reset-s4" style="margin-top:8px; margin-left:8px; padding:7px 16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.2); color:#aaa; border-radius:4px; cursor:pointer;">Reset</button>
+    </div>
+    <div style="flex: 1; min-width: 220px;">
+      <h3 style="color:#e94560; font-size:15px; margin-bottom:8px;">$S_5$ — Not Solvable</h3>
+      <div id="chain-s5" style="font-family: monospace; font-size: 14px; line-height: 2.2;"></div>
+      <button id="step-s5" style="margin-top:8px; padding:7px 16px; background:rgba(233,69,96,0.2); border:1px solid #e94560; color:#e94560; border-radius:4px; cursor:pointer;">Step →</button>
+      <button id="reset-s5" style="margin-top:8px; margin-left:8px; padding:7px 16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.2); color:#aaa; border-radius:4px; cursor:pointer;">Reset</button>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>The deeper picture:</strong> The solvability of a polynomial depends only on its Galois group — the abstract symmetry group of its roots. The formula vs. no-formula dichotomy is really a statement about whether this symmetry group can be "peeled apart" into abelian layers. Galois theory reduces a question about polynomial arithmetic to a question about group structure.
+  </div>
 
   <nav class="nav-bottom"></nav>
 
@@ -40,5 +90,62 @@
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var S4_CHAIN = [
+    { name: 'S₄', order: 24, desc: 'Full symmetric group on 4 elements.' },
+    { name: 'A₄', order: 12, desc: '[S₄,S₄]=A₄. Quotient S₄/A₄≅ℤ/2 — abelian ✓' },
+    { name: 'V₄={e,(12)(34),(13)(24),(14)(23)}', order: 4, desc: '[A₄,A₄]=V₄ (Klein 4-group). Quotient A₄/V₄≅ℤ/3 — abelian ✓' },
+    { name: '{e}', order: 1, desc: '[V₄,V₄]={e}. Quotient V₄/{e}≅ℤ/2×ℤ/2 — abelian ✓  →  S₄ is SOLVABLE 🎉' },
+  ];
+
+  var S5_CHAIN = [
+    { name: 'S₅', order: 120, desc: 'Full symmetric group on 5 elements.' },
+    { name: 'A₅', order: 60,  desc: '[S₅,S₅]=A₅. Quotient S₅/A₅≅ℤ/2 — abelian ✓' },
+    { name: 'A₅', order: 60,  desc: '[A₅,A₅]=A₅. A₅ is SIMPLE — no proper normal subgroups. Chain is stuck. → S₅ is NOT SOLVABLE ✗' },
+    { name: 'A₅', order: 60,  desc: 'Still A₅. Will never reach {e}. No radical formula exists for a generic quintic.' },
+  ];
+
+  function makeChainUI(chainId, stepId, resetId, chain, color) {
+    var el = document.getElementById(chainId);
+    var stepBtn = document.getElementById(stepId);
+    var resetBtn = document.getElementById(resetId);
+    var step = 0;
+
+    function render() {
+      var html = '';
+      for (var i = 0; i <= step && i < chain.length; i++) {
+        var g = chain[i];
+        var isNew = i === step;
+        html +=
+          '<div style="' + (isNew ? 'color:' + color + ';' : 'color:#666;') + '">' +
+          (i > 0 ? '⊃ ' : '') +
+          '<strong>' + g.name + '</strong>' +
+          ' <span style="font-size:11px">(order ' + g.order + ')</span>' +
+          (isNew ? '<br><span style="color:#aaa; font-size:12px; padding-left:12px;">' + g.desc + '</span>' : '') +
+          '</div>';
+      }
+      if (step >= chain.length - 1) {
+        stepBtn.disabled = true;
+        stepBtn.style.opacity = '0.4';
+      }
+      el.innerHTML = html;
+    }
+
+    stepBtn.addEventListener('click', function () {
+      if (step < chain.length - 1) { step++; render(); }
+    });
+    resetBtn.addEventListener('click', function () {
+      step = 0; stepBtn.disabled = false; stepBtn.style.opacity = '1'; render();
+    });
+    render();
+  }
+
+  makeChainUI('chain-s4', 'step-s4', 'reset-s4', S4_CHAIN, '#4caf50');
+  makeChainUI('chain-s5', 'step-s5', 'reset-s5', S5_CHAIN, '#e94560');
+})();
+</script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 2: Permuting Roots</title>
+  <title>Module 2: Permuting Roots: the Galois Group</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 </head>
@@ -14,19 +14,90 @@
 
   <h1>Permuting Roots: the Galois Group</h1>
 
-  <!-- PLAN ---------------------------------------------------------------
-  1. Roots of x²-2 are ±√2; the map σ: √2 ↦ -√2 is a field automorphism fixing ℚ
-  2. Definition: Gal(K/F) = all automorphisms of K that fix F pointwise
-  3. For x²-2: Gal(ℚ(√2)/ℚ) = {e, σ} ≅ ℤ/2ℤ
-  4. For x²+x+1 (roots ω, ω̄): Gal = complex conjugation, again ℤ/2ℤ
-  5. For x³-2: three roots ∛2, ω∛2, ω²∛2; splitting field degree 6 over ℚ
-     Gal ≅ S₃ (all permutations of 3 objects)
-     6 elements: identity, 2 rotations (order 3), 3 reflections (order 2)
-  6. Key principle: |Gal(K/F)| = [K:F] for Galois extensions
-  INTERACTIVE: drag the 3 roots of x³-2 on the complex plane;
-               show which of the 6 automorphisms sends each root where
-  See PLAN.md for full details.
-  ---------------------------------------------------------------------- -->
+  <h2>2.1 — Symmetries of a Quadratic</h2>
+
+  <p>The roots of $x^2 - 2$ are $\sqrt{2}$ and $-\sqrt{2}$. They are related by complex conjugation — or equivalently, by the map $\sigma: \sqrt{2} \mapsto -\sqrt{2}$. Let's think about what $\sigma$ does to the whole field $\mathbb{Q}(\sqrt{2}) = \{a + b\sqrt{2}: a,b\in\mathbb{Q}\}$:</p>
+  <div class="math-block">$$\sigma(a + b\sqrt{2}) = a - b\sqrt{2} \qquad (a, b \in \mathbb{Q})$$</div>
+  <p>This map is a <strong>field automorphism</strong>: it preserves addition and multiplication (check: $\sigma((a+b\sqrt{2})(c+d\sqrt{2})) = \sigma(ac+2bd + (ad+bc)\sqrt{2}) = ac+2bd - (ad+bc)\sqrt{2}$, which equals $\sigma(a+b\sqrt{2})\cdot\sigma(c+d\sqrt{2})$ ✓). It also <strong>fixes $\mathbb{Q}$</strong> pointwise ($\sigma(a) = a$ for all $a \in \mathbb{Q}$).</p>
+
+  <p>The group of all automorphisms of $\mathbb{Q}(\sqrt{2})$ that fix $\mathbb{Q}$ is: $\{e, \sigma\}$ — the identity and the conjugation. This is the <strong>Galois group</strong>:</p>
+  <div class="math-block">$$\text{Gal}(\mathbb{Q}(\sqrt{2})/\mathbb{Q}) = \{e, \sigma\} \cong \mathbb{Z}/2\mathbb{Z}$$</div>
+  <p>Order 2, equal to the degree $[\mathbb{Q}(\sqrt{2}):\mathbb{Q}] = 2$. This is always true for Galois extensions.</p>
+
+  <h2>2.2 — The Galois Group: Definition</h2>
+
+  <p>Let $K/F$ be a field extension. The <strong>Galois group</strong> is:</p>
+  <div class="math-block">$$\text{Gal}(K/F) = \{\sigma: K \xrightarrow{\sim} K : \sigma \text{ is a field automorphism and } \sigma|_F = \text{id}\}$$</div>
+  <p>The group operation is composition. Key theorem: if $K/F$ is a Galois extension (normal + separable), then $|\text{Gal}(K/F)| = [K:F]$.</p>
+
+  <p><strong>Galois extension:</strong> $K/F$ is <em>normal</em> (every irreducible polynomial over $F$ with one root in $K$ splits completely in $K$) and <em>separable</em> (no repeated roots — automatic over $\mathbb{Q}$). Equivalently: $K$ is the splitting field of some polynomial over $F$.</p>
+
+  <h2>2.3 — A Cubic: $x^3 - 2$ and $S_3$</h2>
+
+  <p>The three roots of $x^3 - 2$ are:</p>
+  <div class="math-block">$$r_1 = \sqrt[3]{2} \approx 1.260 \qquad r_2 = \omega\sqrt[3]{2} \approx -0.630 + 1.091i \qquad r_3 = \omega^2\sqrt[3]{2} \approx -0.630 - 1.091i$$</div>
+  <p>where $\omega = e^{2\pi i/3}$. The splitting field $K = \mathbb{Q}(r_1, \omega)$ has degree 6 over $\mathbb{Q}$.</p>
+
+  <p>An automorphism $\sigma \in \text{Gal}(K/\mathbb{Q})$ is determined by where it sends $r_1$ and $\omega$:
+  <ul>
+    <li>$\sigma(r_1)$ must be one of $r_1, r_2, r_3$ (another root of $x^3-2$)</li>
+    <li>$\sigma(\omega)$ must be a primitive cube root of unity — either $\omega$ or $\omega^2$</li>
+  </ul>
+  <p>This gives at most $3 \times 2 = 6$ automorphisms. Since $[K:\mathbb{Q}] = 6$, all 6 are realised. They form the symmetric group $S_3$, acting by permuting the three roots:</p>
+
+  <div style="overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin: 15px 0;">
+    <thead><tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+      <th style="padding:8px; text-align:left;">Element of $S_3$</th>
+      <th style="padding:8px; text-align:left;">Action on roots</th>
+      <th style="padding:8px; text-align:left;">$\sigma(\omega)$</th>
+    </tr></thead>
+    <tbody>
+      <tr><td style="padding:8px">$e$ (identity)</td><td style="padding:8px">$r_1 \to r_1,\; r_2 \to r_2,\; r_3 \to r_3$</td><td style="padding:8px">$\omega$</td></tr>
+      <tr><td style="padding:8px">$(12)$</td><td style="padding:8px">$r_1 \leftrightarrow r_2,\; r_3 \to r_3$</td><td style="padding:8px">$\omega^2$</td></tr>
+      <tr><td style="padding:8px">$(13)$</td><td style="padding:8px">$r_1 \leftrightarrow r_3,\; r_2 \to r_2$</td><td style="padding:8px">$\omega^2$</td></tr>
+      <tr><td style="padding:8px">$(23)$</td><td style="padding:8px">$r_2 \leftrightarrow r_3,\; r_1 \to r_1$</td><td style="padding:8px">$\omega$</td></tr>
+      <tr><td style="padding:8px">$(123)$</td><td style="padding:8px">$r_1 \to r_2 \to r_3 \to r_1$</td><td style="padding:8px">$\omega$</td></tr>
+      <tr><td style="padding:8px">$(132)$</td><td style="padding:8px">$r_1 \to r_3 \to r_2 \to r_1$</td><td style="padding:8px">$\omega$</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note success">
+    <strong>The Galois group is the symmetry group of the roots.</strong> $\text{Gal}(\mathbb{Q}(\sqrt[3]{2},\omega)/\mathbb{Q}) \cong S_3$. The six elements are exactly the six ways of rearranging the three roots — the six symmetries a rational observer can't distinguish.
+  </div>
+
+  <details class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: Why Do Automorphisms Permute Roots?</summary>
+    <div style="margin-top: 15px;">
+      <p>If $\sigma$ is a field automorphism fixing $\mathbb{Q}$, and $r$ is a root of $f(x) \in \mathbb{Q}[x]$, then $\sigma(r)$ is also a root of $f$. Proof: $f(r) = 0 \Rightarrow \sigma(f(r)) = \sigma(0) = 0$. But $\sigma(f(r)) = f(\sigma(r))$ since $\sigma$ fixes the rational coefficients and preserves ring operations. So $f(\sigma(r)) = 0$.</p>
+      <p>Therefore every automorphism sends roots to roots — it permutes them. Different automorphisms give different permutations (otherwise they'd agree on a generating set). So $\text{Gal}(K/F)$ injects into the permutation group of the roots.</p>
+    </div>
+  </details>
+
+  <h2>2.4 — Interactive: The Six Elements of $S_3$</h2>
+
+  <p>The three roots $r_1, r_2, r_3$ of $x^3-2$ are shown below in the complex plane. Click an element of $S_3$ to see how it permutes the roots. Labels follow the roots.</p>
+
+  <div style="margin: 15px 0; display: flex; gap: 10px; flex-wrap: wrap;">
+    <button class="s3-btn" data-perm="0,1,2" style="padding:8px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; cursor:pointer; font-size:14px;">$e$</button>
+    <button class="s3-btn" data-perm="1,0,2" style="padding:8px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; cursor:pointer; font-size:14px;">$(12)$</button>
+    <button class="s3-btn" data-perm="2,1,0" style="padding:8px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; cursor:pointer; font-size:14px;">$(13)$</button>
+    <button class="s3-btn" data-perm="0,2,1" style="padding:8px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; cursor:pointer; font-size:14px;">$(23)$</button>
+    <button class="s3-btn" data-perm="1,2,0" style="padding:8px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; cursor:pointer; font-size:14px;">$(123)$</button>
+    <button class="s3-btn" data-perm="2,0,1" style="padding:8px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; cursor:pointer; font-size:14px;">$(132)$</button>
+  </div>
+
+  <div id="s3-desc" style="font-family: monospace; font-size: 13px; min-height: 24px; margin-bottom: 10px; color: #aaa;"></div>
+
+  <div class="canvas-wrap" style="margin-bottom: 20px;">
+    <canvas id="c-s3"></canvas>
+    <span class="canvas-label">Three roots of $x^3-2$ in $\mathbb{C}$. Click an element of $S_3$ above to apply the permutation.</span>
+  </div>
+
+  <div class="note">
+    <strong>Order matters:</strong> the three transpositions $(12), (13), (23)$ each have order 2 (applying twice gives identity). The two 3-cycles $(123)$ and $(132)$ are inverses of each other. Together they generate $S_3$ — which is non-abelian: $(12)\circ(123) \neq (123)\circ(12)$.
+  </div>
 
   <nav class="nav-bottom"></nav>
 
@@ -35,5 +106,106 @@
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="../js/interactive.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('c-s3');
+  var dpr = UI.fitCanvas(canvas, 0.65);
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var desc = document.getElementById('s3-desc');
+
+  // Roots of x³-2 in complex plane
+  var cbrt2 = Math.pow(2, 1/3);
+  var ROOTS_ORIG = [
+    { re: cbrt2,              im: 0,                           label: 'r₁', color: '#4ab8ff' },
+    { re: -cbrt2 / 2,         im:  cbrt2 * Math.sqrt(3) / 2,  label: 'r₂', color: '#4caf50' },
+    { re: -cbrt2 / 2,         im: -cbrt2 * Math.sqrt(3) / 2,  label: 'r₃', color: '#ff9800' },
+  ];
+
+  var perm = [0, 1, 2]; // current permutation: root at slot i is originally ROOTS_ORIG[perm[i]]
+
+  var SCALE = Math.min(W, H) * 0.32;
+  function sx(re) { return W / 2 + re * SCALE; }
+  function sy(im) { return H / 2 - im * SCALE; }
+
+  function draw() {
+    ctx.fillStyle = '#0d1117';
+    ctx.fillRect(0, 0, W, H);
+
+    // Axes
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, H/2); ctx.lineTo(W, H/2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
+
+    // Unit circle (for reference)
+    ctx.beginPath(); ctx.arc(W/2, H/2, SCALE * cbrt2, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.stroke();
+
+    // Axes labels
+    ctx.fillStyle = '#555'; ctx.font = (10*dpr) + 'px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Re', W - 18, H/2 - 8);
+    ctx.textAlign = 'left';
+    ctx.fillText('Im', W/2 + 6, 16);
+
+    // Draw roots at permuted positions
+    ROOTS_ORIG.forEach(function (orig, slot) {
+      var srcIdx = perm[slot]; // which original root is at this label position
+      var root = ROOTS_ORIG[srcIdx];
+      var x = sx(root.re), y = sy(root.im);
+
+      // Dot
+      ctx.beginPath(); ctx.arc(x, y, 9*dpr, 0, Math.PI*2);
+      ctx.fillStyle = orig.color; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5*dpr; ctx.stroke();
+
+      // Label (the slot label, not the root label)
+      ctx.fillStyle = '#fff'; ctx.font = 'bold ' + (12*dpr) + 'px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(orig.label, x, y);
+      ctx.textBaseline = 'alphabetic';
+
+      // Approx value
+      ctx.fillStyle = '#888'; ctx.font = (10*dpr) + 'px sans-serif';
+      var offsetX = root.re > 0 ? 16*dpr : -16*dpr;
+      var offsetY = root.im > 0 ? -14*dpr : (root.im < 0 ? 14*dpr : 0);
+      ctx.textAlign = root.re > 0 ? 'left' : 'right';
+      ctx.fillText(root.re.toFixed(2) + (root.im !== 0 ? (root.im > 0 ? '+' : '') + root.im.toFixed(2) + 'i' : ''), x + offsetX, y + offsetY);
+    });
+  }
+
+  var DESCS = {
+    '0,1,2': 'e: identity — each root stays at its own position.',
+    '1,0,2': '(12): transpose r₁ ↔ r₂; r₃ fixed. Sends ω ↦ ω².',
+    '2,1,0': '(13): transpose r₁ ↔ r₃; r₂ fixed. Sends ω ↦ ω².',
+    '0,2,1': '(23): transpose r₂ ↔ r₃; r₁ fixed. Sends ω ↦ ω.',
+    '1,2,0': '(123): r₁ ↦ r₂ ↦ r₃ ↦ r₁. Cyclic order 3.',
+    '2,0,1': '(132): r₁ ↦ r₃ ↦ r₂ ↦ r₁. Inverse of (123).',
+  };
+
+  document.querySelectorAll('.s3-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var p = btn.dataset.perm.split(',').map(Number);
+      perm = p;
+      desc.textContent = DESCS[btn.dataset.perm] || '';
+      document.querySelectorAll('.s3-btn').forEach(function (b) {
+        b.style.background = b === btn ? 'rgba(100,181,246,0.25)' : 'rgba(255,255,255,0.08)';
+        b.style.borderColor = b === btn ? '#64b5f6' : 'rgba(255,255,255,0.2)';
+      });
+      draw();
+    });
+  });
+
+  draw();
+
+  UI.onResize(function () {
+    dpr = UI.fitCanvas(canvas, 0.65);
+    W = canvas.width; H = canvas.height; ctx = canvas.getContext('2d');
+    draw();
+  });
+})();
+</script>
 </body>
 </html>

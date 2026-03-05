@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Module 1: Field Extensions</title>
+  <title>Module 1: Field Extensions: Adding a Root</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 </head>
@@ -14,17 +14,97 @@
 
   <h1>Field Extensions: Adding a Root</h1>
 
-  <!-- PLAN ---------------------------------------------------------------
-  1. Motivation: x²-2=0 has no solution in ℚ — adjoin one: ℚ(√2)
-  2. ℚ(√2) as a vector space over ℚ, basis {1, √2}, dimension 2
-  3. The degree [K:F]: dimension of K as F-vector space
-  4. The minimal polynomial: smallest monic poly in ℚ[x] vanishing at the element
-     (e.g. √2 has min poly x²-2; ∛2 has x³-2; ω = e^{2πi/3} has x²+x+1)
-  5. Tower law: [K:F] = [K:M][M:F] for F ⊆ M ⊆ K
-  6. Examples: ℚ(√2,√3) degree 4; ℚ(∛2) degree 3
-  INTERACTIVE: nested field diagram — adjoin roots one at a time, show degree
-  See PLAN.md for full details.
-  ---------------------------------------------------------------------- -->
+  <h2>1.1 — A Problem with Rationals</h2>
+
+  <p>Consider the equation $x^2 - 2 = 0$. Its solutions are $\pm\sqrt{2}$. Neither is rational — there is no fraction $p/q$ whose square is $2$. The rationals $\mathbb{Q}$ are <em>incomplete</em> for this polynomial.</p>
+
+  <p>The fix: <strong>adjoin</strong> a root. We formally add $\sqrt{2}$ to $\mathbb{Q}$ and close under the field operations. Every product $\sqrt{2}\cdot\sqrt{2} = 2$ lands back in $\mathbb{Q}$, so the result stays finite:</p>
+  <div class="math-block">$$\mathbb{Q}(\sqrt{2}) = \{a + b\sqrt{2} : a, b \in \mathbb{Q}\}$$</div>
+  <p>This is a field: addition and multiplication close within it, and every non-zero element has an inverse (rationalise: $1/(a+b\sqrt{2}) = (a-b\sqrt{2})/(a^2-2b^2)$ when $a^2 \neq 2b^2$).</p>
+
+  <h2>1.2 — Field Extensions and Degree</h2>
+
+  <p>$\mathbb{Q} \subset \mathbb{Q}(\sqrt{2})$ is a <strong>field extension</strong>. As a vector space over $\mathbb{Q}$, it has basis $\{1, \sqrt{2}\}$ — dimension 2. The <strong>degree</strong> of the extension:</p>
+  <div class="math-block">$$[\mathbb{Q}(\sqrt{2}) : \mathbb{Q}] = 2$$</div>
+
+  <p>In general: for fields $F \subset K$, the degree $[K : F]$ is the dimension of $K$ as an $F$-vector space. It measures "how much bigger" $K$ is than $F$. Key examples:</p>
+
+  <div style="overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin: 15px 0;">
+    <thead><tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+      <th style="padding: 8px; text-align: left;">Extension</th>
+      <th style="padding: 8px; text-align: left;">Basis over $\mathbb{Q}$</th>
+      <th style="padding: 8px; text-align: left;">Degree</th>
+    </tr></thead>
+    <tbody>
+      <tr><td style="padding:8px">$\mathbb{Q}(\sqrt{2})$</td><td style="padding:8px">$\{1,\, \sqrt{2}\}$</td><td style="padding:8px">2</td></tr>
+      <tr><td style="padding:8px">$\mathbb{Q}(\sqrt[3]{2})$</td><td style="padding:8px">$\{1,\, \sqrt[3]{2},\, \sqrt[3]{4}\}$</td><td style="padding:8px">3</td></tr>
+      <tr><td style="padding:8px">$\mathbb{Q}(\sqrt{2}, \sqrt{3})$</td><td style="padding:8px">$\{1,\, \sqrt{2},\, \sqrt{3},\, \sqrt{6}\}$</td><td style="padding:8px">4</td></tr>
+      <tr><td style="padding:8px">$\mathbb{Q}(i)$</td><td style="padding:8px">$\{1,\, i\}$</td><td style="padding:8px">2</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>1.3 — The Minimal Polynomial</h2>
+
+  <p>An element $\alpha$ is <strong>algebraic over $F$</strong> if it satisfies some polynomial with $F$-coefficients. Its <strong>minimal polynomial</strong> $\text{min}_F(\alpha)$ is the unique monic, irreducible polynomial over $F$ that $\alpha$ satisfies.</p>
+
+  <p><strong>Key fact:</strong> $[F(\alpha) : F] = \deg(\text{min}_F(\alpha))$.</p>
+
+  <ul>
+    <li>$\sqrt{2}$ has minimal polynomial $x^2 - 2$ over $\mathbb{Q}$ → degree 2</li>
+    <li>$\sqrt[3]{2}$ has minimal polynomial $x^3 - 2$ over $\mathbb{Q}$ (irreducible by Eisenstein at $p=2$) → degree 3</li>
+    <li>$\omega = e^{2\pi i/3}$ has minimal polynomial $x^2 + x + 1$ over $\mathbb{Q}$ → degree 2</li>
+    <li>$\sqrt{2} + \sqrt{3}$ has minimal polynomial $x^4 - 10x^2 + 1$ → degree 4</li>
+  </ul>
+
+  <details class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: Eisenstein's Criterion</summary>
+    <div style="margin-top: 15px;">
+      <p>A polynomial $f(x) = a_n x^n + \cdots + a_0 \in \mathbb{Z}[x]$ is irreducible over $\mathbb{Q}$ if there exists a prime $p$ such that:</p>
+      <ul>
+        <li>$p \nmid a_n$ (leading coefficient)</li>
+        <li>$p \mid a_i$ for all $i < n$ (all other coefficients)</li>
+        <li>$p^2 \nmid a_0$ (constant term not doubly divisible)</li>
+      </ul>
+      <p>For $x^3 - 2$ with $p = 2$: leading coefficient 1 not divisible by 2 ✓; coefficients of $x^2, x$ are 0 ✓; constant $-2$ divisible by 2 but not 4 ✓. So $x^3 - 2$ is irreducible over $\mathbb{Q}$, confirming $[\mathbb{Q}(\sqrt[3]{2}):\mathbb{Q}] = 3$.</p>
+    </div>
+  </details>
+
+  <h2>1.4 — The Tower Law</h2>
+
+  <p>If $F \subseteq M \subseteq K$ are fields with finite extensions, degrees multiply:</p>
+  <div class="math-block">$$[K : F] = [K : M] \cdot [M : F]$$</div>
+
+  <p>This is the <strong>Tower Law</strong>. It follows from the fact that if $\{v_i\}$ is a basis of $M/F$ and $\{w_j\}$ is a basis of $K/M$, then $\{v_i w_j\}$ is a basis of $K/F$.</p>
+
+  <p><strong>Example:</strong> $\mathbb{Q} \subset \mathbb{Q}(\sqrt[3]{2}) \subset \mathbb{Q}(\sqrt[3]{2}, \omega)$.
+  The first step has degree 3; the second has degree 2 (adjoin $\omega$, whose minimal polynomial $x^2+x+1$ stays irreducible over $\mathbb{Q}(\sqrt[3]{2})$ since $\omega \notin \mathbb{R}$). Tower Law: $[\mathbb{Q}(\sqrt[3]{2}, \omega) : \mathbb{Q}] = 3 \cdot 2 = 6$. This is the splitting field of $x^3 - 2$ over $\mathbb{Q}$.</p>
+
+  <h2>1.5 — Splitting Fields</h2>
+
+  <p>The <strong>splitting field</strong> of a polynomial $f$ over $F$ is the smallest extension of $F$ containing all roots of $f$. It is the natural home for Galois theory: every symmetry of the roots is an automorphism of the splitting field.</p>
+
+  <p>The splitting field of $x^3 - 2$ over $\mathbb{Q}$ is $K = \mathbb{Q}(\sqrt[3]{2}, \omega)$ of degree 6. Its Galois group — the group of automorphisms fixing $\mathbb{Q}$ — will be $S_3$, the symmetric group on 3 elements. This is Module 2's story.</p>
+
+  <h2>1.6 — Interactive: Building the Field Tower</h2>
+
+  <p>Click to adjoin successive elements. Each step shows the extension degree and the total degree over $\mathbb{Q}$.</p>
+
+  <div style="margin: 15px 0; display: flex; gap: 10px; flex-wrap: wrap;">
+    <button class="adj-btn" data-key="sqrt2" style="padding:8px 16px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; cursor:pointer;">Adjoin √2</button>
+    <button class="adj-btn" data-key="sqrt3" style="padding:8px 16px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; cursor:pointer;">Adjoin √3</button>
+    <button class="adj-btn" data-key="cbrt2" style="padding:8px 16px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; cursor:pointer;">Adjoin ∛2</button>
+    <button class="adj-btn" data-key="omega" style="padding:8px 16px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; cursor:pointer;">Adjoin ω</button>
+    <button class="adj-btn" data-key="i"     style="padding:8px 16px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; cursor:pointer;">Adjoin i</button>
+    <button id="reset-btn" style="padding:8px 16px; background:#e94560; border:none; color:#fff; border-radius:4px; cursor:pointer;">Reset</button>
+  </div>
+
+  <div id="tower-display" style="font-family: monospace; font-size: 14px; padding: 16px; background: rgba(255,255,255,0.04); border-radius: 6px; min-height: 100px; line-height: 2;"></div>
+
+  <div class="note" style="margin-top:16px;">
+    <strong>Preview:</strong> The degree of the splitting field of $x^3 - 2$ is 6 (adjoin ∛2 then ω). The Galois group has order 6 too — it will be $S_3$, the symmetric group on 3 elements. This equality $|$Gal$(K/\mathbb{Q})| = [K:\mathbb{Q}]$ is the central theorem of Module 2.
+  </div>
 
   <nav class="nav-bottom"></nav>
 
@@ -33,5 +113,57 @@
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script>
+(function () {
+  'use strict';
+  var display = document.getElementById('tower-display');
+  var STEPS = {
+    sqrt2: { sym: '√2',  deg: 2, req: [],       name: 'ℚ(√2)',            poly: 'x²−2',       note: 'Basis over prev: {1, √2}.' },
+    sqrt3: { sym: '√3',  deg: 2, req: [],        name: '…(√3)',            poly: 'x²−3',       note: 'Basis adds √3 (and √6 if √2 already in).' },
+    cbrt2: { sym: '∛2',  deg: 3, req: [],        name: 'ℚ(∛2)',            poly: 'x³−2',       note: 'Eisenstein p=2. Basis adds ∛2, ∛4.' },
+    omega: { sym: 'ω',   deg: 2, req: ['cbrt2'], name: '…(ω)',             poly: 'x²+x+1',     note: 'Completes splitting field of x³−2. Total: 6.' },
+    i:     { sym: 'i',   deg: 2, req: [],        name: '…(i)',             poly: 'x²+1',       note: 'Imaginary unit.' },
+  };
+  var done = {}, chain = [];
+  var COLORS = ['#64b5f6','#4caf50','#ff9800','#a78bfa','#e94560'];
+
+  function render() {
+    if (!chain.length) { display.innerHTML = '<span style="color:#666">Click a button to start building the tower…</span>'; return; }
+    var total = 1, html = '<div style="color:#888">ℚ (base field, degree&nbsp;1)</div>';
+    chain.forEach(function (k, idx) {
+      var s = STEPS[k]; total *= s.deg;
+      html += '<div style="padding-left:' + ((idx+1)*20) + 'px; color:' + COLORS[idx % COLORS.length] + ';">' +
+        '⊂ <strong>' + s.name + '</strong>' +
+        ' &nbsp;[×<strong>' + s.deg + '</strong>, min.poly: ' + s.poly + ']' +
+        ' <span style="color:#666; font-size:12px">— ' + s.note + '</span>' +
+        '</div>';
+    });
+    html += '<div style="margin-top:10px; padding:8px; background:rgba(255,255,255,0.05); border-radius:4px; color:#fff;">' +
+      'Total degree over ℚ: <strong style="color:#4caf50">' + total + '</strong>' +
+      (total === 6 && done.cbrt2 && done.omega ? ' ← splitting field of x³−2, Gal ≅ S₃' : '') +
+      '</div>';
+    display.innerHTML = html;
+  }
+
+  document.querySelectorAll('.adj-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.dataset.key;
+      if (done[key]) return;
+      var step = STEPS[key];
+      for (var i = 0; i < step.req.length; i++) {
+        if (!done[step.req[i]]) {
+          display.innerHTML = '<span style="color:#e94560">Please adjoin ' + STEPS[step.req[i]].sym + ' first.</span>';
+          setTimeout(render, 1800); return;
+        }
+      }
+      done[key] = true; chain.push(key); render();
+    });
+  });
+  document.getElementById('reset-btn').addEventListener('click', function () {
+    done = {}; chain = []; render();
+  });
+  render();
+})();
+</script>
 </body>
 </html>

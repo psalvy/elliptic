@@ -14,25 +14,74 @@
 
   <h1>The Galois Correspondence</h1>
 
-  <!-- PLAN ---------------------------------------------------------------
-  1. Galois extension: normal (contains all conjugates) + separable
-     (in char 0 all extensions are separable — always true over ℚ)
-  2. Fundamental theorem of Galois theory:
-     Order-reversing bijection between
-       subgroups H ≤ Gal(K/F)  ↔  intermediate fields F ⊆ M ⊆ K
-     given by H ↦ K^H (fixed field) and M ↦ Gal(K/M)
-  3. Key facts:
-     - [K:M] = |Gal(K/M)|
-     - [M:F] = [G : Gal(K/M)] (index of subgroup)
-     - M/F is Galois iff Gal(K/M) is normal in G
-  4. Worked example in full: splitting field of x⁴-2 over ℚ
-     - Degree 8, Gal ≅ D₄ (dihedral group of order 8)
-     - Draw the complete subgroup lattice of D₄ (10 subgroups)
-     - Draw the corresponding field lattice (10 intermediate fields)
-     - Identify which intermediate extensions are themselves Galois
-  INTERACTIVE: clickable lattice — click a subgroup, highlight its fixed field
-  See PLAN.md for full details.
-  ---------------------------------------------------------------------- -->
+  <h2>3.1 — Fixed Fields</h2>
+
+  <p>Let $K/F$ be a Galois extension with Galois group $G = \text{Gal}(K/F)$. For any subgroup $H \leq G$, define the <strong>fixed field</strong>:</p>
+  <div class="math-block">$$K^H = \{\alpha \in K : \sigma(\alpha) = \alpha \text{ for all } \sigma \in H\}$$</div>
+  <p>This is always an intermediate field $F \subseteq K^H \subseteq K$. The bigger $H$ is, the more elements it fixes — or rather, the fewer elements survive all those fixings — so $K^H$ is <em>smaller</em> when $H$ is <em>larger</em>. This order-reversal is the heart of the correspondence.</p>
+
+  <h2>3.2 — The Fundamental Theorem of Galois Theory</h2>
+
+  <p>For a finite Galois extension $K/F$ with group $G$, there is a perfect bijection:</p>
+  <div class="math-block">$$\left\{\begin{array}{c}\text{subgroups } H \leq G\end{array}\right\} \xleftrightarrow{1:1} \left\{\begin{array}{c}\text{intermediate fields} \\ F \subseteq M \subseteq K\end{array}\right\}$$</div>
+  <p>given by:</p>
+  <ul>
+    <li>$H \mapsto K^H$ (fixed field of $H$)</li>
+    <li>$M \mapsto \text{Gal}(K/M)$ (the subgroup fixing $M$)</li>
+  </ul>
+  <p>These maps are inverse to each other: $(K^H)^{\text{Gal}} = H$ and $K^{\text{Gal}(K/M)} = M$. The correspondence reverses inclusion: $H_1 \leq H_2 \Leftrightarrow K^{H_1} \supseteq K^{H_2}$.</p>
+
+  <p><strong>Degree formulas:</strong> $[K : K^H] = |H|$ and $[K^H : F] = [G : H]$ (the index of $H$ in $G$).</p>
+
+  <p><strong>Normality:</strong> A subgroup $H \trianglelefteq G$ is normal if and only if the corresponding fixed field $K^H/F$ is itself a Galois extension. In that case $\text{Gal}(K^H/F) \cong G/H$.</p>
+
+  <h2>3.3 — Worked Example: Splitting Field of $x^3 - 2$</h2>
+
+  <p>We work out the full correspondence for $K = \mathbb{Q}(\sqrt[3]{2}, \omega)$ over $F = \mathbb{Q}$, with $G = S_3$. The subgroups of $S_3 = \{e, (12), (13), (23), (123), (132)\}$:</p>
+
+  <div style="overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin: 15px 0;">
+    <thead><tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+      <th style="padding:8px; text-align:left;">Subgroup $H$</th>
+      <th style="padding:8px; text-align:left;">Order</th>
+      <th style="padding:8px; text-align:left;">Fixed field $K^H$</th>
+      <th style="padding:8px; text-align:left;">Degree $[K^H:\mathbb{Q}]$</th>
+      <th style="padding:8px; text-align:left;">Normal in $S_3$?</th>
+    </tr></thead>
+    <tbody>
+      <tr><td style="padding:8px">$S_3$ (whole group)</td><td style="padding:8px">6</td><td style="padding:8px">$\mathbb{Q}$</td><td style="padding:8px">1</td><td style="padding:8px">Yes (trivially)</td></tr>
+      <tr><td style="padding:8px">$A_3 = \{e,(123),(132)\}$</td><td style="padding:8px">3</td><td style="padding:8px">$\mathbb{Q}(\omega)$</td><td style="padding:8px">2</td><td style="padding:8px">Yes ($A_3 \trianglelefteq S_3$)</td></tr>
+      <tr><td style="padding:8px">$\{e, (23)\}$</td><td style="padding:8px">2</td><td style="padding:8px">$\mathbb{Q}(\sqrt[3]{2}) = \mathbb{Q}(r_1)$</td><td style="padding:8px">3</td><td style="padding:8px">No</td></tr>
+      <tr><td style="padding:8px">$\{e, (13)\}$</td><td style="padding:8px">2</td><td style="padding:8px">$\mathbb{Q}(\omega\sqrt[3]{2}) = \mathbb{Q}(r_2)$</td><td style="padding:8px">3</td><td style="padding:8px">No</td></tr>
+      <tr><td style="padding:8px">$\{e, (12)\}$</td><td style="padding:8px">2</td><td style="padding:8px">$\mathbb{Q}(\omega^2\sqrt[3]{2}) = \mathbb{Q}(r_3)$</td><td style="padding:8px">3</td><td style="padding:8px">No</td></tr>
+      <tr><td style="padding:8px">$\{e\}$ (trivial)</td><td style="padding:8px">1</td><td style="padding:8px">$K = \mathbb{Q}(\sqrt[3]{2},\omega)$</td><td style="padding:8px">6</td><td style="padding:8px">Yes (trivially)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>The normal subgroup $A_3 \trianglelefteq S_3$ corresponds to the Galois intermediate extension $\mathbb{Q}(\omega)/\mathbb{Q}$, with $\text{Gal}(\mathbb{Q}(\omega)/\mathbb{Q}) \cong S_3/A_3 \cong \mathbb{Z}/2\mathbb{Z}$ (complex conjugation on $\omega$). The three non-normal subgroups correspond to the three non-Galois subextensions $\mathbb{Q}(r_i)$ — each contains only one real cube root and is not stable under the other automorphisms.</p>
+
+  <details class="math-details" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-left: 4px solid #64b5f6; border-radius: 4px;">
+    <summary style="cursor: pointer; font-weight: bold; color: #64b5f6;">Deep Dive: Why Does $A_3$ Fix $\mathbb{Q}(\omega)$?</summary>
+    <div style="margin-top: 15px;">
+      <p>We need to check that the three-cycles $(123)$ and $(132)$ fix $\omega$. The three-cycle $(123)$ sends $r_1 \to r_2 \to r_3 \to r_1$. Since $r_2 = \omega r_1$ and $r_3 = \omega^2 r_1$, the automorphism $(123)$ must send $r_1 \mapsto \omega r_1$. For this to be a field automorphism fixing $\mathbb{Q}$, we need $\sigma(\omega r_1) = \omega \sigma(r_1) = \omega r_2 = \omega^2 r_1$. So $\sigma(r_1) = r_2$ and $\sigma(\omega) = \omega$ (since $\sigma(\omega r_1) = \sigma(\omega)\sigma(r_1) = \sigma(\omega) r_2 = \omega r_2 = \omega^2 r_1$, which requires $\sigma(\omega) = \omega$). Therefore $A_3$ fixes $\omega$, confirming $K^{A_3} \supseteq \mathbb{Q}(\omega)$. Since $[K : \mathbb{Q}(\omega)] = 3 = |A_3|$, we get equality.</p>
+    </div>
+  </details>
+
+  <h2>3.4 — Interactive: The Galois Lattice</h2>
+
+  <p>Click any subgroup or field node below. The corresponding pair under the Galois correspondence will highlight in the same colour. Arrows run upward in the subgroup lattice (smaller → larger) and upward in the field lattice (smaller → larger extension).</p>
+
+  <div class="canvas-wrap" style="margin-bottom: 20px;">
+    <canvas id="c-lattice"></canvas>
+    <span class="canvas-label">Galois correspondence for $x^3-2$: subgroup lattice (left) ↔ field lattice (right). Click any node.</span>
+  </div>
+
+  <div id="lattice-info" style="font-family: monospace; font-size: 13px; min-height: 36px; padding: 8px 12px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 20px;"></div>
+
+  <div class="note success">
+    <strong>The key reversal:</strong> the <em>larger</em> the subgroup, the <em>smaller</em> the fixed field. $S_3$ (largest subgroup, order 6) fixes only $\mathbb{Q}$ (smallest field). $\{e\}$ (smallest subgroup) fixes all of $K$ (largest field). Normal subgroups ↔ Galois intermediate extensions — these are the "nicely behaved" ones.
+  </div>
 
   <nav class="nav-bottom"></nav>
 
@@ -41,5 +90,153 @@
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="../js/interactive.js"></script>
+<script>
+(function () {
+  'use strict';
+  var canvas = document.getElementById('c-lattice');
+  var dpr = UI.fitCanvas(canvas, 0.85);
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var infoEl = document.getElementById('lattice-info');
+
+  // Subgroup nodes — positioned in fraction of W/H
+  // Left column: subgroup lattice   Right column: field lattice
+  // y levels: 0=top (large group/large field), 1=mid, 2=bot (small group/base field)
+  // Corrected: subgroups top=S3 (largest), bottom={e}; fields top=K (largest), bottom=Q
+
+  var NODES = [
+    // Subgroup lattice (left half)
+    { id: 'S3',   side: 'sub', fx: 0.22, fy: 0.90, label: 'S₃',           info: 'Full Galois group S₃, order 6. Fixes only ℚ.', pair: 'Q',  normal: true,  color: '#e94560' },
+    { id: 'A3',   side: 'sub', fx: 0.22, fy: 0.60, label: 'A₃={e,(123),(132)}', info: 'Index-2 normal subgroup A₃≅ℤ/3. Fixes ℚ(ω).', pair: 'Qw', normal: true,  color: '#4caf50' },
+    { id: 'H12',  side: 'sub', fx: 0.08, fy: 0.35, label: '{e,(12)}',     info: 'Subgroup of order 2. Fixes ℚ(r₃). Not normal.', pair: 'Qr3', normal: false, color: '#ff9800' },
+    { id: 'H13',  side: 'sub', fx: 0.22, fy: 0.35, label: '{e,(13)}',     info: 'Subgroup of order 2. Fixes ℚ(r₂). Not normal.', pair: 'Qr2', normal: false, color: '#a78bfa' },
+    { id: 'H23',  side: 'sub', fx: 0.36, fy: 0.35, label: '{e,(23)}',     info: 'Subgroup of order 2. Fixes ℚ(r₁)=ℚ(∛2). Not normal.', pair: 'Qr1', normal: false, color: '#64b5f6' },
+    { id: 'e',    side: 'sub', fx: 0.22, fy: 0.10, label: '{e}',          info: 'Trivial subgroup, order 1. Fixed field = whole K.', pair: 'K',  normal: true,  color: '#888' },
+
+    // Field lattice (right half)
+    { id: 'K',    side: 'fld', fx: 0.78, fy: 0.10, label: 'K=ℚ(∛2,ω)',   info: 'Full splitting field. [K:ℚ]=6. Fixed by {e} only.', pair: 'e',  normal: true,  color: '#888' },
+    { id: 'Qr1',  side: 'fld', fx: 0.64, fy: 0.35, label: 'ℚ(r₁)=ℚ(∛2)', info: '[ℚ(r₁):ℚ]=3. Not Galois over ℚ (not stable).', pair: 'H23', normal: false, color: '#64b5f6' },
+    { id: 'Qr2',  side: 'fld', fx: 0.78, fy: 0.35, label: 'ℚ(r₂)',        info: '[ℚ(r₂):ℚ]=3. Not Galois over ℚ.', pair: 'H13', normal: false, color: '#a78bfa' },
+    { id: 'Qr3',  side: 'fld', fx: 0.92, fy: 0.35, label: 'ℚ(r₃)',        info: '[ℚ(r₃):ℚ]=3. Not Galois over ℚ.', pair: 'H12', normal: false, color: '#ff9800' },
+    { id: 'Qw',   side: 'fld', fx: 0.78, fy: 0.60, label: 'ℚ(ω)',         info: '[ℚ(ω):ℚ]=2. Galois over ℚ, Gal≅ℤ/2. Normal!', pair: 'A3', normal: true,  color: '#4caf50' },
+    { id: 'Q',    side: 'fld', fx: 0.78, fy: 0.90, label: 'ℚ',            info: 'Base field. Fixed by all of S₃.', pair: 'S3', normal: true,  color: '#e94560' },
+  ];
+
+  // Edges: subgroup lattice (sub containment, smaller H at bottom)
+  // S3 → A3 → {e}; S3 → H12 → {e}; etc.
+  var SUB_EDGES = [
+    ['S3','A3'], ['S3','H12'], ['S3','H13'], ['S3','H23'],
+    ['A3','e'], ['H12','e'], ['H13','e'], ['H23','e'],
+  ];
+  // Field lattice: K at top, Q at bottom
+  var FLD_EDGES = [
+    ['K','Qr1'], ['K','Qr2'], ['K','Qr3'], ['K','Qw'],
+    ['Qr1','Q'], ['Qr2','Q'], ['Qr3','Q'], ['Qw','Q'],
+  ];
+
+  var selected = null;
+
+  function nodeById(id) { return NODES.find(function(n){ return n.id === id; }); }
+  function nodePos(n) { return { x: n.fx * W, y: n.fy * H }; }
+
+  function draw() {
+    ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, W, H);
+
+    // Divider
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(W/2, 20); ctx.lineTo(W/2, H-20); ctx.stroke();
+
+    // Column labels
+    ctx.fillStyle = '#555'; ctx.font = (11*dpr) + 'px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Subgroup lattice of S₃', W * 0.22, H - 8);
+    ctx.fillText('Field extension lattice', W * 0.78, H - 8);
+
+    // Draw edges
+    function drawEdges(edges, col) {
+      edges.forEach(function (e) {
+        var a = nodeById(e[0]), b = nodeById(e[1]);
+        var pa = nodePos(a), pb = nodePos(b);
+        var isHighlighted = selected && (a.id === selected.id || a.id === selected.pair ||
+                                         b.id === selected.id || b.id === selected.pair);
+        ctx.strokeStyle = isHighlighted ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.12)';
+        ctx.lineWidth = isHighlighted ? 2*dpr : 1;
+        ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y); ctx.stroke();
+      });
+    }
+    drawEdges(SUB_EDGES);
+    drawEdges(FLD_EDGES);
+
+    // Correspondence arrow (highlighted pair)
+    if (selected) {
+      var paired = nodeById(selected.pair);
+      if (paired) {
+        var pa = nodePos(selected), pb = nodePos(paired);
+        ctx.strokeStyle = selected.color + 'aa'; ctx.lineWidth = 1.5*dpr;
+        ctx.setLineDash([5*dpr, 4*dpr]);
+        ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
+    // Draw nodes
+    NODES.forEach(function (n) {
+      var p = nodePos(n);
+      var isSelected = selected && (n.id === selected.id || n.id === selected.pair);
+      var r = isSelected ? 10*dpr : 7*dpr;
+
+      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+      ctx.fillStyle = isSelected ? n.color : n.color + '55';
+      ctx.fill();
+      if (isSelected) {
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2*dpr; ctx.stroke();
+      }
+
+      // Normal indicator (double ring)
+      if (n.normal && n.side === 'sub') {
+        ctx.beginPath(); ctx.arc(p.x, p.y, r + 4*dpr, 0, Math.PI*2);
+        ctx.strokeStyle = n.color + '44'; ctx.lineWidth = 1; ctx.stroke();
+      }
+
+      ctx.fillStyle = isSelected ? '#fff' : '#aaa';
+      ctx.font = (10*dpr) + 'px sans-serif'; ctx.textAlign = 'center';
+      var lx = p.x, ly = p.y - r - 5*dpr;
+      ctx.fillText(n.label, lx, ly);
+    });
+  }
+
+  canvas.addEventListener('click', function (e) {
+    var pos = UI.canvasPos(canvas, e);
+    var best = null, bestD = Infinity;
+    NODES.forEach(function (n) {
+      var p = nodePos(n);
+      var d = Math.hypot(pos.x - p.x, pos.y - p.y);
+      if (d < bestD) { bestD = d; best = n; }
+    });
+    if (best && bestD < 22*dpr) {
+      selected = (selected && selected.id === best.id) ? null : best;
+      if (selected) {
+        var paired = nodeById(selected.pair);
+        infoEl.innerHTML =
+          '<strong>' + selected.id + '</strong>: ' + selected.info +
+          (paired ? '<br>↔ Corresponds to <strong>' + paired.id + '</strong>: ' + paired.info : '');
+      } else {
+        infoEl.textContent = 'Click a node to explore the Galois correspondence.';
+      }
+    } else {
+      selected = null;
+      infoEl.textContent = '';
+    }
+    draw();
+  });
+
+  draw();
+  UI.onResize(function () {
+    dpr = UI.fitCanvas(canvas, 0.85);
+    W = canvas.width; H = canvas.height; ctx = canvas.getContext('2d');
+    draw();
+  });
+})();
+</script>
 </body>
 </html>

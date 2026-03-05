@@ -14,40 +14,86 @@
 
   <h1>Galois Acting on Torsion Points</h1>
 
-  <!-- PLAN ---------------------------------------------------------------
-  This is the bridge module from abstract Galois theory into elliptic curves.
+  <h2>5.1 — Torsion Points of an Elliptic Curve</h2>
 
-  1. The n-torsion subgroup:
-       E[n] = {P ∈ E(Q̄) : nP = O}
-     As abstract group: E[n] ≅ ℤ/nℤ × ℤ/nℤ (a 2D grid of n² points)
-     Proof via the torus: n-torsion = {(aω₁ + bω₂)/n : 0 ≤ a,b < n}
+  <p>Let $E$ be an elliptic curve defined over $\mathbb{Q}$, say $y^2 = x^3 + ax + b$ with $a, b \in \mathbb{Q}$. For any integer $n \geq 1$, the <strong>$n$-torsion subgroup</strong> is:</p>
+  <div class="math-block">$$E[n] = \{P \in E(\bar{\mathbb{Q}}) : nP = \mathcal{O}\}$$</div>
+  <p>the set of points (over the algebraic closure $\bar{\mathbb{Q}}$) killed by $n$ under the group law. These are the "division points" of the curve.</p>
 
-  2. Coordinates of torsion points are algebraic:
-     They satisfy the n-division polynomial (a poly in x with coefficients in ℚ
-     or the field of definition of E), so they are algebraic numbers.
+  <p>From the torus picture of Module 3 of the elliptic course: $E(\mathbb{C}) \cong \mathbb{C}/\Lambda$ where $\Lambda = \mathbb{Z}\omega_1 \oplus \mathbb{Z}\omega_2$. Under this isomorphism, the $n$-torsion points are exactly:</p>
+  <div class="math-block">$$E[n] \leftrightarrow \frac{1}{n}\Lambda/\Lambda = \left\{\frac{a\omega_1 + b\omega_2}{n} : a, b \in \{0, 1, \ldots, n-1\}\right\}$$</div>
+  <p>This is a $2D$ grid of $n^2$ points. As an abstract group:</p>
+  <div class="math-block">$$E[n] \cong \mathbb{Z}/n\mathbb{Z} \times \mathbb{Z}/n\mathbb{Z}$$</div>
 
-  3. Galois acts: σ ∈ Gal(Q̄/ℚ) acts on coordinates of torsion points,
-     sending one torsion point to another torsion point.
-     Crucially this respects the group law: σ(P+Q) = σ(P) + σ(Q).
+  <h2>5.2 — Torsion Coordinates Are Algebraic</h2>
 
-  4. The mod-n Galois representation:
-     Choose a basis {P₁, P₂} of E[n] ≅ (ℤ/n)². Then each σ gives a matrix:
-       ρₙ(σ)(P₁) = aP₁ + bP₂
-       ρₙ(σ)(P₂) = cP₁ + dP₂
-     i.e. ρₙ: Gal(Q̄/ℚ) → GL₂(ℤ/n)
+  <p>The $x$-coordinates of $n$-torsion points satisfy the <strong>$n$-th division polynomial</strong> $\psi_n(x)$, a polynomial with coefficients in $\mathbb{Q}$ (or the field of definition of $E$). So torsion points have algebraic coordinates — they live in some finite extension of $\mathbb{Q}$.</p>
 
-  5. The Weil pairing: a bilinear map E[n] × E[n] → μₙ (n-th roots of unity)
-     preserved by Galois — constrains det(ρₙ(σ)) = χ(σ) (cyclotomic character)
-     so image of ρₙ lies in GSp₂ ⊆ GL₂
+  <p>This means $\text{Gal}(\bar{\mathbb{Q}}/\mathbb{Q})$ acts on the coordinates of torsion points: if $P = (x_P, y_P) \in E[n]$ and $\sigma \in \text{Gal}(\bar{\mathbb{Q}}/\mathbb{Q})$, then $\sigma(P) = (\sigma(x_P), \sigma(y_P))$ is again a point in $E[n]$. Crucially, Galois respects the group law: $\sigma(P + Q) = \sigma(P) + \sigma(Q)$ (because the addition formulas have rational coefficients).</p>
 
-  6. Brief mention of the ℓ-adic representation (n = ℓᵏ, pass to limit):
-       ρ_ℓ: Gal(Q̄/ℚ) → GL₂(ℤ_ℓ)
-     This is the object appearing in Wiles's proof of Fermat's Last Theorem.
+  <p>So each $\sigma$ gives a group automorphism of $E[n] \cong (\mathbb{Z}/n)^2$. Group automorphisms of $(\mathbb{Z}/n)^2$ are exactly invertible $2 \times 2$ matrices over $\mathbb{Z}/n$.</p>
 
-  INTERACTIVE: for small n (e.g. n=3), plot the 9 torsion points on the torus;
-               show how a specific Galois element permutes them as a GL₂(ℤ/3) action
-  See PLAN.md for full details.
-  ---------------------------------------------------------------------- -->
+  <h2>5.3 — The Mod-$n$ Galois Representation</h2>
+
+  <p>Choose a basis $\{P_1, P_2\}$ of $E[n]$ (two independent $n$-torsion points). Each $\sigma \in \text{Gal}(\bar{\mathbb{Q}}/\mathbb{Q})$ gives a matrix:</p>
+  <div class="math-block">$$\sigma(P_1) = a P_1 + b P_2, \quad \sigma(P_2) = c P_1 + d P_2 \quad \Longrightarrow \quad \rho_n(\sigma) = \begin{pmatrix} a & b \\ c & d \end{pmatrix} \in \text{GL}_2(\mathbb{Z}/n\mathbb{Z})$$</div>
+  <p>This defines the <strong>mod-$n$ Galois representation</strong>:</p>
+  <div class="math-block">$$\rho_n : \text{Gal}(\bar{\mathbb{Q}}/\mathbb{Q}) \to \text{GL}_2(\mathbb{Z}/n\mathbb{Z})$$</div>
+  <p>It is a group homomorphism (because Galois acts on coordinates, so composition of automorphisms corresponds to matrix multiplication). Different bases give conjugate representations; the image is well-defined up to conjugacy.</p>
+
+  <h2>5.4 — The Weil Pairing Constraint</h2>
+
+  <p>There is a canonical bilinear, alternating, non-degenerate pairing:</p>
+  <div class="math-block">$$e_n : E[n] \times E[n] \to \mu_n \qquad (\text{$n$-th roots of unity})$$</div>
+  <p>called the <strong>Weil pairing</strong>. It is preserved by Galois: $e_n(\sigma P, \sigma Q) = \sigma(e_n(P,Q))$. Since $\sigma$ acts on $\mu_n$ by the cyclotomic character $\chi_n(\sigma)$ (where $\sigma(\zeta) = \zeta^{\chi_n(\sigma)}$ for $\zeta$ a primitive $n$-th root of unity), this forces:</p>
+  <div class="math-block">$$\det(\rho_n(\sigma)) = \chi_n(\sigma)$$</div>
+  <p>So the image of $\rho_n$ lies not in all of $\text{GL}_2(\mathbb{Z}/n)$ but in the <strong>symplectic subgroup</strong> $\text{GSp}_2(\mathbb{Z}/n)$ (matrices with determinant equal to the cyclotomic character).</p>
+
+  <h2>5.5 — Serre's Theorem and the Size of the Image</h2>
+
+  <p>For a "generic" elliptic curve $E$ over $\mathbb{Q}$ (one without special symmetries — specifically without Complex Multiplication), Serre proved in 1972 that:</p>
+
+  <div class="note success">
+    <strong>Serre's Open Image Theorem (1972):</strong> If $E/\mathbb{Q}$ has no CM, then for all but finitely many primes $\ell$, the representation $\rho_\ell : \text{Gal}(\bar{\mathbb{Q}}/\mathbb{Q}) \to \text{GL}_2(\mathbb{Z}/\ell)$ is <em>surjective</em>. Galois acts as freely as possible on the torsion.
+  </div>
+
+  <p>The image is as large as it can be (subject to the Weil pairing constraint). This is the "generic" case — no extra structure.</p>
+
+  <p>CM curves are the exception: they have extra endomorphisms that commute with Galois, forcing the image to be much smaller — in fact, <em>abelian</em>. This is the bridge to Module 6.</p>
+
+  <h2>5.6 — The $\ell$-adic Representation</h2>
+
+  <p>For a prime $\ell$, consider all the torsion: $E[\ell^k]$ for all $k \geq 1$. Passing to the inverse limit gives the <strong>$\ell$-adic Tate module</strong>:</p>
+  <div class="math-block">$$T_\ell E = \varprojlim_k E[\ell^k] \cong \mathbb{Z}_\ell^2$$</div>
+  <p>and the <strong>$\ell$-adic Galois representation</strong>:</p>
+  <div class="math-block">$$\rho_\ell : \text{Gal}(\bar{\mathbb{Q}}/\mathbb{Q}) \to \text{GL}_2(\mathbb{Z}_\ell)$$</div>
+  <p>This is the object that appears in Wiles's proof of Fermat's Last Theorem (1995): the representation attached to a hypothetical Fermat solution would contradict modularity, establishing a contradiction.</p>
+
+  <h2>5.7 — Interactive: The $n$-Torsion Grid</h2>
+
+  <p>Below, the parallelogram represents one period of the torus $\mathbb{C}/\Lambda$ (with $\Lambda = \mathbb{Z} \oplus \mathbb{Z}\tau$, $\tau = e^{i\pi/3}$ for a hexagonal lattice). The $n^2$ torsion points $E[n]$ are shown as a grid. A GL₂(ℤ/n) matrix acts on the grid — use the sliders to set the matrix entries and see the action.</p>
+
+  <div style="margin:15px 0; display:flex; gap:20px; flex-wrap:wrap; align-items:center;">
+    <label>$n$ = <strong id="n-label">3</strong>
+      <input type="range" id="n-slider" min="2" max="7" value="3" style="width:120px; margin-left:8px; vertical-align:middle;">
+    </label>
+    <span style="color:#aaa; font-size:13px;">Matrix entries mod <span id="n-mod">3</span>:</span>
+    <label style="font-size:13px; font-family:monospace;">a=<strong id="a-val">1</strong><input type="range" id="a-sl" min="0" max="6" value="1" style="width:80px; margin-left:6px;"></label>
+    <label style="font-size:13px; font-family:monospace;">b=<strong id="b-val">1</strong><input type="range" id="b-sl" min="0" max="6" value="1" style="width:80px; margin-left:6px;"></label>
+    <label style="font-size:13px; font-family:monospace;">c=<strong id="c-val">0</strong><input type="range" id="c-sl" min="0" max="6" value="0" style="width:80px; margin-left:6px;"></label>
+    <label style="font-size:13px; font-family:monospace;">d=<strong id="d-val">1</strong><input type="range" id="d-sl" min="0" max="6" value="1" style="width:80px; margin-left:6px;"></label>
+  </div>
+
+  <div id="grid-info" style="font-family:monospace; font-size:13px; padding:6px 12px; background:rgba(255,255,255,0.05); border-radius:4px; margin-bottom:10px;"></div>
+
+  <div class="canvas-wrap" style="margin-bottom: 20px;">
+    <canvas id="c-torsion"></canvas>
+    <span class="canvas-label">$E[n]$ torsion grid (blue). Orange arrows show where each point moves under the GL₂ matrix.</span>
+  </div>
+
+  <div class="note">
+    <strong>Connection to representation theory:</strong> Each Galois automorphism $\sigma$ corresponds to some matrix $M \in \text{GL}_2(\mathbb{Z}/n)$. The representation $\rho_n$ is the map $\sigma \mapsto M$. For a CM curve, the image of $\rho_n$ is contained in a <em>commutative</em> (abelian) subgroup of GL₂ — this is Module 6's story.
+  </div>
 
   <nav class="nav-bottom"></nav>
 
@@ -56,5 +102,142 @@
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="../js/interactive.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('c-torsion');
+  var dpr = UI.fitCanvas(canvas, 0.7);
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var info = document.getElementById('grid-info');
+
+  var nSlider = document.getElementById('n-slider');
+  var nLabel  = document.getElementById('n-label');
+  var nMod    = document.getElementById('n-mod');
+  var aSlider = document.getElementById('a-sl'), aLabel = document.getElementById('a-val');
+  var bSlider = document.getElementById('b-sl'), bLabel = document.getElementById('b-val');
+  var cSlider = document.getElementById('c-sl'), cLabel = document.getElementById('c-val');
+  var dSlider = document.getElementById('d-sl'), dLabel = document.getElementById('d-val');
+
+  function mod(x, n) { return ((x % n) + n) % n; }
+  function det(a,b,c,d,n) { return mod(a*d - b*c, n); }
+
+  function getParams() {
+    var n = parseInt(nSlider.value);
+    var a = mod(parseInt(aSlider.value), n);
+    var b = mod(parseInt(bSlider.value), n);
+    var c = mod(parseInt(cSlider.value), n);
+    var d = mod(parseInt(dSlider.value), n);
+    return { n:n, a:a, b:b, c:c, d:d };
+  }
+
+  // Lattice basis vectors for the torus (in canvas coords)
+  // We'll use: e1 = (1,0) and e2 = (cos(pi/3), sin(pi/3))
+  var TAU_RE = Math.cos(Math.PI / 3);
+  var TAU_IM = Math.sin(Math.PI / 3);
+
+  function toCanvas(a_frac, b_frac) {
+    // Point a_frac * e1 + b_frac * e2 in the parallelogram, scaled to canvas
+    var PAD = 0.15;
+    var SCALE = Math.min(W, H) * (1 - 2*PAD);
+    var ox = W * PAD + SCALE * 0.0;
+    var oy = H * (1 - PAD);
+    return {
+      x: ox + SCALE * (a_frac + b_frac * TAU_RE),
+      y: oy - SCALE * (b_frac * TAU_IM)
+    };
+  }
+
+  function draw() {
+    var p = getParams();
+    var n = p.n;
+    nLabel.textContent = n; nMod.textContent = n;
+    aLabel.textContent = p.a; bLabel.textContent = p.b;
+    cLabel.textContent = p.c; dLabel.textContent = p.d;
+
+    ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, W, H);
+
+    // Draw parallelogram outline
+    var c00 = toCanvas(0, 0), c10 = toCanvas(1, 0), c11 = toCanvas(1, 1), c01 = toCanvas(0, 1);
+    ctx.strokeStyle = 'rgba(74,184,255,0.2)'; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(c00.x, c00.y);
+    ctx.lineTo(c10.x, c10.y);
+    ctx.lineTo(c11.x, c11.y);
+    ctx.lineTo(c01.x, c01.y);
+    ctx.closePath(); ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = '#555'; ctx.font = (10*dpr) + 'px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('0', c00.x - 12, c00.y + 4);
+    ctx.fillText('ω₁', c10.x + 4, c10.y + 14);
+    ctx.fillText('ω₂', c01.x - 8, c01.y - 8);
+
+    var Dval = det(p.a, p.b, p.c, p.d, n);
+    var isInvertible = (Dval !== 0);
+
+    // Draw torsion points and arrows
+    for (var i = 0; i < n; i++) {
+      for (var j = 0; j < n; j++) {
+        var af = i / n, bf = j / n;
+        var src = toCanvas(af, bf);
+
+        // Draw original point
+        ctx.beginPath(); ctx.arc(src.x, src.y, 5*dpr, 0, Math.PI*2);
+        ctx.fillStyle = '#4ab8ff'; ctx.fill();
+
+        if (isInvertible) {
+          // Map (i,j) by matrix [a b; c d] mod n
+          var ni = mod(p.a * i + p.b * j, n);
+          var nj = mod(p.c * i + p.d * j, n);
+          var dst = toCanvas(ni / n, nj / n);
+
+          // Arrow if not fixed
+          if (ni !== i || nj !== j) {
+            var dx = dst.x - src.x, dy = dst.y - src.y;
+            var len = Math.hypot(dx, dy);
+            if (len > 4) {
+              ctx.strokeStyle = '#ff9800'; ctx.lineWidth = 1.2*dpr;
+              ctx.beginPath(); ctx.moveTo(src.x, src.y);
+              ctx.lineTo(dst.x - dx/len*5, dst.y - dy/len*5);
+              ctx.stroke();
+              // Arrowhead
+              var angle = Math.atan2(dy, dx);
+              var ah = 6*dpr;
+              ctx.fillStyle = '#ff9800';
+              ctx.beginPath();
+              ctx.moveTo(dst.x, dst.y);
+              ctx.lineTo(dst.x - ah*Math.cos(angle-0.4), dst.y - ah*Math.sin(angle-0.4));
+              ctx.lineTo(dst.x - ah*Math.cos(angle+0.4), dst.y - ah*Math.sin(angle+0.4));
+              ctx.closePath(); ctx.fill();
+            }
+          }
+        }
+      }
+    }
+
+    var detStr = det(p.a, p.b, p.c, p.d, n);
+    info.innerHTML =
+      'Matrix: [[' + p.a + ',' + p.b + '],[' + p.c + ',' + p.d + ']] mod ' + n +
+      ' &nbsp;|&nbsp; det = ' + detStr + ' mod ' + n +
+      (isInvertible
+        ? ' &nbsp;(<strong style="color:#4caf50">invertible</strong> → valid GL₂ element → valid Galois action)'
+        : ' &nbsp;(<strong style="color:#e94560">not invertible</strong> → not in GL₂ → not a valid automorphism)');
+  }
+
+  [nSlider, aSlider, bSlider, cSlider, dSlider].forEach(function (sl) {
+    sl.addEventListener('input', draw);
+  });
+
+  draw();
+  UI.onResize(function () {
+    dpr = UI.fitCanvas(canvas, 0.7);
+    W = canvas.width; H = canvas.height; ctx = canvas.getContext('2d');
+    draw();
+  });
+})();
+</script>
 </body>
 </html>
