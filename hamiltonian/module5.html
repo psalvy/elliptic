@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 5: Liouville's Theorem</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    #c-liou { cursor: crosshair; touch-action: none; }
+    .readout { font-family: var(--mono); font-size: 0.85rem; margin-top: 0.4rem; }
+    .readout b { color: var(--link); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>Liouville's Theorem</h1>
+
+  <p>Stop thinking about a single trajectory. Imagine instead a whole <em>cloud</em> of initial conditions — a little patch of phase space, like a drop of dye — and let every point in it flow under Hamilton's equations at once. The patch will stretch, shear, and curl into ever-thinner filaments. Liouville's theorem makes a startling promise about it: however grotesquely the patch deforms, its <strong>area never changes</strong>. The phase fluid is incompressible.</p>
+
+  <h2>5.1 — The flow is a fluid with a velocity field</h2>
+
+  <p>Hamilton's equations assign a velocity to every point of phase space — exactly the data of a fluid flow. Write the phase-space velocity field as</p>
+
+  <div class="math-block">$$\mathbf{V} = (\dot q, \dot p) = \left( \frac{\partial H}{\partial p},\; -\frac{\partial H}{\partial q} \right).$$</div>
+
+  <p>Whether such a flow compresses or expands volume is measured by its <strong>divergence</strong>, just as for any fluid. Compute it:</p>
+
+  <div class="math-block">$$\nabla\cdot\mathbf{V} = \frac{\partial \dot q}{\partial q} + \frac{\partial \dot p}{\partial p} = \frac{\partial}{\partial q}\!\left(\frac{\partial H}{\partial p}\right) + \frac{\partial}{\partial p}\!\left(-\frac{\partial H}{\partial q}\right) = \frac{\partial^2 H}{\partial q\,\partial p} - \frac{\partial^2 H}{\partial p\,\partial q}.$$</div>
+
+  <p>For any twice-differentiable $H$ the mixed partials are equal, so the two terms cancel <em>identically</em>:</p>
+
+  <div class="math-block">$$\boxed{\;\nabla\cdot\mathbf{V} = 0\;}$$</div>
+
+  <p>The Hamiltonian flow is <strong>divergence-free</strong> — incompressible — for the same structural reason energy is conserved: that single minus sign in Hamilton's equations, here turning $\partial^2 H/\partial q\partial p$ against its equal twin. It is a property of <em>every</em> Hamiltonian system, with no exceptions and no special initial conditions.</p>
+
+  <h2>5.2 — From zero divergence to constant volume</h2>
+
+  <p>A cloud of states has a density $\rho(q, p, t)$. Since states are neither created nor destroyed, $\rho$ obeys the continuity equation $\partial_t\rho + \nabla\cdot(\rho\mathbf{V}) = 0$. Expanding the divergence of the product,</p>
+
+  <div class="math-block">$$\frac{\partial \rho}{\partial t} + \mathbf{V}\cdot\nabla\rho + \rho\,\underbrace{\nabla\cdot\mathbf{V}}_{=\,0} = 0 \;\;\Longrightarrow\;\; \frac{d\rho}{dt} = \frac{\partial\rho}{\partial t} + \mathbf{V}\cdot\nabla\rho = 0.$$</div>
+
+  <p>The left-hand $d\rho/dt$ is the density measured by an observer <em>drifting with the flow</em>. It is zero: a comoving observer sees the local density of states never change. If the number of states in a comoving patch is fixed and their density is fixed, the patch's <strong>area must be fixed too</strong>. That is Liouville's theorem.</p>
+
+  <p>Drop a blob below — <strong>click anywhere</strong> to place it — and watch. The left panel shows the patch flowing on the pendulum's phase portrait; the right panel tracks its measured area. With damping off it is a flat line, no matter how violently the blob filaments.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>damping γ =</label>
+      <input type="range" id="slider-g" min="0" max="0.5" step="0.01" value="0">
+      <span class="val" id="val-g">0.00</span>
+    </div>
+    <button class="btn" id="btn-reset">Reset blob</button>
+    <span style="font-size:0.8rem;color:var(--fg2)">tip: try placing a blob right on the separatrix</span>
+  </div>
+
+  <div class="split-view">
+    <div class="canvas-wrap">
+      <canvas id="c-liou"></canvas>
+      <span class="canvas-label">a patch of states, advected by the flow</span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="c-areaplot"></canvas>
+      <span class="canvas-label">measured area of the patch vs time</span>
+    </div>
+  </div>
+  <div class="readout" id="readout">…</div>
+
+  <div class="note">
+    <strong>Key insight:</strong> Hamiltonian flow can stretch a region into an arbitrarily long, thin filament — mixing it through phase space — but it can never shrink or inflate its area. Incompressibility is the geometric heart of mechanics.
+  </div>
+
+  <h2>5.3 — Turn on damping, and watch the rule break</h2>
+
+  <p>Liouville is a statement about <em>Hamiltonian</em> systems specifically. Add friction $-\gamma p$ to the momentum equation — making the system dissipative, no longer derivable from any $H$ — and recompute the divergence:</p>
+
+  <div class="math-block">$$\dot q = p, \quad \dot p = -\sin q - \gamma p \;\;\Longrightarrow\;\; \nabla\cdot\mathbf{V} = \frac{\partial p}{\partial q} + \frac{\partial(-\sin q - \gamma p)}{\partial p} = -\gamma < 0.$$</div>
+
+  <p>The divergence is now negative, so volume <em>contracts</em> exponentially, $A(t) = A(0)\,e^{-\gamma t}$. Slide $\gamma$ up and the area trace decays as the blob spirals into the stable rest point. This is exactly why dissipative systems have <strong>attractors</strong> — basins where volumes collapse onto a point or a cycle — and why Hamiltonian systems, with $\nabla\cdot\mathbf{V}=0$, <em>cannot</em>. No friction, no attractor.</p>
+
+  <div class="note success">
+    <strong>A profound corollary (Poincaré recurrence):</strong> if a Hamiltonian system is confined to a bounded region of phase space, incompressibility forces almost every state to return arbitrarily close to where it began, infinitely often. Volume cannot pile up anywhere, so the flow must keep revisiting. There is no "settling down."
+  </div>
+
+  <h2>5.4 — The deeper object: the symplectic form</h2>
+
+  <p>Conserving area is the two-dimensional shadow of something sharper. In $2n$ dimensions, Hamiltonian flows preserve not merely the $2n$-volume but a specific antisymmetric structure, the <strong>symplectic 2-form</strong></p>
+
+  <div class="math-block">$$\omega = \sum_i dq_i \wedge dp_i.$$</div>
+
+  <p>This form measures oriented area in each conjugate $(q_i, p_i)$ plane, summed. Preserving $\omega$ is strictly stronger than preserving volume — it is the coordinate-free expression of the fundamental bracket $\{q, p\} = 1$ from Module 4. A transformation that preserves $\omega$ is called <strong>canonical (symplectic)</strong>, and the time-$t$ flow of <em>any</em> Hamiltonian is one. The whole subject of Hamiltonian mechanics is, in modern language, the geometry of this 2-form — which is why integrators that respect it (like the symplectic stepper in this course's code) track long-time energy so much better than naive ones.</p>
+
+  <h2>5.5 — The thread to pull next</h2>
+
+  <p>Incompressibility says the flow cannot collapse — but it says nothing about whether the flow is <em>orderly</em> or <em>turbulent</em>. The pendulum blob deforms predictably. Yet the same area-preserving rule governs systems whose blobs get shredded into fractal tangles, where nearby states fly apart exponentially: <strong>chaos</strong>. What separates a system whose orbits wind neatly onto tori from one that mixes wildly, even though both preserve phase volume? Module 6.</p>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="../js/plot2d.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/dynamics.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var gamma = 0;
+    var loop0 = null;     // boundary points of the patch
+    var area0 = 1, t = 0;
+    var areaHist = [];
+
+    var cL = document.getElementById('c-liou');
+    var cA = document.getElementById('c-areaplot');
+    UI.fitCanvas(cL, 1.0); UI.fitCanvas(cA, 1.0);
+    var plot = new Plot2D(cL, { xMin: -3.7, xMax: 3.7, yMin: -3.2, yMax: 3.2 });
+    var pA;
+
+    function deriv(s) { return [s[1], -Math.sin(s[0]) - gamma * s[1]]; }
+    function energy(q, p) { return 0.5 * p * p + (1 - Math.cos(q)); }
+
+    function shoelace(pts) {
+      var A = 0;
+      for (var i = 0; i < pts.length; i++) {
+        var j = (i + 1) % pts.length;
+        A += pts[i][0] * pts[j][1] - pts[j][0] * pts[i][1];
+      }
+      return Math.abs(A) / 2;
+    }
+
+    function makeBlob(q0, p0) {
+      var n = 240, r = 0.45, pts = [];
+      for (var i = 0; i < n; i++) {
+        var th = i / n * Math.PI * 2;
+        pts.push([q0 + r * Math.cos(th), p0 + r * Math.sin(th)]);
+      }
+      loop0 = pts; area0 = shoelace(pts); t = 0; areaHist = [[0, area0]];
+      pA = new Plot2D(cA, { xMin: 0, xMax: 30, yMin: 0, yMax: area0 * 1.25 });
+    }
+
+    function drawField() {
+      var step = 0.62;
+      for (var x = plot.xMin + 0.3; x < plot.xMax; x += step)
+        for (var y = plot.yMin + 0.3; y < plot.yMax; y += step) {
+          var d = [y, -Math.sin(x)];   // show conservative field for context
+          var len = Math.hypot(d[0], d[1]) || 1, L = 0.16;
+          plot.drawLine(x, y, x + d[0] / len * L, y + d[1] / len * L, 'rgba(120,150,200,0.30)', 1);
+        }
+    }
+
+    function drawPhase() {
+      plot.w = cL.width; plot.h = cL.height;
+      plot.clear(); plot.drawGrid();
+      [0.5, 1.2, 2.0, 3.0, 4.5].forEach(function (E) {
+        plot.plotImplicit(function (q, p) { return energy(q, p) - E; },
+          Math.abs(E - 2) < 1e-6 ? 'rgba(233,69,96,0.4)' : 'rgba(255,255,255,0.10)', Math.abs(E - 2) < 1e-6 ? 2 : 1);
+      });
+      drawField();
+      if (loop0) {
+        plot.ctx.beginPath();
+        for (var i = 0; i < loop0.length; i++) {
+          var s = plot.toScreen(loop0[i][0], loop0[i][1]);
+          if (i === 0) plot.ctx.moveTo(s.x, s.y); else plot.ctx.lineTo(s.x, s.y);
+        }
+        plot.ctx.closePath();
+        plot.ctx.fillStyle = 'rgba(233,69,96,0.30)';
+        plot.ctx.strokeStyle = '#e94560'; plot.ctx.lineWidth = 1.5;
+        plot.ctx.fill(); plot.ctx.stroke();
+      }
+    }
+
+    function drawArea() {
+      pA.w = cA.width; pA.h = cA.height;
+      pA.clear(); pA.drawGrid();
+      // reference line at initial area
+      pA.drawLine(0, area0, pA.xMax, area0, 'rgba(255,255,255,0.25)', 1);
+      pA.ctx.strokeStyle = '#4caf50'; pA.ctx.lineWidth = 2; pA.ctx.beginPath();
+      for (var i = 0; i < areaHist.length; i++) {
+        var s = pA.toScreen(areaHist[i][0], areaHist[i][1]);
+        if (i === 0) pA.ctx.moveTo(s.x, s.y); else pA.ctx.lineTo(s.x, s.y);
+      }
+      pA.ctx.stroke();
+    }
+
+    function step() {
+      if (!loop0) return;
+      var dt = 0.02;
+      for (var k = 0; k < 4; k++) {       // a few substeps per frame
+        for (var i = 0; i < loop0.length; i++) loop0[i] = Dynamics.rk4(deriv, loop0[i], dt);
+        t += dt;
+      }
+      var A = shoelace(loop0);
+      areaHist.push([t, A]);
+      if (t > pA.xMax) { areaHist.shift(); pA.xMin = t - 30; pA.xMax = t; }
+      var divtxt = gamma === 0 ? '0 (incompressible)' : '−γ = ' + (-gamma).toFixed(2);
+      document.getElementById('readout').innerHTML =
+        't = <b>' + t.toFixed(1) + '</b> &nbsp; area = <b>' + A.toFixed(4) + '</b>' +
+        ' &nbsp; (start ' + area0.toFixed(4) + ', ratio ' + (A / area0).toFixed(3) + ')' +
+        ' &nbsp; ∇·V = <b>' + divtxt + '</b>';
+    }
+
+    function frame() { step(); drawPhase(); if (pA) drawArea(); requestAnimationFrame(frame); }
+
+    cL.addEventListener('mousedown', function (e) {
+      var pos = UI.canvasPos(cL, e), c = plot.fromScreen(pos.x, pos.y); makeBlob(c.x, c.y);
+    });
+    cL.addEventListener('touchstart', function (e) {
+      e.preventDefault(); var pos = UI.canvasPos(cL, e), c = plot.fromScreen(pos.x, pos.y); makeBlob(c.x, c.y);
+    }, { passive: false });
+
+    UI.bindSlider('slider-g', 'val-g', function (v) { gamma = v; });
+    document.getElementById('btn-reset').addEventListener('click', function () { makeBlob(0, 1.6); });
+
+    setTimeout(function () {
+      UI.fitCanvas(cL, 1.0); UI.fitCanvas(cA, 1.0);
+      makeBlob(0, 1.6); frame();
+    }, 50);
+    UI.onResize(function () { UI.fitCanvas(cL, 1.0); UI.fitCanvas(cA, 1.0); });
+  } catch (err) {
+    console.error('Module 5 init error:', err);
+    var r = document.getElementById('readout');
+    if (r) r.innerHTML = '<span style="color:var(--accent)">Script error: ' + err.message + '</span>';
+  }
+});
+</script>
+</body>
+</html>

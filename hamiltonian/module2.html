@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 2: The Legendre Transform</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    .readout { font-family: var(--mono); font-size: 0.9rem; margin-top: 0.4rem; }
+    .readout b { color: var(--link); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>The Legendre Transform</h1>
+
+  <p>Module 1 left us holding a clue: the quantity $p = \partial L/\partial\dot x$ kept appearing, and it was nothing but the momentum. The Euler–Lagrange equation is one second-order equation in the variables $(x, \dot x)$. What happens if we refuse to treat velocity $\dot x$ as the fundamental partner of position, and instead promote $p$ to a coordinate of equal standing?</p>
+
+  <p>To do that we need a reversible way to swap a variable for the slope of a function in that variable. That tool is the <strong>Legendre transform</strong>, and it is worth meeting on its own before we unleash it on mechanics.</p>
+
+  <h2>2.1 — Encoding a curve by its tangent lines</h2>
+
+  <p>A convex function $f(v)$ can be described two equivalent ways. The obvious way is the graph: for each $v$, the height $f(v)$. The second way is to forget the points and record only the <em>tangent lines</em> — for each slope $p$, the line of that slope that just touches the curve from below. A convex curve is the envelope of its tangents, so no information is lost. The Legendre transform is the dictionary between these two descriptions.</p>
+
+  <p>Concretely: a line of slope $p$ has the form $y = pv - c$. To make it a supporting tangent we push it up (increase $c$ is down, so we lower $c$) until it just kisses the curve. The required intercept is</p>
+
+  <div class="math-block">$$f^\star(p) = \max_v\big(\,p v - f(v)\,\big),$$</div>
+
+  <p>and $-f^\star(p)$ is exactly the $y$-intercept of that tangent line. Below, $f(v) = \tfrac12 m v^2$ is the kinetic energy as a function of velocity. <strong>Drag the slope $p$</strong> to slide the tangent line along the curve; the right panel builds the transform $f^\star(p) = H(p)$ point by point. Drag $m$ to change the curvature.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>slope p =</label>
+      <input type="range" id="slider-p" min="-3" max="3" step="0.02" value="1.2">
+      <span class="val" id="val-p">1.20</span>
+    </div>
+    <div class="control-group">
+      <label>mass m =</label>
+      <input type="range" id="slider-m" min="0.4" max="2.5" step="0.05" value="1">
+      <span class="val" id="val-m">1.00</span>
+    </div>
+  </div>
+
+  <div class="split-view">
+    <div class="canvas-wrap">
+      <canvas id="c-f"></canvas>
+      <span class="canvas-label">f(v) = ½mv² and its tangent of slope p</span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="c-h"></canvas>
+      <span class="canvas-label">the transform H(p) = p²/2m</span>
+    </div>
+  </div>
+
+  <div class="readout" id="readout">…</div>
+
+  <p>Two facts jump out of the picture. First, the contact point sits at the velocity $v^\star$ where the curve's own slope equals $p$, i.e. $f'(v^\star) = p$ — for kinetic energy that is $mv^\star = p$, the familiar $p = mv$. Second, watch the curvatures: making $f$ <em>steeper</em> (larger $m$) makes its transform $H$ <em>flatter</em>. The transform inverts curvature, $H''(p) = 1/f''(v) = 1/m$. A stiff function has a soft dual.</p>
+
+  <div class="note">
+    <strong>Key insight:</strong> The Legendre transform re-expresses a convex function in terms of its slope instead of its argument. Convexity (a single tangent per slope) is exactly what makes it reversible: transforming twice returns the original, $f^{\star\star} = f$.
+  </div>
+
+  <h2>2.2 — From the Lagrangian to the Hamiltonian</h2>
+
+  <p>Now apply this to mechanics, transforming in the velocity variable $\dot x$ while position $x$ rides along as a spectator. Define the <strong>conjugate momentum</strong> as the slope of $L$ in $\dot x$ — exactly the quantity that kept reappearing:</p>
+
+  <div class="math-block">$$p \;\equiv\; \frac{\partial L}{\partial \dot x}.$$</div>
+
+  <p>The Legendre transform of $L$ in $\dot x$ is the <strong>Hamiltonian</strong>:</p>
+
+  <div class="math-block">$$H(x, p) \;=\; p\,\dot x - L(x, \dot x), \qquad\text{with } \dot x \text{ solved in terms of } p.$$</div>
+
+  <p>That last clause is the whole point: we use $p = \partial L/\partial\dot x$ to eliminate every $\dot x$ in favour of $p$, so $H$ is genuinely a function of position and momentum, never velocity. For our particle, $p = m\dot x \Rightarrow \dot x = p/m$, hence</p>
+
+  <div class="math-block">$$H = p\cdot\frac{p}{m} - \left(\tfrac12 m\frac{p^2}{m^2} - V\right) = \frac{p^2}{2m} + V(x) = T + V.$$</div>
+
+  <p>The minus sign of the Lagrangian has flipped into a plus: $H$ is the total <em>energy</em>, kinetic plus potential. (This identification $H = T+V$ holds whenever the kinetic energy is a quadratic form in the velocities and the constraints do not depend on time — true for everything in this course.)</p>
+
+  <h2>2.3 — Hamilton's equations, in one line of algebra</h2>
+
+  <p>Here is the payoff. Take the differential of $H = p\dot x - L$, letting all of $x$, $\dot x$, $p$ vary:</p>
+
+  <div class="math-block">$$dH = \dot x\,dp + p\,d\dot x - \frac{\partial L}{\partial x}dx - \frac{\partial L}{\partial \dot x}d\dot x.$$</div>
+
+  <p>The middle terms cancel by the very definition $p = \partial L/\partial\dot x$: $\;p\,d\dot x - (\partial L/\partial\dot x)\,d\dot x = 0$. This cancellation is the magic of the Legendre transform — the velocity differential vanishes, confirming $H$ truly depends only on $x$ and $p$. What survives is</p>
+
+  <div class="math-block">$$dH = \dot x\,dp - \frac{\partial L}{\partial x}\,dx.$$</div>
+
+  <p>But $dH = \frac{\partial H}{\partial x}dx + \frac{\partial H}{\partial p}dp$ identically. Matching the coefficients of the independent differentials $dx$ and $dp$:</p>
+
+  <div class="math-block">$$\frac{\partial H}{\partial p} = \dot x, \qquad \frac{\partial H}{\partial x} = -\frac{\partial L}{\partial x}.$$</div>
+
+  <p>The second one needs the Euler–Lagrange equation to finish. Recall $\frac{d}{dt}\frac{\partial L}{\partial\dot x} = \frac{\partial L}{\partial x}$, and the left side is just $\dot p$. So $\partial L/\partial x = \dot p$, and therefore $\partial H/\partial x = -\dot p$. Collecting both results gives <strong>Hamilton's canonical equations</strong>:</p>
+
+  <div class="math-block">$$\boxed{\;\dot x = \frac{\partial H}{\partial p}, \qquad \dot p = -\frac{\partial H}{\partial x}\;}$$</div>
+
+  <p>For $n$ degrees of freedom there is one such pair per coordinate, $\dot q_i = \partial H/\partial p_i$ and $\dot p_i = -\partial H/\partial q_i$. We have traded one second-order equation for <strong>two first-order equations</strong> — and they are almost mirror images of each other, differing only by a single minus sign. That near-symmetry is not cosmetic; it is the seed of every conservation law and geometric structure in the rest of the course.</p>
+
+  <div class="note success">
+    <strong>Check on the oscillator:</strong> For a spring, $H = \frac{p^2}{2m} + \frac12 kx^2$. Then $\dot x = \partial H/\partial p = p/m$ and $\dot p = -\partial H/\partial x = -kx$. Differentiate the first and substitute the second: $m\ddot x = \dot p = -kx$ — simple harmonic motion, recovered with no second derivatives anywhere in the formulation.
+  </div>
+
+  <h2>2.4 — Reading the equations</h2>
+
+  <p>The two equations say something physical and worth pausing on:</p>
+  <ul>
+    <li>$\dot x = \partial H/\partial p$ — how position changes is dictated by how the energy depends on momentum. For $H = p^2/2m + V$ this is just $\dot x = p/m$, the definition of momentum read backwards.</li>
+    <li>$\dot p = -\partial H/\partial x$ — momentum flows downhill in the potential. The minus sign means the force $-\partial V/\partial x$ pushes toward lower energy.</li>
+  </ul>
+
+  <p>Notice that $x$ and $p$ now sit on completely equal footing — both are just coordinates evolving in time, governed by partial derivatives of one master function $H$. There is no longer a privileged "position space"; there is a <strong>phase space</strong> with axes $x$ and $p$, and the state of the system is a single point in it.</p>
+
+  <h2>2.5 — The thread to pull next</h2>
+
+  <p>We have a point $(x, p)$ and a rule, $(\dot x, \dot p) = (\partial H/\partial p,\, -\partial H/\partial x)$, that tells it where to go next. That is precisely the data of a <strong>vector field</strong>: at every point of the plane, an arrow. The trajectory of the system is just the streamline you get by following the arrows.</p>
+
+  <p>So mechanics becomes the study of a flow on a plane. What do these flows look like? Why can trajectories never cross? And what curve does a given orbit trace? Module 3 moves into phase space and watches the flow.</p>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="../js/plot2d.js"></script>
+<script src="../js/interactive.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var m = 1, p = 1.2;
+    var cF = document.getElementById('c-f');
+    var cH = document.getElementById('c-h');
+    UI.fitCanvas(cF, 1.0); UI.fitCanvas(cH, 1.0);
+    var plotF = new Plot2D(cF, { xMin: -3.2, xMax: 3.2, yMin: -3.2, yMax: 4.5 });
+    var plotH = new Plot2D(cH, { xMin: -3.2, xMax: 3.2, yMin: -3.2, yMax: 4.5 });
+
+    function f(v) { return 0.5 * m * v * v; }       // kinetic energy
+    function H(pp) { return pp * pp / (2 * m); }     // its Legendre dual
+
+    function drawF() {
+      plotF.w = cF.width; plotF.h = cF.height;
+      plotF.clear(); plotF.drawGrid();
+      plotF.plotParametric(function (v) { return v; }, f, -3, 3, 200, '#e94560', 2.5);
+      var vStar = p / m;                              // contact velocity, f'(v*) = p
+      var Hp = H(p), intercept = -Hp;                 // tangent: y = p v - H(p)
+      // tangent line of slope p
+      plotF.drawLineThrough(-3, p * (-3) - Hp, 3, p * 3 - Hp, 'rgba(76,175,80,0.9)', 2);
+      // contact point and intercept
+      plotF.drawPoint(vStar, f(vStar), '#64b5f6', 6, 'v*');
+      plotF.drawPoint(0, intercept, '#4caf50', 6);
+      // dashed drop from contact point to show the gap p·v* - f(v*) = H
+      plotF.ctx.setLineDash([4, 4]);
+      plotF.drawLine(vStar, f(vStar), vStar, p * vStar, 'rgba(255,255,255,0.35)', 1.5);
+      plotF.ctx.setLineDash([]);
+      // label intercept value
+      var s = plotF.toScreen(0, intercept);
+      plotF.ctx.fillStyle = '#4caf50'; plotF.ctx.font = '12px monospace';
+      plotF.ctx.fillText('−H = ' + intercept.toFixed(2), s.x + 8, s.y + 4);
+    }
+
+    function drawH() {
+      plotH.w = cH.width; plotH.h = cH.height;
+      plotH.clear(); plotH.drawGrid();
+      plotH.plotParametric(function (pp) { return pp; }, H, -3, 3, 200, '#4caf50', 2.5);
+      plotH.drawPoint(p, H(p), '#e94560', 6, 'H(p)');
+    }
+
+    function update() {
+      drawF(); drawH();
+      var vStar = p / m;
+      document.getElementById('readout').innerHTML =
+        'slope p = <b>' + p.toFixed(2) + '</b>' +
+        ' &nbsp; contact at v* = p/m = <b>' + vStar.toFixed(2) + '</b>' +
+        ' &nbsp; H(p) = p²/2m = <b>' + H(p).toFixed(3) + '</b>' +
+        ' &nbsp; curvature: f″ = <b>' + m.toFixed(2) + '</b>, H″ = <b>' + (1 / m).toFixed(2) + '</b>';
+    }
+
+    UI.bindSlider('slider-p', 'val-p', function (v) { p = v; update(); });
+    UI.bindSlider('slider-m', 'val-m', function (v) { m = v; update(); });
+
+    setTimeout(function () { UI.fitCanvas(cF, 1.0); UI.fitCanvas(cH, 1.0); update(); }, 50);
+    UI.onResize(function () { UI.fitCanvas(cF, 1.0); UI.fitCanvas(cH, 1.0); update(); });
+  } catch (err) {
+    console.error('Module 2 init error:', err);
+    var r = document.getElementById('readout');
+    if (r) r.innerHTML = '<span style="color:var(--accent)">Script error: ' + err.message + '</span>';
+  }
+});
+</script>
+</body>
+</html>

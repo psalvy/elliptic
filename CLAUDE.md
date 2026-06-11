@@ -21,16 +21,28 @@ root/
 ├── sw.js                          — service worker (offline caching, covers all courses)
 ├── CLAUDE.md                      — this file
 ├── COURSE_STYLE.md                — style guide for course creation
-└── elliptic/                      — Course 1: Elliptic Curves & Ramanujan's π
+├── elliptic/                      — Course 1: Elliptic Curves & Ramanujan's π
+│   ├── index.html                 — course landing page
+│   ├── module1.html … module8.html
+│   ├── module-4.1-dashboard.html  — interlude
+│   └── js/nav.js                  — MODULES array for this course
+├── riemann/                       — Course 2: Riemann Zeta & the Primes (+ js/zeta-utils.js)
+├── galois/                        — Course 3: Galois Theory & Elliptic Curves
+└── hamiltonian/                   — Course 4: Hamiltonian Mechanics & the Geometry of Motion
     ├── index.html                 — course landing page
     ├── module1.html … module6.html
-    ├── module-4.1-dashboard.html  — interlude
-    └── js/nav.js                  — MODULES array for this course
+    ├── module-3.1-playground.html — interlude
+    └── js/
+        ├── nav.js                 — MODULES array for this course
+        └── dynamics.js            — RK4 + double pendulum + standard map helpers
 ```
 
 ## Courses
 
-- `elliptic/` — Elliptic Curves & Ramanujan's π (7 entries: 6 modules + 1 interlude)
+- `elliptic/` — Elliptic Curves & Ramanujan's π (9 entries: 8 modules + 1 interlude)
+- `riemann/` — Riemann Zeta Function & the Primes (6 modules)
+- `galois/` — Galois Theory & Elliptic Curves (6 modules)
+- `hamiltonian/` — Hamiltonian Mechanics & the Geometry of Motion (7 entries: 6 modules + 1 interlude)
 
 ## Tech stack
 

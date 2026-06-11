@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 3: Life in Phase Space</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    #c-phase { cursor: crosshair; touch-action: none; }
+    .readout { font-family: var(--mono); font-size: 0.88rem; margin-top: 0.4rem; }
+    .readout b { color: var(--link); }
+    .seg-btn { background: var(--accent2); }
+    .seg-btn.active { background: var(--accent); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>Life in Phase Space</h1>
+
+  <p>Module 2 reduced all of mechanics to a point $(q, p)$ and an instruction for where it goes next:</p>
+  <div class="math-block">$$\dot q = \frac{\partial H}{\partial p}, \qquad \dot p = -\frac{\partial H}{\partial q}.$$</div>
+  <p>Read those two numbers $(\dot q, \dot p)$ as an arrow attached to each point of the plane, and mechanics becomes a single picture: a <strong>vector field</strong>, and the curves that thread through it. This plane — one axis for position, one for momentum — is <strong>phase space</strong>, and learning to read it is learning to see a dynamical system whole.</p>
+
+  <h2>3.1 — The state is a point; the law is a flow</h2>
+
+  <p>Take the pendulum, the workhorse of the rest of the course. With mass, length and gravity scaled to one, its Hamiltonian is</p>
+
+  <div class="math-block">$$H(q, p) = \tfrac12 p^2 + \big(1 - \cos q\big),$$</div>
+
+  <p>where $q$ is the angle from straight down and $p$ the angular momentum. Hamilton's equations give the arrow at every point:</p>
+
+  <div class="math-block">$$\dot q = \frac{\partial H}{\partial p} = p, \qquad \dot p = -\frac{\partial H}{\partial q} = -\sin q.$$</div>
+
+  <p>The faint arrows below are exactly this field. <strong>Click anywhere</strong> to drop a state there and watch it flow; the bob on the right swings in lockstep with the moving dot. Toggle to the harmonic oscillator to compare, and use the sliders to change the energy scale.</p>
+
+  <div class="controls">
+    <button class="btn seg-btn active" id="btn-pend">Pendulum</button>
+    <button class="btn seg-btn" id="btn-sho">Harmonic oscillator</button>
+    <div class="control-group">
+      <label id="lbl-param">g/L =</label>
+      <input type="range" id="slider-w" min="0.4" max="2.5" step="0.05" value="1">
+      <span class="val" id="val-w">1.00</span>
+    </div>
+    <button class="btn" id="btn-clear">Clear orbits</button>
+  </div>
+
+  <div class="split-view">
+    <div class="canvas-wrap">
+      <canvas id="c-phase"></canvas>
+      <span class="canvas-label">phase space (q, p) — click to launch an orbit</span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="c-phys"></canvas>
+      <span class="canvas-label">the physical system</span>
+    </div>
+  </div>
+
+  <div class="readout" id="readout">Click the phase plane to launch a trajectory.</div>
+
+  <h2>3.2 — Why orbits are level sets of $H$</h2>
+
+  <p>The orbits are not arbitrary curves. Watch how the energy of the system changes as it moves, by differentiating $H$ along a trajectory and substituting Hamilton's equations:</p>
+
+  <div class="math-block">$$\frac{dH}{dt} = \frac{\partial H}{\partial q}\dot q + \frac{\partial H}{\partial p}\dot p = \frac{\partial H}{\partial q}\frac{\partial H}{\partial p} + \frac{\partial H}{\partial p}\!\left(-\frac{\partial H}{\partial q}\right) = 0.$$</div>
+
+  <p>The two terms are identical except for a sign — that lone minus from Hamilton's equations — so they cancel <em>exactly</em>. <strong>$H$ is conserved.</strong> Energy conservation is not an extra assumption bolted on; it is a one-line consequence of the antisymmetry built into the equations. (This holds for any $H$ with no explicit time dependence.)</p>
+
+  <p>Geometrically, conservation of $H$ means every trajectory is confined to a curve $H(q,p) = E$ — a <strong>level set</strong> of the energy. That is why the orbits you launch always close up smoothly and trace the contours drawn faintly in the background: the flow can shuttle a state <em>around</em> a level set but never <em>off</em> it.</p>
+
+  <div class="note">
+    <strong>Key insight:</strong> The vector field of Hamilton's equations is everywhere <em>tangent</em> to the level sets of $H$. Time evolution slides the state along a contour of constant energy — never across one.
+  </div>
+
+  <h2>3.3 — Three kinds of orbit, one picture</h2>
+
+  <p>For the pendulum the level sets split into three regimes, all visible at once in the phase portrait:</p>
+  <ul>
+    <li><strong>Libration</strong> ($E < 2$): closed loops around the origin. The pendulum swings back and forth. Small loops are near-ellipses — for tiny swings $1 - \cos q \approx \tfrac12 q^2$ and the pendulum <em>is</em> a harmonic oscillator.</li>
+    <li><strong>The separatrix</strong> ($E = 2$): the special orbit that just barely reaches the top. It takes infinite time to arrive, so it is an open curve that never quite closes — the boundary between two behaviours.</li>
+    <li><strong>Rotation</strong> ($E > 2$): the bob has enough energy to go over the top and round and round. These orbits run off the right and reappear on the left, because $q$ and $q + 2\pi$ are the same angle.</li>
+  </ul>
+
+  <p>The points where the field vanishes are the <strong>fixed points</strong>. At $(0,0)$ the pendulum hangs at rest — a <em>centre</em>, with orbits circling it stably. At $(\pm\pi, 0)$ it balances inverted — a <em>saddle</em>, where two branches of the separatrix cross; the slightest push sends it away. Launch an orbit right next to the saddle to feel how it lingers, then bolts.</p>
+
+  <h2>3.4 — Why trajectories never cross</h2>
+
+  <p>Notice you can never make two orbits intersect at an angle. This is forced, not lucky. At any point the field defines <em>one</em> arrow, so there is exactly one direction the flow can take. If two distinct trajectories crossed, the state at the crossing would have two futures — impossible for a deterministic first-order system. This is the geometric face of the existence-and-uniqueness theorem for ODEs, and it is why the phase portrait neatly tiles into nested, non-crossing curves.</p>
+
+  <div class="note success">
+    <strong>Reading a phase portrait:</strong> closed loops ⇒ oscillation; nested loops shrinking to a point ⇒ a stable equilibrium at the centre; crossing separatrices ⇒ an unstable equilibrium; curves that march off to infinity ⇒ unbounded motion. The shape of $H$'s contours <em>is</em> the qualitative dynamics.
+  </div>
+
+  <h2>3.5 — The thread to pull next</h2>
+
+  <p>We found one conserved quantity, $H$ itself, and it pinned every orbit to a curve. That single constant of motion was the difference between a comprehensible picture and a tangle. It raises a sharp question: are there <em>other</em> conserved quantities hiding in a given system, and is there a mechanical way to find them rather than guessing?</p>
+
+  <p>There is, and it comes from a remarkable bracket operation $\{f, H\}$ that computes the rate of change of <em>any</em> quantity along the flow — and turns "is this conserved?" into a one-line calculation. But first, a playground to make everything so far second nature.</p>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="../js/plot2d.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/dynamics.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var system = 'pend';   // 'pend' | 'sho'
+    var w = 1;             // g/L for pendulum, ω₀ for SHO
+    var orbits = [];       // each: {pts:[[q,p],...], color}
+    var anim = null;       // {orbit, idx} latest launched orbit being animated
+
+    var cPhase = document.getElementById('c-phase');
+    var cPhys  = document.getElementById('c-phys');
+    UI.fitCanvas(cPhase, 1.0); UI.fitCanvas(cPhys, 1.0);
+    var plot = new Plot2D(cPhase, { xMin: -3.7, xMax: 3.7, yMin: -3.3, yMax: 3.3 });
+
+    // --- dynamics ----------------------------------------------------------
+    function deriv(s) {
+      if (system === 'pend') return [s[1], -w * Math.sin(s[0])];
+      return [s[1], -w * w * s[0]];                 // SHO: ω₀ = w
+    }
+    function energy(q, p) {
+      if (system === 'pend') return 0.5 * p * p + w * (1 - Math.cos(q));
+      return 0.5 * (p * p + w * w * q * q);
+    }
+
+    function integrate(q0, p0) {
+      var pts = [], s = [q0, p0], dt = 0.02, steps = 900;
+      // backward then forward, so the seed sits mid-orbit
+      var back = [s.slice()];
+      for (var i = 0; i < steps; i++) { s = Dynamics.rk4(deriv, s, -dt); back.push(s.slice()); }
+      back.reverse(); pts = back;
+      s = [q0, p0];
+      for (i = 0; i < steps; i++) { s = Dynamics.rk4(deriv, s, dt); pts.push(s.slice()); }
+      return pts;
+    }
+
+    // --- drawing -----------------------------------------------------------
+    function drawArrow(x, y, u, v, color) {
+      var len = Math.hypot(u, v) || 1;
+      var L = 0.20, hx = x + u / len * L, hy = y + v / len * L;
+      plot.drawLine(x, y, hx, hy, color, 1);
+      var a = Math.atan2(v, u), s = plot.toScreen(hx, hy);
+      plot.ctx.fillStyle = color; plot.ctx.beginPath();
+      plot.ctx.moveTo(s.x, s.y);
+      plot.ctx.lineTo(s.x - 5 * Math.cos(a - 0.4), s.y + 5 * Math.sin(a - 0.4));
+      plot.ctx.lineTo(s.x - 5 * Math.cos(a + 0.4), s.y + 5 * Math.sin(a + 0.4));
+      plot.ctx.closePath(); plot.ctx.fill();
+    }
+
+    function drawField() {
+      var step = 0.62;
+      for (var x = plot.xMin + 0.3; x < plot.xMax; x += step)
+        for (var y = plot.yMin + 0.3; y < plot.yMax; y += step) {
+          var d = deriv([x, y]);
+          drawArrow(x, y, d[0], d[1], 'rgba(120,150,200,0.45)');
+        }
+    }
+
+    function drawLevels() {
+      var Es = system === 'pend'
+        ? [0.4, 1.0, 1.6, 2.0, 2.8, 3.8, 5.0]
+        : [0.4, 1.2, 2.4, 4.0, 6.0];
+      Es.forEach(function (E) {
+        var sep = (system === 'pend' && Math.abs(E - 2.0) < 1e-6);
+        plot.plotImplicit(function (q, p) { return energy(q, p) - E; },
+          sep ? 'rgba(233,69,96,0.55)' : 'rgba(255,255,255,0.13)', sep ? 2 : 1);
+      });
+    }
+
+    function drawFixed() {
+      if (system === 'pend') {
+        plot.drawPoint(0, 0, '#4caf50', 5);             // centre
+        plot.drawPoint(Math.PI, 0, '#ff9800', 5);        // saddle
+        plot.drawPoint(-Math.PI, 0, '#ff9800', 5);
+      } else {
+        plot.drawPoint(0, 0, '#4caf50', 5);
+      }
+    }
+
+    function drawPhase() {
+      plot.w = cPhase.width; plot.h = cPhase.height;
+      plot.clear(); plot.drawGrid();
+      drawLevels();
+      drawField();
+      drawFixed();
+      orbits.forEach(function (o) {
+        plot.ctx.strokeStyle = o.color; plot.ctx.lineWidth = 2; plot.ctx.beginPath();
+        for (var i = 0; i < o.pts.length; i++) {
+          var s = plot.toScreen(o.pts[i][0], o.pts[i][1]);
+          // lift the pen across the wrap-around jump for rotating orbits
+          if (i > 0 && Math.abs(o.pts[i][0] - o.pts[i - 1][0]) > 4) { plot.ctx.stroke(); plot.ctx.beginPath(); plot.ctx.moveTo(s.x, s.y); }
+          else if (i === 0) plot.ctx.moveTo(s.x, s.y); else plot.ctx.lineTo(s.x, s.y);
+        }
+        plot.ctx.stroke();
+      });
+      if (anim) {
+        var cur = anim.orbit.pts[anim.idx];
+        plot.drawPoint(cur[0], cur[1], '#fff', 6);
+      }
+    }
+
+    function drawPhys(q) {
+      var ctx = cPhys.getContext('2d'), W = cPhys.width, Hc = cPhys.height;
+      ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, W, Hc);
+      var cx = W / 2;
+      if (system === 'pend') {
+        var cy = Hc * 0.34, L = Math.min(W, Hc) * 0.32;
+        var bx = cx + L * Math.sin(q), by = cy + L * Math.cos(q);
+        ctx.strokeStyle = '#555'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(bx, by); ctx.stroke();
+        ctx.fillStyle = '#888'; ctx.beginPath(); ctx.arc(cx, cy, 4, 0, 7); ctx.fill();
+        ctx.fillStyle = '#e94560'; ctx.beginPath(); ctx.arc(bx, by, 13, 0, 7); ctx.fill();
+      } else {
+        // mass on a horizontal spring, displacement q
+        var cy2 = Hc / 2, scale = Math.min(W, Hc) * 0.18, x0 = cx + scale * q;
+        var wallL = W * 0.12;
+        ctx.strokeStyle = '#555'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(wallL, cy2 - 30); ctx.lineTo(wallL, cy2 + 30); ctx.stroke();
+        ctx.strokeStyle = '#888'; ctx.lineWidth = 2; ctx.beginPath();
+        var coils = 14;
+        for (var i = 0; i <= coils; i++) {
+          var t = i / coils, xx = wallL + (x0 - wallL) * t;
+          var yy = cy2 + (i === 0 || i === coils ? 0 : (i % 2 ? -10 : 10));
+          if (i === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+        }
+        ctx.stroke();
+        ctx.fillStyle = '#e94560'; ctx.fillRect(x0 - 16, cy2 - 16, 32, 32);
+        ctx.strokeStyle = '#444'; ctx.beginPath(); ctx.moveTo(W * 0.05, cy2 + 16); ctx.lineTo(W * 0.95, cy2 + 16); ctx.stroke();
+      }
+    }
+
+    // --- interaction & animation ------------------------------------------
+    var palette = ['#64b5f6', '#4caf50', '#ffb74d', '#ba68c8', '#4dd0e1', '#f06292'];
+    function launch(q0, p0) {
+      var o = { pts: integrate(q0, p0), color: palette[orbits.length % palette.length] };
+      orbits.push(o);
+      anim = { orbit: o, idx: o.pts.length / 2 | 0 };
+      var E = energy(q0, p0);
+      var kind = system === 'pend'
+        ? (E < 2 ? 'libration (swinging)' : (Math.abs(E - 2) < 0.05 ? 'near the separatrix' : 'rotation (over the top)'))
+        : 'elliptical oscillation';
+      document.getElementById('readout').innerHTML =
+        'launched at q = <b>' + q0.toFixed(2) + '</b>, p = <b>' + p0.toFixed(2) +
+        '</b> &nbsp; E = H(q,p) = <b>' + E.toFixed(3) + '</b> &nbsp; → ' + kind;
+    }
+
+    function onClick(e) {
+      var pos = UI.canvasPos(cPhase, e), c = plot.fromScreen(pos.x, pos.y);
+      launch(c.x, c.y);
+    }
+    cPhase.addEventListener('mousedown', onClick);
+    cPhase.addEventListener('touchstart', function (e) { e.preventDefault(); onClick(e); }, { passive: false });
+
+    function loop() {
+      if (anim) {
+        anim.idx = (anim.idx + 3) % anim.orbit.pts.length;
+        drawPhase();
+        drawPhys(anim.orbit.pts[anim.idx][0]);
+      }
+      requestAnimationFrame(loop);
+    }
+
+    function reset() {
+      orbits = []; anim = null;
+      drawPhase();
+      drawPhys(system === 'pend' ? 0.0 : 0.0);
+    }
+
+    function setSystem(sys) {
+      system = sys;
+      document.getElementById('btn-pend').classList.toggle('active', sys === 'pend');
+      document.getElementById('btn-sho').classList.toggle('active', sys === 'sho');
+      document.getElementById('lbl-param').textContent = sys === 'pend' ? 'g/L =' : 'ω₀ =';
+      reset();
+    }
+    document.getElementById('btn-pend').addEventListener('click', function () { setSystem('pend'); });
+    document.getElementById('btn-sho').addEventListener('click', function () { setSystem('sho'); });
+    document.getElementById('btn-clear').addEventListener('click', reset);
+    UI.bindSlider('slider-w', 'val-w', function (v) { w = v; reset(); });
+
+    setTimeout(function () {
+      UI.fitCanvas(cPhase, 1.0); UI.fitCanvas(cPhys, 1.0);
+      drawPhase(); launch(0, 1.2);   // start with one libration orbit
+      loop();
+    }, 50);
+    UI.onResize(function () {
+      UI.fitCanvas(cPhase, 1.0); UI.fitCanvas(cPhys, 1.0); drawPhase();
+    });
+  } catch (err) {
+    console.error('Module 3 init error:', err);
+    var r = document.getElementById('readout');
+    if (r) r.innerHTML = '<span style="color:var(--accent)">Script error: ' + err.message + '</span>';
+  }
+});
+</script>
+</body>
+</html>

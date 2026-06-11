@@ -2,7 +2,7 @@
 // Our own files: network-first, fall back to cache.
 // CDN resources (KaTeX): cache-first (version-pinned, never change).
 
-const CACHE = 'math-v2';
+const CACHE = 'math-v3';
 
 const PRECACHE = [
   'index.html',
@@ -43,6 +43,17 @@ const PRECACHE = [
   'galois/module4.html',
   'galois/module5.html',
   'galois/module6.html',
+  // Hamiltonian course
+  'hamiltonian/index.html',
+  'hamiltonian/js/nav.js',
+  'hamiltonian/js/dynamics.js',
+  'hamiltonian/module1.html',
+  'hamiltonian/module2.html',
+  'hamiltonian/module3.html',
+  'hamiltonian/module-3.1-playground.html',
+  'hamiltonian/module4.html',
+  'hamiltonian/module5.html',
+  'hamiltonian/module6.html',
 ];
 
 self.addEventListener('install', function (e) {

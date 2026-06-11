@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interlude: The Phase-Space Playground</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    #c-play { cursor: crosshair; touch-action: none; }
+    .readout { font-family: var(--mono); font-size: 0.85rem; margin-top: 0.4rem; }
+    .readout b { color: var(--link); }
+    .seg-btn { background: var(--accent2); }
+    .seg-btn.active { background: var(--accent); }
+    .hbar { font-family: var(--mono); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>The Phase-Space Playground</h1>
+
+  <p>No new theory here — just room to play. You have met the action, the Legendre transform, Hamilton's equations, and the idea that orbits ride the level sets of $H$. This sandbox lets you steer all of it at once. Pick a Hamiltonian, then <strong>click anywhere</strong> to drop a state and watch it flow.</p>
+
+  <p>Each preset is a separable Hamiltonian $H(q,p) = \tfrac12 p^2 + V(q)$, so the kinetic part is always $\tfrac12 p^2$ and only the potential changes. The flow is</p>
+  <div class="math-block">$$\dot q = \frac{\partial H}{\partial p} = p, \qquad \dot p = -\frac{\partial H}{\partial q} = -V'(q).$$</div>
+
+  <div class="controls">
+    <button class="btn seg-btn active" data-sys="pend">Pendulum</button>
+    <button class="btn seg-btn" data-sys="sho">Harmonic</button>
+    <button class="btn seg-btn" data-sys="well">Double well</button>
+    <button class="btn seg-btn" data-sys="quartic">Quartic</button>
+  </div>
+  <div class="controls">
+    <div class="control-group">
+      <label id="lbl-k">k =</label>
+      <input type="range" id="slider-k" min="0.4" max="2.5" step="0.05" value="1">
+      <span class="val" id="val-k">1.00</span>
+    </div>
+    <button class="btn seg-btn active" id="btn-orbit">Mode: single orbit</button>
+    <button class="btn seg-btn" id="btn-blob">Mode: drop a blob</button>
+    <button class="btn" id="btn-clear">Clear</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-play"></canvas>
+    <span class="canvas-label">phase space (q, p) — click to launch</span>
+  </div>
+
+  <div class="readout" id="readout">Pick a system, then click the plane.</div>
+
+  <div class="note">
+    <strong>Things to try.</strong> On the <em>double well</em>, launch just inside one lobe of the figure-eight, then just outside — the figure-eight separatrix divides "trapped in one well" from "sloshing over both." On any system, switch to <em>drop a blob</em> and watch a little cloud of states get sheared and stretched as it flows — yet its <em>area</em> never changes. That conservation of phase-space area is Liouville's theorem, and it is the subject of Module 5. Notice the blob can become a long thin filament but never shrinks to nothing or piles up.
+  </div>
+
+  <h2>The potentials</h2>
+  <ul>
+    <li><strong>Pendulum:</strong> $V(q) = k\,(1-\cos q)$ — one well per $2\pi$, centres at the bottom, saddles at the top.</li>
+    <li><strong>Harmonic:</strong> $V(q) = \tfrac12 k\,q^2$ — a single parabolic well; every orbit is an ellipse and the period is independent of amplitude.</li>
+    <li><strong>Double well:</strong> $V(q) = \tfrac14 q^4 - \tfrac12 k\,q^2$ — two stable minima separated by an unstable hilltop at the origin; the home of the figure-eight separatrix.</li>
+    <li><strong>Quartic:</strong> $V(q) = \tfrac14 k\,q^4$ — a single soft well; unlike the harmonic case the period <em>shrinks</em> as the amplitude grows (a nonlinear oscillator).</li>
+  </ul>
+
+  <p>When you are done playing, Module 4 turns the question "is this quantity conserved?" into a one-line bracket computation.</p>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="../js/plot2d.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/dynamics.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var sys = 'pend', k = 1, mode = 'orbit';
+    var orbits = [], blobs = [];
+
+    var SYS = {
+      pend:    { V: function (q) { return k * (1 - Math.cos(q)); }, dV: function (q) { return k * Math.sin(q); }, label: 'k =' },
+      sho:     { V: function (q) { return 0.5 * k * q * q; },       dV: function (q) { return k * q; },          label: 'ω₀² = k =' },
+      well:    { V: function (q) { return 0.25 * q * q * q * q - 0.5 * k * q * q; }, dV: function (q) { return q * q * q - k * q; }, label: 'k =' },
+      quartic: { V: function (q) { return 0.25 * k * q * q * q * q; }, dV: function (q) { return k * q * q * q; }, label: 'k =' }
+    };
+
+    var cv = document.getElementById('c-play');
+    UI.fitCanvas(cv, 0.62);
+    var plot = new Plot2D(cv, { xMin: -3.7, xMax: 3.7, yMin: -3.0, yMax: 3.0 });
+
+    function deriv(s) { return [s[1], -SYS[sys].dV(s[0])]; }
+    function energy(q, p) { return 0.5 * p * p + SYS[sys].V(q); }
+
+    function integrate(q0, p0) {
+      var s = [q0, p0], dt = 0.02, steps = 1000, pts = [s.slice()];
+      var back = [s.slice()];
+      for (var i = 0; i < steps; i++) { s = Dynamics.rk4(deriv, s, -dt); back.push(s.slice()); }
+      back.reverse();
+      s = [q0, p0];
+      for (i = 0; i < steps; i++) { s = Dynamics.rk4(deriv, s, dt); back.push(s.slice()); }
+      return back;
+    }
+
+    function drawArrow(x, y, u, v, color) {
+      var len = Math.hypot(u, v) || 1, L = 0.18, hx = x + u / len * L, hy = y + v / len * L;
+      plot.drawLine(x, y, hx, hy, color, 1);
+      var a = Math.atan2(v, u), s = plot.toScreen(hx, hy);
+      plot.ctx.fillStyle = color; plot.ctx.beginPath();
+      plot.ctx.moveTo(s.x, s.y);
+      plot.ctx.lineTo(s.x - 4.5 * Math.cos(a - 0.4), s.y + 4.5 * Math.sin(a - 0.4));
+      plot.ctx.lineTo(s.x - 4.5 * Math.cos(a + 0.4), s.y + 4.5 * Math.sin(a + 0.4));
+      plot.ctx.closePath(); plot.ctx.fill();
+    }
+
+    function drawBase() {
+      plot.w = cv.width; plot.h = cv.height;
+      plot.clear(); plot.drawGrid();
+      // a fan of level sets sampled from energies across the window
+      for (var j = 1; j <= 7; j++) {
+        var E = j * 0.7;
+        plot.plotImplicit(function (q, p) { return energy(q, p) - E; }, 'rgba(255,255,255,0.10)', 1);
+      }
+      var step = 0.6;
+      for (var x = plot.xMin + 0.3; x < plot.xMax; x += step)
+        for (var y = plot.yMin + 0.3; y < plot.yMax; y += step)
+          { var d = deriv([x, y]); drawArrow(x, y, d[0], d[1], 'rgba(120,150,200,0.4)'); }
+    }
+
+    var palette = ['#64b5f6', '#4caf50', '#ffb74d', '#ba68c8', '#4dd0e1', '#f06292', '#e94560'];
+
+    function draw() {
+      drawBase();
+      orbits.forEach(function (o) {
+        plot.ctx.strokeStyle = o.color; plot.ctx.lineWidth = 2; plot.ctx.beginPath();
+        for (var i = 0; i < o.pts.length; i++) {
+          var s = plot.toScreen(o.pts[i][0], o.pts[i][1]);
+          if (i > 0 && Math.abs(o.pts[i][0] - o.pts[i - 1][0]) > 4) { plot.ctx.stroke(); plot.ctx.beginPath(); plot.ctx.moveTo(s.x, s.y); }
+          else if (i === 0) plot.ctx.moveTo(s.x, s.y); else plot.ctx.lineTo(s.x, s.y);
+        }
+        plot.ctx.stroke();
+        var c = o.pts[o.idx]; plot.drawPoint(c[0], c[1], '#fff', 5);
+      });
+      blobs.forEach(function (b) {
+        plot.ctx.fillStyle = b.color;
+        for (var i = 0; i < b.pts.length; i++) {
+          var s = plot.toScreen(b.pts[i][0], b.pts[i][1]);
+          plot.ctx.fillRect(s.x - 1.3, s.y - 1.3, 2.6, 2.6);
+        }
+      });
+    }
+
+    function launchOrbit(q0, p0) {
+      var o = { pts: integrate(q0, p0), color: palette[orbits.length % palette.length], idx: 0 };
+      o.idx = o.pts.length / 2 | 0;
+      orbits.push(o);
+      document.getElementById('readout').innerHTML =
+        'orbit at q=<b>' + q0.toFixed(2) + '</b>, p=<b>' + p0.toFixed(2) + '</b> &nbsp; E=<b>' + energy(q0, p0).toFixed(3) + '</b>';
+    }
+
+    function dropBlob(q0, p0) {
+      var pts = [], r = 0.28;
+      for (var i = 0; i < 220; i++) {
+        // uniform disk: deterministic spiral so no Math.random needed
+        var rr = r * Math.sqrt((i + 0.5) / 220), th = i * 2.399963;   // golden angle
+        pts.push([q0 + rr * Math.cos(th), p0 + rr * Math.sin(th)]);
+      }
+      blobs.push({ pts: pts, color: palette[blobs.length % palette.length] });
+      document.getElementById('readout').innerHTML =
+        'blob of 220 states dropped at q=<b>' + q0.toFixed(2) + '</b>, p=<b>' + p0.toFixed(2) + '</b> — watch its area stay fixed as it shears.';
+    }
+
+    cv.addEventListener('mousedown', function (e) {
+      var pos = UI.canvasPos(cv, e), c = plot.fromScreen(pos.x, pos.y);
+      if (mode === 'orbit') launchOrbit(c.x, c.y); else dropBlob(c.x, c.y);
+    });
+    cv.addEventListener('touchstart', function (e) {
+      e.preventDefault(); var pos = UI.canvasPos(cv, e), c = plot.fromScreen(pos.x, pos.y);
+      if (mode === 'orbit') launchOrbit(c.x, c.y); else dropBlob(c.x, c.y);
+    }, { passive: false });
+
+    function loop() {
+      orbits.forEach(function (o) { o.idx = (o.idx + 3) % o.pts.length; });
+      blobs.forEach(function (b) {
+        for (var i = 0; i < b.pts.length; i++) b.pts[i] = Dynamics.rk4(deriv, b.pts[i], 0.02);
+      });
+      if (orbits.length || blobs.length) draw();
+      requestAnimationFrame(loop);
+    }
+
+    function clear() { orbits = []; blobs = []; draw(); }
+    document.getElementById('btn-clear').addEventListener('click', clear);
+
+    document.querySelectorAll('[data-sys]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        sys = btn.getAttribute('data-sys');
+        document.querySelectorAll('[data-sys]').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        document.getElementById('lbl-k').textContent = SYS[sys].label;
+        clear();
+      });
+    });
+    document.getElementById('btn-orbit').addEventListener('click', function () {
+      mode = 'orbit'; this.classList.add('active'); document.getElementById('btn-blob').classList.remove('active');
+    });
+    document.getElementById('btn-blob').addEventListener('click', function () {
+      mode = 'blob'; this.classList.add('active'); document.getElementById('btn-orbit').classList.remove('active');
+    });
+    UI.bindSlider('slider-k', 'val-k', function (v) { k = v; clear(); });
+
+    setTimeout(function () { UI.fitCanvas(cv, 0.62); drawBase(); launchOrbit(0, 1.3); loop(); }, 50);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.62); draw(); });
+  } catch (err) {
+    console.error('Interlude init error:', err);
+    var r = document.getElementById('readout');
+    if (r) r.innerHTML = '<span style="color:var(--accent)">Script error: ' + err.message + '</span>';
+  }
+});
+</script>
+</body>
+</html>

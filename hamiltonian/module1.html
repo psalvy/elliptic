@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 1: The Path Nature Chooses</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    .canvas-wrap canvas { cursor: default; }
+    .readout {
+      font-family: var(--mono); font-size: 0.9rem;
+      display: flex; flex-wrap: wrap; gap: 1.2rem; margin-top: 0.4rem;
+    }
+    .readout b { color: var(--link); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>The Path Nature Chooses</h1>
+
+  <p>Throw a ball across the room. Out of the infinitely many curves that connect where it left your hand to where it lands — straight lines, loops, wild zig-zags — the ball traces exactly <em>one</em>. Newton explains this locally: at every instant $F = ma$ nudges it. But there is a second, stranger explanation that looks at the whole trajectory at once and asks: <strong>of all conceivable paths between two fixed events, what makes the real one special?</strong></p>
+
+  <p>The answer is a single number attached to each path — the <strong>action</strong> — and the rule that the true path makes it <em>stationary</em>. This module builds that rule from the ground up. Everything in the rest of the course is a consequence of it.</p>
+
+  <h2>1.1 — A number for every path</h2>
+
+  <p>Take a particle of mass $m$ moving in one dimension $x(t)$, in a uniform gravitational field so its potential energy is $V(x) = mgx$. At each instant it has a kinetic energy $T = \tfrac12 m\dot x^2$ and a potential energy $V$. Form their <em>difference</em> — this is the <strong>Lagrangian</strong>:</p>
+
+  <div class="math-block">$$L(x, \dot x) = T - V = \tfrac12 m\dot x^2 - mgx.$$</div>
+
+  <p>The minus sign is not a typo and not obvious — we will see in §1.4 exactly why it must be a difference and not the sum. Now integrate $L$ along an entire candidate path from a fixed start event $(t_0, x_0)$ to a fixed end event $(t_1, x_1)$. That single number is the <strong>action</strong>:</p>
+
+  <div class="math-block">$$S[x] = \int_{t_0}^{t_1} L\big(x(t), \dot x(t)\big)\, dt.$$</div>
+
+  <p>The square brackets in $S[x]$ are deliberate: $S$ is a <em>functional</em>, a machine that eats an entire function $x(t)$ and returns one real number. Below, the left panel shows a particle thrown straight up and falling back ($x_0 = x_1 = 0$, with $m=1$, $g=2$, $t_1 = 2$). The faint dashed curve is the true Newtonian path. Drag the slider to <strong>deform the trial path</strong> away from it; the right panel plots the resulting action.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>deformation α =</label>
+      <input type="range" id="slider-alpha" min="-2" max="2" step="0.01" value="0.8">
+      <span class="val" id="val-alpha">0.80</span>
+    </div>
+    <button id="btn-snap" class="btn">Snap to true path (α = 0)</button>
+  </div>
+
+  <div class="split-view">
+    <div class="canvas-wrap">
+      <canvas id="c-path"></canvas>
+      <span class="canvas-label">trial path x(t) — solid; true path — dashed</span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="c-action"></canvas>
+      <span class="canvas-label">action S(α) — the dot is the current trial</span>
+    </div>
+  </div>
+
+  <div class="readout" id="readout">…</div>
+
+  <p>The trial path is the true path plus a bump that vanishes at both ends, $x_\alpha(t) = x_{\text{true}}(t) + \alpha\sin\!\big(\pi t / t_1\big)$. As you sweep $\alpha$, the action traces a parabola whose <strong>minimum sits exactly at $\alpha = 0$</strong> — the true path. Push the path up or down, fast or slow, and $S$ only ever increases.</p>
+
+  <div class="note">
+    <strong>Key insight:</strong> The real trajectory is not the one that minimises energy, or distance, or time. It is the one that makes the action $S = \int (T - V)\,dt$ stationary against every small wiggle of the path.
+  </div>
+
+  <h2>1.2 — "Stationary," not "minimum"</h2>
+
+  <p>The example above is genuinely a minimum — for a uniform force the action always is. But that is special. The honest statement of <strong>Hamilton's principle</strong> is only that the action is <em>stationary</em>: its first-order change vanishes for every small deformation, exactly as a function's derivative vanishes at a max, a min, <em>or</em> a saddle. A harmonic oscillator followed for longer than half a period, for instance, sits at a genuine saddle of $S$ — stationary, but not minimal. So we never say "least action," only "stationary action."</p>
+
+  <p>Make this precise. Perturb the true path $x(t)$ by an arbitrary small function $\eta(t)$ that respects the fixed endpoints, $\eta(t_0) = \eta(t_1) = 0$, scaled by a bookkeeping parameter $\varepsilon$:</p>
+
+  <div class="math-block">$$x_\varepsilon(t) = x(t) + \varepsilon\,\eta(t).$$</div>
+
+  <p>Then $S(\varepsilon) = S[x_\varepsilon]$ is an ordinary function of the one real number $\varepsilon$. Stationarity is the single clean condition</p>
+
+  <div class="math-block">$$\left.\frac{dS}{d\varepsilon}\right|_{\varepsilon = 0} = 0 \quad\text{for every admissible } \eta(t).$$</div>
+
+  <p>This object — the first-order response of a functional to a deformation — is the <strong>first variation</strong>, written $\delta S$. The whole content of mechanics is hidden in "$\delta S = 0$." Let us extract it.</p>
+
+  <h2>1.3 — Deriving the Euler–Lagrange equation</h2>
+
+  <p>Differentiate $S(\varepsilon) = \int_{t_0}^{t_1} L\big(x + \varepsilon\eta,\; \dot x + \varepsilon\dot\eta\big)\,dt$ under the integral sign. By the chain rule, the integrand's $\varepsilon$-derivative is</p>
+
+  <div class="math-block">$$\frac{d}{d\varepsilon} L = \frac{\partial L}{\partial x}\,\eta + \frac{\partial L}{\partial \dot x}\,\dot\eta.$$</div>
+
+  <p>Setting $\varepsilon = 0$ (so $x_\varepsilon \to x$, the true path) and demanding the integral vanish:</p>
+
+  <div class="math-block">$$\delta S = \int_{t_0}^{t_1}\!\left( \frac{\partial L}{\partial x}\,\eta + \frac{\partial L}{\partial \dot x}\,\dot\eta \right) dt = 0.$$</div>
+
+  <p>The two terms treat $\eta$ differently — one multiplies $\eta$, the other its derivative $\dot\eta$. We cannot yet factor out $\eta$. The fix is <strong>integration by parts</strong> on the second term, which trades the derivative off $\eta$:</p>
+
+  <div class="math-block">$$\int_{t_0}^{t_1} \frac{\partial L}{\partial \dot x}\,\dot\eta\, dt = \underbrace{\left[ \frac{\partial L}{\partial \dot x}\,\eta \right]_{t_0}^{t_1}}_{\text{boundary term}} - \int_{t_0}^{t_1} \frac{d}{dt}\!\left( \frac{\partial L}{\partial \dot x} \right)\eta\, dt.$$</div>
+
+  <p>Here is where the fixed endpoints earn their keep: since $\eta(t_0) = \eta(t_1) = 0$, the boundary term is exactly zero. Substituting back, the deformation $\eta$ now appears as a common factor:</p>
+
+  <div class="math-block">$$\delta S = \int_{t_0}^{t_1}\!\left( \frac{\partial L}{\partial x} - \frac{d}{dt}\frac{\partial L}{\partial \dot x} \right)\eta(t)\, dt = 0.$$</div>
+
+  <p>This must hold for <em>every</em> admissible $\eta$. A continuous function whose weighted integral against <em>all</em> test functions vanishes must itself be identically zero — the <strong>fundamental lemma of the calculus of variations</strong>. (If the bracket were positive on some interval, choose an $\eta$ that bumps up only there; the integral would be positive, contradiction.) Therefore the bracket vanishes pointwise:</p>
+
+  <div class="math-block">$$\boxed{\;\frac{d}{dt}\!\left( \frac{\partial L}{\partial \dot x} \right) = \frac{\partial L}{\partial x}\;}$$</div>
+
+  <p>This is the <strong>Euler–Lagrange equation</strong>. One equation per coordinate; for $n$ coordinates $q_1, \dots, q_n$ it reads $\frac{d}{dt}(\partial L/\partial \dot q_i) = \partial L/\partial q_i$ with no change to the derivation.</p>
+
+  <div class="note">
+    <strong>Key insight:</strong> Integration by parts is the entire trick. It moves the time-derivative off the arbitrary wiggle $\eta$ and onto the physics, and the fixed endpoints kill the leftover boundary term. What remains must vanish for all $\eta$ — so it vanishes identically.
+  </div>
+
+  <h2>1.4 — Sanity check: where is $F = ma$?</h2>
+
+  <p>A new principle is worthless if it does not reproduce what we already trust. Feed our Lagrangian $L = \tfrac12 m\dot x^2 - V(x)$ into the Euler–Lagrange machine. The two pieces are</p>
+
+  <div class="math-block">$$\frac{\partial L}{\partial \dot x} = m\dot x, \qquad \frac{\partial L}{\partial x} = -\frac{dV}{dx}.$$</div>
+
+  <p>The first is just the momentum $p = m\dot x$ — remember that it fell out of $\partial L/\partial \dot x$; that is no coincidence, and Module 2 is built on it. Plugging both into $\frac{d}{dt}(\partial L/\partial\dot x) = \partial L/\partial x$:</p>
+
+  <div class="math-block">$$\frac{d}{dt}(m\dot x) = -\frac{dV}{dx} \;\;\Longrightarrow\;\; m\ddot x = -V'(x) = F.$$</div>
+
+  <p>Exactly Newton's second law. Now the minus sign in $L = T - V$ is forced: only a <em>difference</em> produces $+\partial T/\partial\dot x$ on the left (the momentum's rate of change) and $-\partial V/\partial x$ on the right (the force). A sum would put a spurious $+V'$ and give the wrong sign of force. Hamilton's principle is not a re-skin of Newton — it is a deeper statement that <em>implies</em> Newton, while also extending cleanly to fields, relativity, and quantum mechanics, where forces are awkward but actions are natural.</p>
+
+  <div class="note success">
+    <strong>Why this reformulation matters:</strong> $F = ma$ is a vector equation tied to Cartesian coordinates. The Euler–Lagrange equation has the <em>same form in any coordinates</em> — polar, rotating, constrained-to-a-surface — because the action is just a number and does not care how you label the path. Choosing good coordinates becomes the whole game.
+  </div>
+
+  <h2>1.5 — The thread to pull next</h2>
+
+  <p>The Euler–Lagrange equation is <strong>second order</strong> in time: to launch a trajectory you must specify both a position $x$ and a velocity $\dot x$. Yet something kept trying to simplify itself. The combination $\partial L/\partial \dot x$ appeared twice — once as the thing we differentiate, once as the momentum $p = m\dot x$. What if we stopped treating velocity as fundamental and promoted this $p$ to a coordinate in its own right?</p>
+
+  <p>Doing so trades one second-order equation for <em>two</em> first-order equations of breathtaking symmetry — and the transformation that accomplishes it, the Legendre transform, is a beautiful piece of geometry in its own right. That is Module 2.</p>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="../js/plot2d.js"></script>
+<script src="../js/interactive.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var m = 1, g = 2, t0 = 0, t1 = 2;       // physical constants
+    var N = 400;                             // integration samples
+
+    // True Newtonian path: x'' = -g, x(0)=x(2)=0  =>  x = -½ g t² + g t.
+    function xTrue(t) { return -0.5 * g * t * t + g * t; }
+    function deform(t) { return Math.sin(Math.PI * t / t1); }
+
+    // Action of x_alpha(t) = xTrue(t) + alpha·deform(t), via trapezoid rule.
+    function action(alpha) {
+      var dt = (t1 - t0) / N, S = 0;
+      function x(t) { return xTrue(t) + alpha * deform(t); }
+      function xdot(t) {                     // analytic derivative
+        return (-g * t + g) + alpha * (Math.PI / t1) * Math.cos(Math.PI * t / t1);
+      }
+      for (var i = 0; i <= N; i++) {
+        var t = t0 + i * dt;
+        var L = 0.5 * m * xdot(t) * xdot(t) - m * g * x(t);
+        S += (i === 0 || i === N) ? 0.5 * L : L;
+      }
+      return S * dt;
+    }
+
+    // Pre-compute S(α) over the slider range for the parabola plot.
+    var aMin = -2, aMax = 2, samples = [];
+    for (var a = aMin; a <= aMax + 1e-9; a += 0.02) samples.push([a, action(a)]);
+    var sMin = Infinity, sMax = -Infinity;
+    samples.forEach(function (p) { sMin = Math.min(sMin, p[1]); sMax = Math.max(sMax, p[1]); });
+    var sTrue = action(0);
+
+    var cPath = document.getElementById('c-path');
+    var cAct  = document.getElementById('c-action');
+    UI.fitCanvas(cPath, 1.0);
+    UI.fitCanvas(cAct, 1.0);
+    var pPath = new Plot2D(cPath, { xMin: -0.15, xMax: 2.15, yMin: -0.7, yMax: 1.4 });
+    var pAct  = new Plot2D(cAct,  { xMin: aMin - 0.2, xMax: aMax + 0.2,
+                                    yMin: sMin - 0.15 * (sMax - sMin),
+                                    yMax: sMax + 0.1 * (sMax - sMin) });
+
+    function drawPath(alpha) {
+      pPath.w = cPath.width; pPath.h = cPath.height;
+      pPath.clear(); pPath.drawGrid();
+      // true path (dashed, faint)
+      pPath.ctx.setLineDash([5, 5]);
+      pPath.plotParametric(function (t) { return t; }, xTrue, t0, t1, 200, 'rgba(255,255,255,0.35)', 2);
+      pPath.ctx.setLineDash([]);
+      // trial path
+      pPath.plotParametric(function (t) { return t; },
+        function (t) { return xTrue(t) + alpha * deform(t); }, t0, t1, 200, '#e94560', 2.5);
+      // endpoints
+      pPath.drawPoint(t0, xTrue(t0), '#64b5f6', 6, 'A');
+      pPath.drawPoint(t1, xTrue(t1), '#64b5f6', 6, 'B');
+    }
+
+    function drawAction(alpha) {
+      pAct.w = cAct.width; pAct.h = cAct.height;
+      pAct.clear(); pAct.drawGrid();
+      // parabola
+      pAct.ctx.strokeStyle = '#4caf50'; pAct.ctx.lineWidth = 2.5;
+      pAct.ctx.beginPath();
+      for (var i = 0; i < samples.length; i++) {
+        var s = pAct.toScreen(samples[i][0], samples[i][1]);
+        if (i === 0) pAct.ctx.moveTo(s.x, s.y); else pAct.ctx.lineTo(s.x, s.y);
+      }
+      pAct.ctx.stroke();
+      // minimum marker at α = 0
+      pAct.drawPoint(0, sTrue, 'rgba(255,255,255,0.4)', 4, 'min');
+      // current trial
+      pAct.drawPoint(alpha, action(alpha), '#e94560', 6);
+    }
+
+    function update(alpha) {
+      drawPath(alpha);
+      drawAction(alpha);
+      var S = action(alpha), dS = S - sTrue;
+      document.getElementById('readout').innerHTML =
+        'α = <b>' + alpha.toFixed(2) + '</b>' +
+        '&nbsp;&nbsp; S = <b>' + S.toFixed(3) + '</b>' +
+        '&nbsp;&nbsp; S − S<sub>true</sub> = <b>' + dS.toFixed(3) + '</b>' +
+        (Math.abs(dS) < 1e-6 ? ' &nbsp;← stationary!' : '');
+    }
+
+    var slider = document.getElementById('slider-alpha');
+    UI.bindSlider('slider-alpha', 'val-alpha', update);
+    document.getElementById('btn-snap').addEventListener('click', function () {
+      slider.value = 0; slider.dispatchEvent(new Event('input'));
+    });
+
+    setTimeout(function () {
+      UI.fitCanvas(cPath, 1.0); UI.fitCanvas(cAct, 1.0);
+      update(parseFloat(slider.value));
+    }, 50);
+    UI.onResize(function () {
+      UI.fitCanvas(cPath, 1.0); UI.fitCanvas(cAct, 1.0);
+      update(parseFloat(slider.value));
+    });
+  } catch (err) {
+    console.error('Module 1 init error:', err);
+    var r = document.getElementById('readout');
+    if (r) r.innerHTML = '<span style="color:var(--accent)">Script error: ' + err.message + '</span>';
+  }
+});
+</script>
+</body>
+</html>

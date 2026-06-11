@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 6: Tori, Integrability &amp; Chaos</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    #c-torus { cursor: grab; touch-action: none; }
+    #c-torus:active { cursor: grabbing; }
+    #c-map { cursor: crosshair; touch-action: none; }
+    .readout { font-family: var(--mono); font-size: 0.85rem; margin-top: 0.4rem; }
+    .readout b { color: var(--link); }
+    .seg-btn { background: var(--accent2); }
+    .seg-btn.active { background: var(--accent); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>Tori, Integrability &amp; Chaos</h1>
+
+  <p>Liouville told us the phase fluid is incompressible — but said nothing about whether it flows smoothly or shreds into turbulence. Two Hamiltonian systems can both conserve volume while one winds forever onto neat surfaces and the other mixes into a fractal froth. This final module draws the line between them: <strong>integrable</strong> motion on tori, and the <strong>chaos</strong> that erupts when integrability fails.</p>
+
+  <h2>6.1 — Action–angle variables: motion is winding on a torus</h2>
+
+  <p>For the systems of Modules 3–4 we found enough conserved quantities to pin every orbit to a curve. When a system with $n$ degrees of freedom has $n$ independent conserved quantities that are "in involution" (their mutual Poisson brackets vanish, $\{I_j, I_k\} = 0$), it is called <strong>integrable</strong>, and a theorem of Liouville and Arnold says its phase space foliates into <strong>$n$-dimensional tori</strong>. On each torus there are natural coordinates — the <strong>action–angle variables</strong> $(I_j, \theta_j)$ — in which the equations of motion become trivially simple:</p>
+
+  <div class="math-block">$$\dot I_j = -\frac{\partial H}{\partial \theta_j} = 0, \qquad \dot\theta_j = \frac{\partial H}{\partial I_j} = \omega_j(I) = \text{const}.$$</div>
+
+  <p>The actions $I_j$ are constants (they label which torus you are on); the angles $\theta_j$ wind around at fixed rates $\omega_j$. All the hard dynamics has been absorbed into <em>choosing the right coordinates</em> — the dream that started in Module 1, where we noted the Euler–Lagrange equation keeps its form in any coordinates. Each action is a phase-space area, $I_j = \frac{1}{2\pi}\oint p_j\,dq_j$ — the very area Liouville keeps fixed.</p>
+
+  <p>With two angles, the trajectory winds around a torus at rates $\omega_1, \omega_2$. <strong>Drag to rotate</strong> the torus; change the frequency ratio. When $\omega_2/\omega_1$ is <em>rational</em> the path closes into a knot after finitely many loops; when it is <em>irrational</em> the single trajectory never closes and densely fills the entire surface — <strong>quasiperiodic</strong> motion.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>ω₂ / ω₁ =</label>
+      <input type="range" id="slider-ratio" min="0.5" max="4" step="0.001" value="1.618">
+      <span class="val" id="val-ratio">1.618</span>
+    </div>
+    <button class="btn seg-btn" data-ratio="1">1 : 1</button>
+    <button class="btn seg-btn" data-ratio="1.5">2 : 3</button>
+    <button class="btn seg-btn" data-ratio="2">1 : 2</button>
+    <button class="btn seg-btn active" data-ratio="1.618">golden (irrational)</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-torus"></canvas>
+    <span class="canvas-label">a trajectory winding on an invariant torus</span>
+  </div>
+  <div class="readout" id="readout-torus">…</div>
+
+  <div class="note">
+    <strong>Key insight:</strong> Integrable motion is "just" rigid rotation in disguise — uniform winding of angles on a torus. The geometry of an integrable system is a stack of nested tori, one per set of action values.
+  </div>
+
+  <h2>6.2 — Slicing the flow: the Poincaré section</h2>
+
+  <p>Tori in four-dimensional phase space are hard to see directly. Poincaré's trick: fix a slice and mark a dot every time the trajectory crosses it. A continuous flow becomes a discrete, area-preserving <strong>map</strong> of the slice to itself, and an invariant torus shows up as a closed <em>curve</em> of dots (the torus poking through the slice). The canonical model is the <strong>standard map</strong> on the cylinder — itself an exact area-preserving map (Module 5), arising as the section of a periodically kicked rotor:</p>
+
+  <div class="math-block">$$p_{n+1} = p_n + K\sin\theta_n, \qquad \theta_{n+1} = \theta_n + p_{n+1}.$$</div>
+
+  <p>The single parameter $K$ is the kick strength — how far the system is from the integrable case. <strong>Drag $K$</strong> and watch the tori dissolve. Click anywhere to add an orbit from that seed.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>kick K =</label>
+      <input type="range" id="slider-K" min="0" max="3" step="0.01" value="0">
+      <span class="val" id="val-K">0.00</span>
+    </div>
+    <button class="btn seg-btn" data-K="0">0 — integrable</button>
+    <button class="btn seg-btn" data-K="0.6">0.6</button>
+    <button class="btn seg-btn" data-K="0.9716">0.9716 — last torus</button>
+    <button class="btn seg-btn" data-K="2">2 — global chaos</button>
+    <button class="btn" id="btn-clearmap">Clear</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-map"></canvas>
+    <span class="canvas-label">standard map — θ horizontal (0…2π), p vertical (−π…π)</span>
+  </div>
+  <div class="readout" id="readout-map">…</div>
+
+  <p>At $K = 0$ the map is integrable: $p$ never changes, so every orbit is a horizontal line — a stack of tori. Nudge $K$ up and the resonant tori (rational $\omega_2/\omega_1$) are the first to shatter into chains of islands and thin chaotic layers, while the most <em>irrational</em> tori cling on. This is the <strong>KAM theorem</strong> (Kolmogorov–Arnold–Moser): sufficiently irrational tori survive small perturbations, which is why the golden-ratio torus from §6.1 is the very last to die — at $K \approx 0.9716$. Above it, the chaotic regions merge into one connected sea and orbits wander the whole cylinder.</p>
+
+  <div class="note success">
+    <strong>The thresholds to watch:</strong> $K=0$ — pure tori (horizontal lines); $K \approx 0.6$ — visible island chains with thin chaos between them; $K \approx 0.9716$ — the last barrier torus breaks, chaos becomes global; $K \gtrsim 2$ — a near-uniform chaotic sea with only small surviving islands. Every picture preserves area — chaos is not the death of Liouville's theorem, it is incompressible <em>mixing</em>.
+  </div>
+
+  <h2>6.3 — Sensitive dependence: the double pendulum</h2>
+
+  <p>The double pendulum has two degrees of freedom but only one conserved quantity (energy) — it is <strong>not</strong> integrable, and it is chaotic. Below are two copies launched from <em>almost</em> identical angles, differing by one part in a thousand. They track each other briefly, then diverge completely: the hallmark of chaos is exponential sensitivity to initial conditions, $\delta(t) \sim \delta(0)\,e^{\lambda t}$, with $\lambda$ the Lyapunov exponent.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>launch angle =</label>
+      <input type="range" id="slider-init" min="1.2" max="3.0" step="0.02" value="2.30">
+      <span class="val" id="val-init">2.30</span>
+    </div>
+    <button class="btn" id="btn-dp">Restart</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-dp"></canvas>
+    <span class="canvas-label">two double pendulums, initial angles differing by 0.001 rad</span>
+  </div>
+  <div class="readout" id="readout-dp">…</div>
+
+  <p>Notice this is <em>not</em> a numerical artifact and not randomness — the equations are perfectly deterministic, and each pendulum alone would retrace its path exactly if rewound. What explodes is the <em>gap</em> between two infinitesimally separated states. Liouville guarantees the area of a blob of states is preserved, so as the blob stretches exponentially in one direction it must be squeezed exponentially thin in another — incompressibility and chaos are perfectly compatible. Chaos is what efficient phase-space mixing looks like.</p>
+
+  <h2>6.4 — Where this all leads</h2>
+
+  <p>We began with a single principle — make the action stationary — and followed it to the Legendre transform, phase space, Poisson brackets, Liouville's theorem, and the frontier between order and chaos. The structures we uncovered do not stop here:</p>
+  <ul>
+    <li><strong>Quantum mechanics.</strong> Replace the Poisson bracket by a commutator, $\{f, g\} \to \tfrac{1}{i\hbar}[\hat f, \hat g]$, and classical mechanics becomes quantum mechanics. The fundamental bracket $\{q,p\}=1$ becomes the canonical commutation relation $[\hat q, \hat p] = i\hbar$, and $\dot f = \{f, H\}$ becomes the Heisenberg equation $\dot{\hat f} = \tfrac{1}{i\hbar}[\hat f, \hat H]$.</li>
+    <li><strong>Statistical mechanics.</strong> Liouville's theorem is the foundation of ensemble theory — it is what lets a conserved phase-space density define equilibrium.</li>
+    <li><strong>Symplectic geometry.</strong> The 2-form $\omega$ from Module 5 is now a field of its own, the natural home of Hamiltonian dynamics and the language of modern mechanics.</li>
+    <li><strong>The genericity of chaos.</strong> Integrable systems are the exceptions, not the rule — measure zero among all Hamiltonians. The tidy pendulum was a gift; the double pendulum is the norm.</li>
+  </ul>
+
+  <p>From "of all paths, nature chooses one" to "almost all motion is chaotic" — that is the arc of Hamiltonian mechanics. The action was the seed; everything else grew from its single minus sign.</p>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="../js/canvas3d.js"></script>
+<script src="../js/plot2d.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/dynamics.js"></script>
+<script>
+// ---- 6.1 Torus winding -----------------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var canvas = document.getElementById('c-torus');
+    UI.fitCanvas(canvas, 0.62);
+    var scene = new Canvas3D(canvas, { scale: Math.min(canvas.width, canvas.height) * 0.34, autoRotate: true });
+    var R = 2, r = 0.85, ratio = 1.618;
+    var torus = Canvas3D.torusPoints(R, r, 40, 24);
+    var path = [], marker = 0;
+
+    function pt(u, v) {           // u,v in turns
+      var th = u * Math.PI * 2, ph = v * Math.PI * 2;
+      return [(R + r * Math.cos(ph)) * Math.cos(th),
+              (R + r * Math.cos(ph)) * Math.sin(th),
+              r * Math.sin(ph)];
+    }
+    function rebuild() {
+      path = [];
+      var n = 2600, span = 6;    // 6 windings of the slow angle
+      for (var i = 0; i <= n; i++) {
+        var t = i / n * span;
+        path.push(pt(t, t * ratio));
+      }
+      var closes = Math.abs(ratio - Math.round(ratio * 6) / 6) < 1e-3 && false; // generic check below
+      var p = ratio, approxRational = false, info;
+      // detect simple rationals up to denominator 6
+      for (var den = 1; den <= 6 && !approxRational; den++)
+        for (var num = 1; num <= 24; num++)
+          if (Math.abs(p - num / den) < 0.004) { approxRational = true; info = num + ':' + den; }
+      document.getElementById('readout-torus').innerHTML = approxRational
+        ? 'ω₂/ω₁ ≈ <b>' + info + '</b> (rational) → the orbit <b>closes</b> into a periodic knot.'
+        : 'ω₂/ω₁ = <b>' + ratio.toFixed(3) + '</b> (irrational) → the orbit <b>never closes</b> and fills the torus densely (quasiperiodic).';
+    }
+
+    function draw() {
+      scene.clear();
+      scene.drawWireframe(torus, 'rgba(120,150,200,0.22)', 2, 2);
+      scene.ctx.strokeStyle = '#e94560'; scene.ctx.lineWidth = 1.6; scene.ctx.beginPath();
+      for (var i = 0; i < path.length; i++) {
+        var pr = scene.project(path[i][0], path[i][1], path[i][2]);
+        if (i === 0) scene.ctx.moveTo(pr.x, pr.y); else scene.ctx.lineTo(pr.x, pr.y);
+      }
+      scene.ctx.stroke();
+      marker = (marker + 6) % path.length;
+      var m = path[marker], mp = scene.project(m[0], m[1], m[2]);
+      scene.drawPoint(mp, '#fff', 5);
+    }
+
+    rebuild();
+    scene.animate(draw);
+
+    UI.bindSlider('slider-ratio', 'val-ratio', function (v) {
+      ratio = v; rebuild();
+      document.querySelectorAll('[data-ratio]').forEach(function (b) { b.classList.remove('active'); });
+    }, function (v) { return parseFloat(v).toFixed(3); });
+    document.querySelectorAll('[data-ratio]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        ratio = parseFloat(b.getAttribute('data-ratio'));
+        document.getElementById('slider-ratio').value = ratio;
+        document.getElementById('val-ratio').textContent = ratio.toFixed(3);
+        document.querySelectorAll('[data-ratio]').forEach(function (x) { x.classList.toggle('active', x === b); });
+        rebuild();
+      });
+    });
+    UI.onResize(function () { UI.fitCanvas(canvas, 0.62); scene.w = canvas.width; scene.h = canvas.height; scene.cx = scene.w / 2; scene.cy = scene.h / 2; });
+  } catch (err) { console.error('Torus init error:', err); }
+});
+
+// ---- 6.2 Standard map ------------------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var K = 0, seeds = [];
+    var cv = document.getElementById('c-map');
+    UI.fitCanvas(cv, 0.66);
+    var plot = new Plot2D(cv, { xMin: 0, xMax: Math.PI * 2, yMin: -Math.PI, yMax: Math.PI });
+    var palette = ['#64b5f6', '#4caf50', '#ffb74d', '#ba68c8', '#4dd0e1', '#f06292', '#e94560', '#fff176'];
+
+    function defaultSeeds() {
+      seeds = [];
+      for (var i = 0; i < 22; i++) {
+        var p0 = -Math.PI + (i + 0.5) / 22 * 2 * Math.PI;
+        seeds.push({ th: 0.05, p: p0, color: palette[i % palette.length] });
+        seeds.push({ th: Math.PI, p: p0, color: palette[i % palette.length] });
+      }
+    }
+
+    function draw() {
+      plot.w = cv.width; plot.h = cv.height;
+      plot.clear(); plot.drawGrid();
+      var iters = 320;
+      for (var s = 0; s < seeds.length; s++) {
+        var th = seeds[s].th, p = seeds[s].p;
+        plot.ctx.fillStyle = seeds[s].color;
+        for (var k = 0; k < iters; k++) {
+          var next = Dynamics.standardMap(th, p, K, true);
+          th = next[0]; p = next[1];
+          var sc = plot.toScreen(th, p);
+          plot.ctx.fillRect(sc.x, sc.y, 1.1, 1.1);
+        }
+      }
+      var regime = K === 0 ? 'integrable — every orbit is a horizontal torus'
+        : K < 0.6 ? 'mostly tori, thin chaos near resonances'
+        : K < 0.97 ? 'island chains in a growing chaotic sea'
+        : K < 1.1 ? 'last KAM torus breaking — chaos goes global'
+        : 'global chaos with small surviving islands';
+      document.getElementById('readout-map').innerHTML =
+        'K = <b>' + K.toFixed(3) + '</b> — ' + regime + ' &nbsp; (' + seeds.length + ' orbits × ' + iters + ' iterations)';
+    }
+
+    cv.addEventListener('mousedown', function (e) {
+      var pos = UI.canvasPos(cv, e), c = plot.fromScreen(pos.x, pos.y);
+      seeds.push({ th: ((c.x % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI), p: c.y, color: '#fff176' });
+      draw();
+    });
+    cv.addEventListener('touchstart', function (e) {
+      e.preventDefault(); var pos = UI.canvasPos(cv, e), c = plot.fromScreen(pos.x, pos.y);
+      seeds.push({ th: ((c.x % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI), p: c.y, color: '#fff176' });
+      draw();
+    }, { passive: false });
+
+    UI.bindSlider('slider-K', 'val-K', function (v) {
+      K = v; document.querySelectorAll('[data-K]').forEach(function (b) { b.classList.remove('active'); });
+      draw();
+    }, function (v) { return parseFloat(v).toFixed(2); });
+    document.querySelectorAll('[data-K]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        K = parseFloat(b.getAttribute('data-K'));
+        document.getElementById('slider-K').value = K;
+        document.getElementById('val-K').textContent = K.toFixed(2);
+        document.querySelectorAll('[data-K]').forEach(function (x) { x.classList.toggle('active', x === b); });
+        defaultSeeds(); draw();
+      });
+    });
+    document.getElementById('btn-clearmap').addEventListener('click', function () { defaultSeeds(); draw(); });
+
+    setTimeout(function () { UI.fitCanvas(cv, 0.66); defaultSeeds(); draw(); }, 50);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.66); draw(); });
+  } catch (err) {
+    console.error('Standard map init error:', err);
+    var r = document.getElementById('readout-map');
+    if (r) r.innerHTML = '<span style="color:var(--accent)">Script error: ' + err.message + '</span>';
+  }
+});
+
+// ---- 6.3 Double pendulum ---------------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var g = 9.8, m1 = 1, m2 = 1, L1 = 1, L2 = 1, init = 2.30;
+    var sA, sB, t = 0, trailA = [], trailB = [];
+    var cv = document.getElementById('c-dp');
+    UI.fitCanvas(cv, 0.6);
+
+    function deriv(s) { return Dynamics.doublePendulumDeriv(s, g, m1, m2, L1, L2); }
+    function reset() {
+      sA = [init, 0, init, 0];
+      sB = [init, 0, init + 0.001, 0];
+      t = 0; trailA = []; trailB = [];
+    }
+
+    function bob(s) {
+      var x1 = L1 * Math.sin(s[0]), y1 = L1 * Math.cos(s[0]);
+      var x2 = x1 + L2 * Math.sin(s[2]), y2 = y1 + L2 * Math.cos(s[2]);
+      return { x1: x1, y1: y1, x2: x2, y2: y2 };
+    }
+
+    function drawPend(ctx, cx, cy, scale, s, color, trail) {
+      var b = bob(s);
+      // trail
+      ctx.strokeStyle = color; ctx.globalAlpha = 0.35; ctx.lineWidth = 1.2; ctx.beginPath();
+      for (var i = 0; i < trail.length; i++) {
+        var tx = cx + trail[i][0] * scale, ty = cy + trail[i][1] * scale;
+        if (i === 0) ctx.moveTo(tx, ty); else ctx.lineTo(tx, ty);
+      }
+      ctx.stroke(); ctx.globalAlpha = 1;
+      var p1x = cx + b.x1 * scale, p1y = cy + b.y1 * scale;
+      var p2x = cx + b.x2 * scale, p2y = cy + b.y2 * scale;
+      ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(p1x, p1y); ctx.lineTo(p2x, p2y); ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(p1x, p1y, 6, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(p2x, p2y, 9, 0, 7); ctx.fill();
+    }
+
+    function frame() {
+      var dt = 0.005;
+      for (var k = 0; k < 8; k++) { sA = Dynamics.rk4(deriv, sA, dt); sB = Dynamics.rk4(deriv, sB, dt); t += dt; }
+      var bA = bob(sA), bB = bob(sB);
+      trailA.push([bA.x2, bA.y2]); trailB.push([bB.x2, bB.y2]);
+      if (trailA.length > 320) { trailA.shift(); trailB.shift(); }
+
+      var ctx = cv.getContext('2d'), W = cv.width, Hc = cv.height;
+      ctx.fillStyle = '#0d1117'; ctx.fillRect(0, 0, W, Hc);
+      var cx = W / 2, cy = Hc * 0.40, scale = Math.min(W, Hc) * 0.20;
+      ctx.fillStyle = '#888'; ctx.beginPath(); ctx.arc(cx, cy, 4, 0, 7); ctx.fill();
+      drawPend(ctx, cx, cy, scale, sA, '#e94560', trailA);
+      drawPend(ctx, cx, cy, scale, sB, '#4dd0e1', trailB);
+
+      var sep = Math.hypot(sA[0] - sB[0], sA[2] - sB[2]);
+      document.getElementById('readout-dp').innerHTML =
+        't = <b>' + t.toFixed(1) + '</b> s &nbsp; angular separation = <b>' + sep.toFixed(4) +
+        '</b> rad &nbsp; (started at 0.001)' + (sep > 0.5 ? ' &nbsp; ← fully diverged' : '');
+      requestAnimationFrame(frame);
+    }
+
+    UI.bindSlider('slider-init', 'val-init', function (v) { init = v; reset(); });
+    document.getElementById('btn-dp').addEventListener('click', reset);
+
+    setTimeout(function () { UI.fitCanvas(cv, 0.6); reset(); frame(); }, 50);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.6); });
+  } catch (err) {
+    console.error('Double pendulum init error:', err);
+    var r = document.getElementById('readout-dp');
+    if (r) r.innerHTML = '<span style="color:var(--accent)">Script error: ' + err.message + '</span>';
+  }
+});
+</script>
+</body>
+</html>
