@@ -2,7 +2,7 @@
 // Our own files: network-first, fall back to cache.
 // CDN resources (KaTeX): cache-first (version-pinned, never change).
 
-const CACHE = 'math-v3';
+const CACHE = 'math-v4';
 
 const PRECACHE = [
   'index.html',
@@ -47,6 +47,7 @@ const PRECACHE = [
   'hamiltonian/index.html',
   'hamiltonian/js/nav.js',
   'hamiltonian/js/dynamics.js',
+  'hamiltonian/js/glossary.js',
   'hamiltonian/module1.html',
   'hamiltonian/module2.html',
   'hamiltonian/module3.html',

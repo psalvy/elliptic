@@ -111,6 +111,12 @@
 
   <p>The Jacobi identity has a beautiful payoff: if $f$ and $g$ are both conserved ($\{f,H\}=\{g,H\}=0$), then so is their bracket $\{f, g\}$. Conserved quantities are closed under the bracket — a machine for manufacturing new constants of motion from old ones. (Sometimes the new one is trivial, but for systems like the symmetric top it produces genuinely independent conservation laws.)</p>
 
+  <div class="note">
+    <strong>The same algebra runs quantum mechanics.</strong> Those three laws — antisymmetry, bilinearity, Jacobi — are the <em>definition</em> of a Lie algebra, and they are obeyed by one other operation you may have met: the <strong>commutator</strong> $[\hat A, \hat B] = \hat A\hat B - \hat B\hat A$ of quantum operators. It too is antisymmetric, bilinear, a derivation, and Jacobi. So the classical observables under $\{\,\cdot\,,\cdot\,\}$ and the quantum operators under $[\,\cdot\,,\cdot\,]$ are the <em>same kind of object</em>, and quantization is the bridge between them:
+    <div class="math-block">$$\{f, g\} \;\longmapsto\; \frac{1}{i\hbar}\,[\hat f, \hat g].$$</div>
+    This is a Lie-algebra homomorphism (exact to leading order in $\hbar$). Everything in this module has a mirror image across it. The canonical bracket $\{q,p\}=1$ becomes the canonical commutation relation $[\hat q, \hat p] = i\hbar$. The evolution law $\dot f = \{f, H\}$ of 4.1 becomes Heisenberg's equation $\dot{\hat A} = \tfrac1{i\hbar}[\hat A, \hat H]$. And "$f$ is conserved" $\Leftrightarrow \{f,H\}=0$ becomes "$\hat A$ commutes with $\hat H$" $\Leftrightarrow [\hat A,\hat H]=0$ — the quantum statement that an observable is a constant of motion. The vanishing-bracket test for conservation is the same idea in both worlds.
+  </div>
+
   <h2>4.5 — The thread to pull next</h2>
 
   <p>We can now decide whether any single quantity is conserved. But the bracket structure controls more than individual functions — it constrains the geometry of the flow as a whole. The fundamental relation $\{q, p\} = 1$ is secretly a statement about <em>area</em>: as the flow carries a patch of phase space around, that bracket forces the patch's area to stay fixed, no matter how violently it is stretched and folded.</p>
@@ -125,6 +131,7 @@
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="js/glossary.js"></script>
 <script src="../js/plot2d.js"></script>
 <script src="../js/interactive.js"></script>
 <script src="js/dynamics.js"></script>

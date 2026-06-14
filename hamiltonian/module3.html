@@ -31,7 +31,7 @@
 
   <div class="math-block">$$H(q, p) = \tfrac12 p^2 + \big(1 - \cos q\big),$$</div>
 
-  <p>where $q$ is the angle from straight down and $p$ the angular momentum. Hamilton's equations give the arrow at every point:</p>
+  <p>where $q$ is the angle from straight down and $p$ the angular momentum. The potential $1-\cos q$ is pure geometry: a bob on a rod of length $L$ swung to angle $q$ sits a height $L(1-\cos q)$ above its lowest point — the vertical drop from the pivot is $L\cos q$, deepest at $q=0$ — so (with $mgL=1$) that <em>is</em> its gravitational energy, zero at the bottom and rising to $2$ at the top. Its slope $\partial V/\partial q = \sin q$ is the restoring torque, exactly the $-\sin q$ that appears below. (This $\cos$ lives in the energy landscape; the more familiar $\cos t$ of an oscillating pendulum is a different beast — the <em>trajectory through time</em>, recovered only in the small-angle limit $1-\cos q\approx\tfrac12 q^2$ of 3.3.) Hamilton's equations give the arrow at every point:</p>
 
   <div class="math-block">$$\dot q = \frac{\partial H}{\partial p} = p, \qquad \dot p = -\frac{\partial H}{\partial q} = -\sin q.$$</div>
 
@@ -86,6 +86,25 @@
 
   <p>The points where the field vanishes are the <strong>fixed points</strong>. At $(0,0)$ the pendulum hangs at rest — a <em>centre</em>, with orbits circling it stably. At $(\pm\pi, 0)$ it balances inverted — a <em>saddle</em>, where two branches of the separatrix cross; the slightest push sends it away. Launch an orbit right next to the saddle to feel how it lingers, then bolts.</p>
 
+  <div class="note">
+    <strong>Looking ahead — phase space wants to be complex.</strong> Take the simplest system in this module, the harmonic oscillator, with Hamiltonian $H = \tfrac12(p^2 + q^2)$ and equations $\dot q = p,\ \dot p = -q$. Fuse its two axes into a single complex number $z = q + i\,p$. Then
+
+    <div class="math-block">$$\dot z = \dot q + i\,\dot p = p - i\,q = -\,i\,(q + i\,p) = -\,i\,z \quad\Longrightarrow\quad z(t) = e^{-it}\,z_0.$$</div>
+
+    The whole flow is just <em>multiplication by a unit complex number</em>: the state rotates at constant rate, and $|z|^2 = q^2 + p^2 = 2H$ stays fixed — which is exactly why the orbits are circles. Watch where the lone minus sign of Hamilton's equations went: it became the factor of $i$.
+
+    <p style="margin-top:0.8em">That is no accident. A Hermitian form splits into a symmetric real part (a metric) and an antisymmetric imaginary part (the symplectic form $dp\wedge dq$). So complexified phase space carries a Hermitian structure, and the flow of a quadratic Hamiltonian is the <em>unitary</em> group that preserves it. This is the exact seed of quantum mechanics, where a Hermitian $H$ generates unitary evolution $e^{-iHt}$.</p>
+
+    <p style="margin-top:0.8em">Is the full pendulum, then, also Hermitian? Not quite — and the way it fails is the interesting part. The unitary picture is a <em>linear</em> notion, and the pendulum's $\dot p = -\sin q$ is nonlinear, so there is no single Hermitian matrix governing it. What <em>does</em> survive untouched is the antisymmetric half: every Hamiltonian flow preserves the symplectic form $dp\wedge dq$ — phase-space area — linear or not. The full Hermitian package returns only in the linearization about a fixed point:</p>
+
+    <ul>
+      <li>At the <strong>stable centre</strong> $(0,0)$, $\dot p \approx -q$ is <em>elliptic</em> (eigenvalues $\pm i$); there $z = q+ip$ truly rotates and the motion is genuinely unitary, $\mathrm{U}(1)$.</li>
+      <li>At the <strong>unstable saddle</strong> $(\pi,0)$, writing $u = q-\pi$ gives $\dot p \approx +u$, which is <em>hyperbolic</em> (eigenvalues $\pm 1$). Now $z = u+ip$ obeys $\dot z = +i\,\bar z$ — note the conjugate — and the preserved quantity is the indefinite $p^2 - u^2$, not $p^2 + u^2$. This is the Lorentzian cousin of a rotation, the group $\mathrm{SU}(1,1)\cong\mathrm{SL}(2,\mathbb R)$: a squeeze, not a spin.</li>
+    </ul>
+
+    <p style="margin-top:0.8em">So the honest statement: a Hamiltonian system is <em>always</em> symplectic, unitary-Hermitian only near a stable equilibrium, and pseudo-Hermitian (indefinite) near an unstable one. The separatrix is the watershed where the rotation frequency falls to zero and the two characters meet. (Because the undriven pendulum is integrable, action–angle variables turn each libration orbit into a rigid rotation $z = \sqrt{I}\,e^{i\theta}$ — but at an amplitude-dependent frequency $\omega(I)$, an anharmonic spread no single linear unitary can hold, and the very thing that lets a <em>driven</em> pendulum turn chaotic.)</p>
+  </div>
+
   <h2>3.4 — Why trajectories never cross</h2>
 
   <p>Notice you can never make two orbits intersect at an angle. This is forced, not lucky. At any point the field defines <em>one</em> arrow, so there is exactly one direction the flow can take. If two distinct trajectories crossed, the state at the crossing would have two futures — impossible for a deterministic first-order system. This is the geometric face of the existence-and-uniqueness theorem for ODEs, and it is why the phase portrait neatly tiles into nested, non-crossing curves.</p>
@@ -108,6 +127,7 @@
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="js/glossary.js"></script>
 <script src="../js/plot2d.js"></script>
 <script src="../js/interactive.js"></script>
 <script src="js/dynamics.js"></script>

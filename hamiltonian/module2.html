@@ -66,19 +66,39 @@
 
   <h2>2.2 — From the Lagrangian to the Hamiltonian</h2>
 
-  <p>Now apply this to mechanics, transforming in the velocity variable $\dot x$ while position $x$ rides along as a spectator. Define the <strong>conjugate momentum</strong> as the slope of $L$ in $\dot x$ — exactly the quantity that kept reappearing:</p>
+  <p>In one line: <strong>the Hamiltonian is the Legendre transform of the Lagrangian in $\dot x$.</strong> The rest of this section unpacks what that means.</p>
 
-  <div class="math-block">$$p \;\equiv\; \frac{\partial L}{\partial \dot x}.$$</div>
+  <p>Now apply this to mechanics. We transform $L$ in the velocity $\dot x$ while position $x$ rides along as a spectator. The slope variable here — the new independent coordinate that will replace velocity — is the momentum $p$. By the definition from 2.1, the transform is</p>
 
-  <p>The Legendre transform of $L$ in $\dot x$ is the <strong>Hamiltonian</strong>:</p>
+  <div class="math-block">$$H(x, p) \;=\; \max_{\dot x}\big(\,p\,\dot x - L(x, \dot x)\,\big).$$</div>
 
-  <div class="math-block">$$H(x, p) \;=\; p\,\dot x - L(x, \dot x), \qquad\text{with } \dot x \text{ solved in terms of } p.$$</div>
+  <p>Read this carefully: $p$ is held fixed, and we maximize over $\dot x$. To find the maximizing velocity, differentiate the bracket in $\dot x$ and set it to zero:</p>
 
-  <p>That last clause is the whole point: we use $p = \partial L/\partial\dot x$ to eliminate every $\dot x$ in favour of $p$, so $H$ is genuinely a function of position and momentum, never velocity. For our particle, $p = m\dot x \Rightarrow \dot x = p/m$, hence</p>
+  <div class="math-block">$$\frac{\partial}{\partial \dot x}\big(p\,\dot x - L\big) = 0 \quad\Longrightarrow\quad \frac{\partial L}{\partial \dot x} = p.$$</div>
+
+  <p>This equation ties together the fixed slope $p$ and the velocity that achieves the max: the maximizer is the velocity at which $L$'s own slope equals $p$. Because $L$ is convex in $\dot x$ (see the note below), there is exactly one such velocity, and the equation can be inverted to give it explicitly as a function of $p$, written $\dot x(p)$. Solving $\partial L/\partial\dot x = p$ for $\dot x$ <em>is</em> the construction of $\dot x(p)$.</p>
+
+  <p>The relation $\partial L/\partial\dot x = p$ is the same momentum that kept reappearing in Module 1; here it does double duty, both <em>defining</em> the momentum $p$ from a velocity and, read backwards, <em>recovering</em> the velocity $\dot x(p)$ from the momentum. Substituting the maximizer back into the bracket gives the <strong>Hamiltonian</strong>:</p>
+
+  <div class="math-block">$$H(x, p) \;=\; p\,\dot x(p) \;-\; L\big(x,\, \dot x(p)\big).$$</div>
+
+  <p>Every $\dot x$ on the right has been replaced by $\dot x(p)$, so $H$ is genuinely a function of position and momentum, never velocity. For our particle, $\partial L/\partial\dot x = m\dot x = p$ gives $\dot x(p) = p/m$, hence</p>
 
   <div class="math-block">$$H = p\cdot\frac{p}{m} - \left(\tfrac12 m\frac{p^2}{m^2} - V\right) = \frac{p^2}{2m} + V(x) = T + V.$$</div>
 
   <p>The minus sign of the Lagrangian has flipped into a plus: $H$ is the total <em>energy</em>, kinetic plus potential. (This identification $H = T+V$ holds whenever the kinetic energy is a quadratic form in the velocities and the constraints do not depend on time — true for everything in this course.)</p>
+
+  <div class="note">
+    <strong>But is $L$ convex?</strong> Section 2.1 warned that the transform is only reversible for a convex function — yet we never checked $L$. We don't have to check it in $x$: the transform acts <em>only</em> in $\dot x$, with $x$ a spectator, so a wildly non-convex potential $V(x)$ is irrelevant. We need convexity in $\dot x$ alone, and the kinetic term hands it to us for free:
+    <div class="math-block">$$\frac{\partial^2 L}{\partial \dot x^2} = m > 0.$$</div>
+    A positive mass makes $L$ strictly convex in $\dot x$ (in several dimensions: the mass matrix is positive-definite). That is exactly what lets us solve $p = m\dot x$ for $\dot x = p/m$ <em>uniquely</em> above — one velocity per momentum, the mechanical echo of "one tangent per slope." Strictly, all we need is that the velocity Hessian $\partial^2 L/\partial\dot x^2$ be non-degenerate; positive-definiteness is the clean, global version, and it holds automatically for the quadratic kinetic energies in this course.
+  </div>
+
+  <div class="note">
+    <strong>$L$ and $H$ are Legendre duals.</strong> Section 2.1 showed the transform is an involution: do it twice and you return home, $f^{\star\star}=f$. The same holds here. Transform $L$ in $\dot x$ and you get $H(x,p)$; transform $H$ in $p$ and you land back on $L(x,\dot x)$, losing nothing. Neither object is more fundamental — they are a <strong>dual pair</strong> carrying identical information, one indexed by velocity, the other by momentum.
+
+    <p style="margin-top:0.8em">The duality is symmetric in the conjugate slot but twisted in the spectator. The velocity–momentum pairing has no sign: $p = \partial L/\partial\dot x$ going out, $\dot x = \partial H/\partial p$ coming back (the latter is Hamilton's first equation, next section). But position picks up a minus, $\partial H/\partial x = -\partial L/\partial x$. The reason is purely structural: in $H = p\,\dot x(p) - L$, the only term that carries $x$ is $-L$. The pairing term $p\,\dot x$ holds no explicit position, and the $x$-dependence hiding inside $\dot x(p)$ contributes nothing — at the maximizing velocity the slope in $\dot x$ is zero, so nudging it costs nothing to first order. Differentiating in $x$ therefore leaves only $-\partial L/\partial x$. The minus is inherited straight from the minus on $L$ in the transform. In 2.3 this same sign reappears as $\dot p = -\partial H/\partial x$.</p>
+  </div>
 
   <h2>2.3 — Hamilton's equations, in one line of algebra</h2>
 
@@ -128,6 +148,7 @@
 <script src="../js/nav-core.js"></script>
 <script src="js/nav.js"></script>
 <script src="../js/math-render.js"></script>
+<script src="js/glossary.js"></script>
 <script src="../js/plot2d.js"></script>
 <script src="../js/interactive.js"></script>
 <script>
