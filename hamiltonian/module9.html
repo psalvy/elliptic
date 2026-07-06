@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 9: The Hénon Map &amp; Reversibility</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    #c-henon, #c-rev { cursor: crosshair; touch-action: none; }
+    .readout { font-family: var(--mono); font-size: 0.85rem; margin-top: 0.4rem; }
+    .readout b { color: var(--link); }
+    .seg-btn { background: var(--accent2); }
+    .seg-btn.active { background: var(--accent); }
+    table.an { border-collapse: collapse; margin: 1rem 0; font-size: 0.92rem; width: 100%; }
+    table.an td, table.an th { border: 1px solid var(--border, #444); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+    table.an th { background: var(--accent2); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>The Hénon Map &amp; Reversibility</h1>
+
+  <p>We now meet the map the target paper is built around, and uncover the symmetry that survives even when every conserved quantity has been destroyed. Module 7 gave us symplectic maps; Module 8 gave us the algebra that generates them. Here is the concrete, chaotic, beautiful object they were preparing us for — and the discrete echo of Noether's theorem hiding inside it.</p>
+
+  <h2>9.1 — The cubic Hénon map: order and chaos on one screen</h2>
+
+  <p>Take the linear map of Module 7 and make the kick nonlinear. In the <strong>McMillan form</strong> — position and momentum swap roles, with a force $f$ acting on the momentum —</p>
+
+  <div class="math-block">$$T:\qquad q' = p, \qquad p' = -q + f(p), \qquad f(p) = p + p^3.$$</div>
+
+  <p>the extra cubic term $p^3$ changes everything. The origin is still a stable fixed point (the linearised map has trace $f'(0)=1<2$, tune $\nu_0 = \tfrac16$), but two <em>unstable</em> fixed points now sit at $(1,1)$ and $(-1,-1)$ — solve $q=p$ and $p=-q+p+p^3$ to get $p^3=p$. Their stable and unstable manifolds cross in a <strong>tangle</strong>, and an exact invariant $\mathcal K[T\zeta]=\mathcal K[\zeta]$ no longer exists. <strong>Click anywhere to launch an orbit</strong>; drag the seed ring to populate the portrait.</p>
+
+  <div class="controls">
+    <button class="btn seg-btn active" data-seed="line">seed along p = q</button>
+    <button class="btn seg-btn" data-seed="chaos">seed near the saddle</button>
+    <button class="btn" id="btn-henon-clear">Clear</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-henon"></canvas>
+    <span class="canvas-label">cubic Hénon map — q horizontal, p vertical; blue = stable centre, red = unstable saddles</span>
+  </div>
+  <div class="readout" id="readout-henon">…</div>
+
+  <p>The anatomy is the whole story of the course in one picture: nested <strong>KAM curves</strong> hug the centre (surviving invariant tori, Module 6); further out they break into <strong>island chains</strong> at resonant tunes; a thin <strong>chaotic layer</strong> threads between the islands; and beyond the <strong>separatrix</strong> through the saddles, orbits escape to infinity. Every dot still respects Liouville — area is preserved — yet no single smooth function is conserved everywhere.</p>
+
+  <div class="note">
+    <strong>Key insight:</strong> The cubic Hénon map packs stable tori, resonant islands, a chaotic sea, and escaping orbits into one area-preserving map — the generic picture of a perturbed integrable system, and the proving ground for the whole theory.
+  </div>
+
+  <h2>9.2 — Reversibility: the map is two mirrors</h2>
+
+  <p>Even with no conserved quantity, the map is not structureless. It is <strong>reversible</strong>: it factors into two reflections, each of which undoes itself. Define two <em>involutions</em> (maps with $R^2 = \mathrm{Id}$):</p>
+
+  <div class="math-block">$$R_1:\ (q,p)\mapsto(p,q), \qquad R_2:\ (q,p)\mapsto\big(q,\,-p+f(q)\big).$$</div>
+
+  <p>$R_1$ is reflection across the diagonal $p=q$; $R_2$ is a vertical flip about the curve $p=f(q)/2$. A one-line check shows the Hénon map is exactly their composition:</p>
+
+  <div class="math-block">$$R_2\big(R_1(q,p)\big) = R_2(p,q) = \big(p,\,-q+f(p)\big) = T(q,p). \qquad\Longrightarrow\qquad T = R_2\circ R_1.$$</div>
+
+  <p>Because $R_1^2 = R_2^2 = \mathrm{Id}$, running the map backward is just $T^{-1} = R_1\circ R_2$ — same two mirrors, opposite order. The fixed-point sets of the reflections are the <strong>symmetry lines</strong>:</p>
+
+  <div class="math-block">$$\ell_1 = \mathrm{Fix}(R_1):\ p = q, \qquad \ell_2 = \mathrm{Fix}(R_2):\ p = \tfrac12 f(q).$$</div>
+
+  <p>Two consequences you can see below. First, <strong>the entire phase portrait is symmetric under $R_1$</strong> — reflect any orbit across the diagonal and you land on another orbit (the same one, run backward). Second, all the <em>symmetric</em> fixed points and cycles are forced to sit <em>on</em> the symmetry lines — which is why $(0,0)$ and $(\pm1,\pm1)$ all lie on $\ell_1$. <strong>Toggle the mirror image</strong> to watch orbits map onto themselves.</p>
+
+  <div class="controls">
+    <button class="btn" id="btn-rev-reflect">Show R₁ mirror image</button>
+    <button class="btn" id="btn-rev-lines">Toggle symmetry lines</button>
+    <button class="btn" id="btn-rev-clear">Clear</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-rev"></canvas>
+    <span class="canvas-label">orbits (red), their R₁ reflections across p = q (cyan), and the symmetry lines ℓ₁, ℓ₂</span>
+  </div>
+  <div class="readout" id="readout-rev">…</div>
+
+  <div class="note">
+    <strong>Key insight:</strong> A reversible map is the product of two involutions, $T = R_2\circ R_1$. This discrete reflection symmetry persists even in fully chaotic maps — it is structure that outlives every conservation law.
+  </div>
+
+  <h2>9.3 — Reversibility is the discrete Noether</h2>
+
+  <p>Step back to Module 4. Noether's theorem said: every <em>continuous</em> symmetry of the action yields an <em>exact</em> conserved quantity — time-translation gives energy, rotation gives angular momentum. That is the engine of integrability.</p>
+
+  <p>The reflections $R_1, R_2$ are a <em>discrete</em> symmetry. They generate an infinite group (all the words $R_1 R_2 R_1 \cdots$), and unlike the continuous case they persist in chaos, where exact invariants have been destroyed. The organising principle of the target paper is the parallel between these two worlds:</p>
+
+  <table class="an">
+    <tr><th>Noether (Module 4)</th><th>Reversibility (this paper)</th></tr>
+    <tr>
+      <td><em>Continuous</em> symmetry of the action</td>
+      <td><em>Discrete</em> symmetry: reversing involutions $R_1, R_2$</td>
+    </tr>
+    <tr>
+      <td>Yields an <strong>exact</strong> invariant $\dot I = 0$</td>
+      <td>Yields an <strong>approximate</strong> invariant $\mathcal K[T\zeta]-\mathcal K[\zeta]=\mathcal O(\epsilon^{n+1})$</td>
+    </tr>
+    <tr>
+      <td>Guarantees a smooth conserved surface</td>
+      <td>The approximate invariant <em>inherits</em> the discrete symmetry — its level sets respect $R_1, R_2$</td>
+    </tr>
+    <tr>
+      <td>Works only for integrable systems</td>
+      <td>Works even in near-integrable and chaotic maps</td>
+    </tr>
+  </table>
+
+  <p>That is the thesis: reversibility plays for discrete maps the structural role that continuous symmetry plays for flows. It cannot hand us a perfect conserved quantity — chaos forbids that — but it constrains and shapes an <em>almost</em>-conserved one, order by order. Building that object is the last step, and the doorway to the research paper itself.</p>
+
+  <div class="note success">
+    <strong>Next:</strong> We construct $\mathcal K^{(n)}$, a function the Hénon map conserves up to $\mathcal O(\epsilon^{n+1})$ — starting from the Courant–Snyder ellipse of Module 7 and correcting it order by order, watching its level sets snap onto the real orbits above.
+  </div>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="js/glossary.js"></script>
+<script src="../js/canvas3d.js"></script>
+<script src="../js/plot2d.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/dynamics.js"></script>
+<script>
+// ---- 9.1 Hénon phase portrait ----------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var cv = document.getElementById('c-henon');
+    UI.fitCanvas(cv, 0.72);
+    var plot = new Plot2D(cv, { xMin: -1.4, xMax: 1.4, yMin: -1.4, yMax: 1.4 });
+    var f = Dynamics.cubicForce(1);
+    var step = function (q, p) { return Dynamics.mcMillanMap(q, p, f); };
+    var palette = ['#64b5f6', '#4caf50', '#ffb74d', '#ba68c8', '#4dd0e1', '#f06292', '#fff176', '#9ccc65'];
+    var seeds = [];
+
+    function lineSeeds() {
+      seeds = [];
+      for (var i = 0; i < 14; i++) { var r = 0.08 + i * 0.056; seeds.push({ q: r, p: r, c: palette[i % palette.length] }); }
+    }
+    function chaosSeeds() {
+      seeds = [];
+      // near the saddle at (1,1): thin chaotic layer + islands
+      var pts = [[0.95, 0.95], [0.9, 0.86], [0.82, 0.82], [0.7, 0.6], [0.55, 0.55], [-0.6, 0.6], [0.3, -0.2]];
+      for (var i = 0; i < pts.length; i++) seeds.push({ q: pts[i][0], p: pts[i][1], c: palette[i % palette.length] });
+    }
+    function draw() {
+      plot.w = cv.width; plot.h = cv.height;
+      plot.clear(); plot.drawGrid();
+      var iters = 700;
+      for (var s = 0; s < seeds.length; s++) {
+        var q = seeds[s].q, p = seeds[s].p;
+        plot.ctx.fillStyle = seeds[s].c;
+        for (var k = 0; k < iters; k++) {
+          var n = step(q, p); q = n[0]; p = n[1];
+          if (!isFinite(q) || Math.hypot(q, p) > 6) break;
+          var sc = plot.toScreen(q, p);
+          plot.ctx.fillRect(sc.x, sc.y, 1.3, 1.3);
+        }
+      }
+      plot.drawPoint(0, 0, '#64b5f6', 5);
+      plot.drawPoint(1, 1, '#e94560', 5);
+      plot.drawPoint(-1, -1, '#e94560', 5);
+      document.getElementById('readout-henon').innerHTML =
+        'f(p) = p + p³ &nbsp;•&nbsp; stable centre (0,0), saddles (±1,±1) &nbsp;•&nbsp; ' + seeds.length + ' orbits × 700 iterations, area preserved throughout';
+    }
+    function seed(e) {
+      var pos = UI.canvasPos(cv, e), c = plot.fromScreen(pos.x, pos.y);
+      seeds.push({ q: c.x, p: c.y, c: '#fff176' }); draw();
+    }
+    cv.addEventListener('mousedown', seed);
+    cv.addEventListener('touchstart', function (e) { e.preventDefault(); seed(e); }, { passive: false });
+    document.querySelectorAll('[data-seed]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('[data-seed]').forEach(function (x) { x.classList.toggle('active', x === b); });
+        if (b.getAttribute('data-seed') === 'line') lineSeeds(); else chaosSeeds();
+        draw();
+      });
+    });
+    document.getElementById('btn-henon-clear').addEventListener('click', function () { seeds = []; draw(); });
+    setTimeout(function () { UI.fitCanvas(cv, 0.72); lineSeeds(); draw(); }, 40);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.72); draw(); });
+  } catch (err) {
+    console.error('9.1 error', err);
+    var r = document.getElementById('readout-henon'); if (r) r.innerHTML = '<span style="color:var(--accent)">Error: ' + err.message + '</span>';
+  }
+});
+
+// ---- 9.2 Reversibility -----------------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var cv = document.getElementById('c-rev');
+    UI.fitCanvas(cv, 0.72);
+    var plot = new Plot2D(cv, { xMin: -1.4, xMax: 1.4, yMin: -1.4, yMax: 1.4 });
+    var f = Dynamics.cubicForce(1);
+    var step = function (q, p) { return Dynamics.mcMillanMap(q, p, f); };
+    var seeds = [], showReflect = false, showLines = true;
+
+    function baseSeeds() {
+      seeds = [];
+      // asymmetric-looking single orbits so the reflection is visually distinct
+      var pts = [[0.25, 0.05], [0.5, 0.1], [0.72, 0.2]];
+      var cols = ['#e94560', '#ff8a65', '#ffb74d'];
+      for (var i = 0; i < pts.length; i++) seeds.push({ q: pts[i][0], p: pts[i][1], c: cols[i] });
+    }
+    function draw() {
+      plot.w = cv.width; plot.h = cv.height;
+      plot.clear(); plot.drawGrid();
+      if (showLines) {
+        plot.drawLine(-1.4, -1.4, 1.4, 1.4, 'rgba(120,200,255,0.55)', 1.4);   // l1: p=q
+        // l2: p = f(q)/2
+        plot.plotParametric(function (q) { return q; }, function (q) { return f(q) / 2; }, -1.25, 1.25, 200, 'rgba(120,255,180,0.5)', 1.4);
+      }
+      var iters = 900;
+      for (var s = 0; s < seeds.length; s++) {
+        var q = seeds[s].q, p = seeds[s].p;
+        for (var k = 0; k < iters; k++) {
+          var n = step(q, p); q = n[0]; p = n[1];
+          if (!isFinite(q) || Math.hypot(q, p) > 6) break;
+          var sc = plot.toScreen(q, p);
+          plot.ctx.fillStyle = seeds[s].c; plot.ctx.fillRect(sc.x, sc.y, 1.4, 1.4);
+          if (showReflect) { var sr = plot.toScreen(p, q); plot.ctx.fillStyle = 'rgba(77,208,225,0.9)'; plot.ctx.fillRect(sr.x, sr.y, 1.4, 1.4); }
+        }
+      }
+      plot.drawPoint(0, 0, '#64b5f6', 4);
+      plot.drawPoint(1, 1, '#e94560', 4);
+      plot.drawPoint(-1, -1, '#e94560', 4);
+      document.getElementById('readout-rev').innerHTML =
+        (showLines ? 'ℓ₁: p=q (blue), ℓ₂: p=f(q)/2 (green) — fixed points lie on ℓ₁. ' : '') +
+        (showReflect ? '<b>R₁ mirror shown (cyan)</b>: each reflection lands on an orbit — the portrait is symmetric.' : 'Reflection hidden — toggle to overlay R₁ images.');
+    }
+    document.getElementById('btn-rev-reflect').addEventListener('click', function () { showReflect = !showReflect; draw(); });
+    document.getElementById('btn-rev-lines').addEventListener('click', function () { showLines = !showLines; draw(); });
+    document.getElementById('btn-rev-clear').addEventListener('click', function () { baseSeeds(); showReflect = false; draw(); });
+    cv.addEventListener('mousedown', function (e) {
+      var pos = UI.canvasPos(cv, e), c = plot.fromScreen(pos.x, pos.y);
+      seeds.push({ q: c.x, p: c.y, c: '#fff176' }); draw();
+    });
+    setTimeout(function () { UI.fitCanvas(cv, 0.72); baseSeeds(); draw(); }, 40);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.72); draw(); });
+  } catch (err) {
+    console.error('9.2 error', err);
+    var r = document.getElementById('readout-rev'); if (r) r.innerHTML = '<span style="color:var(--accent)">Error: ' + err.message + '</span>';
+  }
+});
+</script>
+</body>
+</html>
