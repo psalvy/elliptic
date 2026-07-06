@@ -42,4 +42,34 @@ navCore.init([
     title: 'Tori, Integrability & Chaos',
     desc:  'Action–angle variables wrap integrable motion onto tori — and the standard map shows them shatter into chaos.',
   },
+  {
+    file:  'module7.html',
+    label: 'Module 7',
+    title: 'From Flow to Map',
+    desc:  'Discrete symplectic maps: area preservation, the trace test for stability, the rotation number $\\nu_0$, and the Courant–Snyder invariant.',
+  },
+  {
+    file:  'module8.html',
+    label: 'Module 8',
+    title: 'Lie Algebras & Lie Transformations',
+    desc:  'The Poisson bracket as a Lie algebra; $e^{:G:}$ turns a generator into a symplectic map; normal forms and the twist coefficient $\\tau_0$.',
+  },
+  {
+    file:  'module9.html',
+    label: 'Module 9',
+    title: 'The Hénon Map & Reversibility',
+    desc:  'The cubic Hénon map’s order-and-chaos portrait, and reversibility $T=R_2\\circ R_1$ — the discrete echo of Noether’s theorem.',
+  },
+  {
+    file:  'module10.html',
+    label: 'Module 10',
+    title: 'Almost-Conserved Quantities',
+    desc:  'Approximate invariants $\\mathcal K[T\\zeta]-\\mathcal K[\\zeta]=\\mathcal O(\\epsilon^{n+1})$ — the perturbation theory of arXiv:2505.07223, made visual.',
+  },
+  {
+    file:  'module-10.1-mcmillan-lab.html',
+    label: 'Interlude',
+    title: 'The McMillan Map Lab',
+    desc:  'A sandbox for Modules 7–10: dial the force $f(p)$, seed orbits, and overlay symmetry lines and Courant–Snyder ellipses.',
+  },
 ]);

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 10: Almost-Conserved Quantities</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    #c-inv, #c-res { cursor: crosshair; touch-action: none; }
+    .readout { font-family: var(--mono); font-size: 0.85rem; margin-top: 0.4rem; }
+    .readout b { color: var(--link); }
+    .seg-btn { background: var(--accent2); }
+    .seg-btn.active { background: var(--accent); }
+    .resbar { height: 14px; border-radius: 3px; margin: 2px 0; background: var(--accent); }
+    .resrow { display: grid; grid-template-columns: 80px 1fr 110px; gap: 8px; align-items: center; font-family: var(--mono); font-size: 0.8rem; margin: 3px 0; }
+    table.map { border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; width: 100%; }
+    table.map td, table.map th { border: 1px solid var(--border, #444); padding: 0.45rem 0.7rem; text-align: left; }
+    table.map th { background: var(--accent2); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>Almost-Conserved Quantities</h1>
+
+  <p>This is where the course meets the frontier. The cubic Hénon map has no exact invariant — chaos forbids it. So we stop demanding perfection and ask for something weaker but astonishingly useful: a function the map conserves <strong>almost</strong> exactly, whose level sets trace the real orbits. We build it from the Courant–Snyder ellipse of Module 7, correct it order by order, and watch it snap onto the tangle from Module 9. This is precisely the construction of the paper this course was written to unlock.</p>
+
+  <h2>10.1 — Relaxing the impossible: the residual</h2>
+
+  <p>An exact invariant satisfies $\mathcal K[T\zeta] - \mathcal K[\zeta] = 0$ at every point. For a chaotic map no such smooth $\mathcal K$ exists. Introduce a small parameter $\epsilon$ measuring the <em>amplitude</em> of the motion (rescale $(q,p)\to\epsilon(q,p)$: near the fixed point the map is nearly linear, and $\epsilon$ controls how much the nonlinearity bites). Then ask only that $\mathcal K$ be conserved to some order in $\epsilon$:</p>
+
+  <div class="math-block">$$\mathcal R_n \;\equiv\; \mathcal K^{(n)}[T\zeta] - \mathcal K^{(n)}[\zeta] \;=\; \mathcal O(\epsilon^{\,n+1}).$$</div>
+
+  <p>$\mathcal R_n$ is the <strong>residual</strong> — the direct, measurable amount by which the "invariant" fails after one step. An exact invariant has $\mathcal R = 0$; a good approximate one has a residual so small that orbits drift across level sets only over astronomically many iterations. The residual is something we can literally compute at any point, and it is our scoreboard for the rest of the module.</p>
+
+  <div class="note">
+    <strong>Key insight:</strong> Give up on $\mathcal R = 0$ and ask for $\mathcal R = \mathcal O(\epsilon^{n+1})$. "Almost conserved to high order" is enough to pin orbits down for practical eternities — and it exists where exact invariants cannot.
+  </div>
+
+  <h2>10.2 — Correcting the ellipse, order by order</h2>
+
+  <p>Expand the invariant as a power series in $\epsilon$, each term a polynomial in $(q,p)$:</p>
+
+  <div class="math-block">$$\mathcal K^{(n)} = \mathcal K_0 + \epsilon\,\mathcal K_1 + \epsilon^2\mathcal K_2 + \cdots + \epsilon^n\mathcal K_n.$$</div>
+
+  <p>The zeroth order is forced by the linearised map — it is the <strong>Courant–Snyder invariant</strong> of Module 7 (with $a = f'(0) = 1$):</p>
+
+  <div class="math-block">$$\mathcal K_0 = \mathrm{C.S.} = p^2 - p\,q + q^2.$$</div>
+
+  <p>Demanding $\mathcal R_n = \mathcal O(\epsilon^{n+1})$ at each order fixes the higher polynomials. Carrying this out for the cubic Hénon map gives the second-order approximate invariant (this is Eq. K<sub>4.a</sub> of the paper):</p>
+
+  <div class="math-block">$$\mathcal K^{(2)}_{4.a} = p^2 - p\,q + q^2 - p^2 q^2.$$</div>
+
+  <p>Below, the faint grey dots are the <em>true</em> Hénon orbits from Module 9. The bright curves are the level sets of the invariant you select. Watch the flat Courant–Snyder ellipses fail to hug the orbits far from the centre — and the corrected invariant lock on. The <strong>residual meter</strong> reports the mean $|\mathcal K[T\zeta]-\mathcal K[\zeta]|$ over a test orbit at the amplitude you set.</p>
+
+  <div class="controls">
+    <button class="btn seg-btn" data-inv="cs">order 0 — Courant–Snyder</button>
+    <button class="btn seg-btn active" data-inv="k4a">order 2 — K₄ₐ</button>
+    <button class="btn seg-btn" data-inv="k4b">order 2 refined — K₄ᵦ</button>
+    <div class="control-group">
+      <label>test amplitude =</label>
+      <input type="range" id="slider-amp" min="0.15" max="0.78" step="0.01" value="0.45">
+      <span class="val" id="val-amp">0.45</span>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-inv"></canvas>
+    <span class="canvas-label">true Hénon orbits (grey) with level sets of the chosen approximate invariant (bright)</span>
+  </div>
+  <div class="readout" id="readout-inv">…</div>
+
+  <div id="resbox" style="margin-top:0.6rem;"></div>
+
+  <div class="note">
+    <strong>Key insight:</strong> The order-0 invariant is just the harmonic-oscillator ellipse; each higher order adds a polynomial correction that bends the level sets to follow the real, nonlinear orbits. The residual drops by a full power of the amplitude at every order.
+  </div>
+
+  <h2>10.3 — The useful ambiguity: refining the separatrix</h2>
+
+  <p>Module 7 warned us that any function of an invariant is again an invariant — a freedom encoded by free coefficients $C_i$. It does <em>not</em> change the residual order, but it reshapes the level sets. The paper exploits it to make the invariant hug the <strong>separatrix</strong> — the boundary curve through the saddles at $(\pm1,\pm1)$. Adding the allowed term $\tfrac{7}{5}\,\mathrm{C.S.}^2$ gives the refined invariant K<sub>4.b</sub>:</p>
+
+  <div class="math-block">$$\mathcal K^{(2)}_{4.b} = p^2 - p\,q + q^2 - p^2 q^2 + \tfrac{7}{5}\big(p^2 - p\,q + q^2\big)^2.$$</div>
+
+  <p>Both K<sub>4.a</sub> and K<sub>4.b</sub> are second order — same residual scaling — yet K<sub>4.b</sub>'s level set through the saddle sits almost exactly on the true separatrix, giving the best global picture of where stable motion ends. <strong>Select K₄ᵦ above</strong> and compare its outermost curve to K₄ₐ: same accuracy near the centre, better geometry at the edge. Low order, chosen well, captures the qualitative truth.</p>
+
+  <h2>10.4 — Where the series bites its own tail: small denominators</h2>
+
+  <p>Why not just push to order 50 and conserve everything? Because at each order the correction is obtained by <em>dividing</em> by a factor that vanishes whenever the tune is rational. Schematically the $n$-th correction carries denominators like</p>
+
+  <div class="math-block">$$\frac{1}{\,e^{\,2\pi i\,m\,\nu} - 1\,}, \qquad \nu = \frac{m'}{m}\ \Rightarrow\ \text{denominator} \to 0.$$</div>
+
+  <p>These are the <strong>small denominators</strong> at the heart of KAM theory (Module 6). A rational tune $\nu = m'/m$ is a <strong>resonance</strong>: the orbit closes after $m$ steps and locks, forming the island chains we saw in Module 9. There the naive series blows up, and the flat detuning curve $\nu(J)$ of Module 8 develops the mode-locked plateaus (Arnold tongues) that no polynomial invariant can follow. The paper's answer is an <strong>averaging procedure</strong> that turns the expansion into a <em>resonant</em> theory: near a rational tune it integrates powers of trigonometric functions instead of dividing by zero, producing invariants valid right through the low-order resonances — islands and all.</p>
+
+  <div class="note success">
+    <strong>Key insight:</strong> The perturbation series is an asymptotic, not convergent, expansion: it improves then diverges, defeated by resonances. Handling them — not ignoring them — is what separates a toy calculation from a theory that describes real island chains.
+  </div>
+
+  <h2>10.5 — You are ready to read the paper</h2>
+
+  <p>Everything above is the ground floor of</p>
+
+  <div class="note">
+    <strong>T. Zolkin, S. Nagaitsev, I. Morozov, S. Kladov,</strong> <em>“Geometry of Almost-Conserved Quantities in Symplectic Maps. Part I: Perturbation Theory,”</em> arXiv:2505.07223 (2025).
+  </div>
+
+  <p>Its logic, now fully in reach: it builds approximate invariants $\mathcal K^{(n)}$ for reversible symplectic maps in <strong>McMillan form</strong> (Module 9), takes the <strong>Courant–Snyder</strong> invariant as zeroth order (Module 7), fixes higher orders by killing the residual (§10.2), benchmarks the resulting <strong>twist coefficients</strong> against the <strong>Lie-algebra</strong> method (Module 8), and introduces the <strong>averaging / resonant</strong> theory to survive small denominators (§10.4). The organising analogy is Noether-for-maps: continuous symmetry gives exact invariants, <strong>reversibility</strong> gives approximate ones (Module 9).</p>
+
+  <p>A concordance, module by module:</p>
+
+  <table class="map">
+    <tr><th>Paper concept</th><th>Section</th><th>Built in</th></tr>
+    <tr><td>Symplectic maps, area preservation, stability, tune $\nu_0$</td><td>I, II</td><td>Module 7</td></tr>
+    <tr><td>Courant–Snyder invariant (zeroth order)</td><td>II, II&nbsp;E</td><td>Module 7</td></tr>
+    <tr><td>Lie transformations, twist coefficients $\tau_i$</td><td>I&nbsp;A, II&nbsp;E</td><td>Module 8</td></tr>
+    <tr><td>McMillan form, reversibility, reversors $R_1,R_2$, symmetry lines</td><td>II</td><td>Module 9</td></tr>
+    <tr><td>Approximate invariant $\mathcal K^{(n)}$, residual, cubic Hénon $\mathcal K_{4.a},\mathcal K_{4.b}$</td><td>II&nbsp;A</td><td>Module 10</td></tr>
+    <tr><td>Averaging, resonant theory, small denominators, Arnold tongues</td><td>II&nbsp;C, II&nbsp;D</td><td>Modules 6 &amp; 10</td></tr>
+    <tr><td>Tori, integrability, KAM, chaos, separatrices</td><td>I</td><td>Module 6</td></tr>
+  </table>
+
+  <p>Part I stops at the local, single-fixed-point theory. Part II carries the same construction to <em>global</em> invariants that capture whole island chains, and to real machines — the Fermilab Integrable Optics Test Accelerator (IOTA), the Mu2e experiment, and the Main Injector — where a single moderately complex function reconstructs the nonlinear dynamics of very different rings. The remarkable empirical fact driving the whole program: in these systems, low-order approximate invariants stay meaningful far beyond where any right to converge should exist. That resilience — order surviving deep into a nonlinear, near-chaotic world — is the quiet miracle this course has been building toward since the single minus sign in the action.</p>
+
+  <p style="margin-top:1.5rem;"><em>Open the PDF beside these ten modules. It should now read not as a wall of unfamiliar machinery, but as a natural next chapter in a story you have followed from the very first path nature chose.</em></p>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="js/glossary.js"></script>
+<script src="../js/canvas3d.js"></script>
+<script src="../js/plot2d.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/dynamics.js"></script>
+<script>
+// ---- 10.2 / 10.3 Approximate invariant overlay + residual meter ------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var inv = 'k4a', amp = 0.45;
+    var cv = document.getElementById('c-inv');
+    UI.fitCanvas(cv, 0.72);
+    var plot = new Plot2D(cv, { xMin: -1.4, xMax: 1.4, yMin: -1.4, yMax: 1.4 });
+    var f = Dynamics.cubicForce(1);
+    var step = function (q, p) { return Dynamics.mcMillanMap(q, p, f); };
+    var K = { cs: Dynamics.csInvariant, k4a: Dynamics.henonK4a, k4b: Dynamics.henonK4b };
+    var col = { cs: '#ba68c8', k4a: '#ffb74d', k4b: '#4dd0e1' };
+
+    // pre-iterate the true orbits once (they don't change)
+    var orbit = [];
+    (function () {
+      for (var i = 0; i < 13; i++) {
+        var r = 0.1 + i * 0.058, q = r, p = r, line = [];
+        for (var k = 0; k < 500; k++) { var n = step(q, p); q = n[0]; p = n[1]; if (!isFinite(q) || Math.hypot(q, p) > 6) break; line.push([q, p]); }
+        orbit.push(line);
+      }
+    })();
+
+    function meanResidual(Kf, a) {
+      // sample a bounded test orbit along p=q at amplitude a
+      var q = a, p = a, sum = 0, cnt = 0;
+      for (var k = 0; k < 300; k++) {
+        var n = step(q, p);
+        if (!isFinite(n[0]) || Math.hypot(n[0], n[1]) > 6) break;
+        sum += Math.abs(Kf(n[0], n[1]) - Kf(q, p)); cnt++;
+        q = n[0]; p = n[1];
+      }
+      return cnt ? sum / cnt : NaN;
+    }
+
+    function draw() {
+      plot.w = cv.width; plot.h = cv.height;
+      plot.clear(); plot.drawGrid();
+      // true orbits, faint grey
+      plot.ctx.fillStyle = 'rgba(180,190,210,0.45)';
+      for (var o = 0; o < orbit.length; o++) for (var i = 0; i < orbit[o].length; i++) {
+        var sc = plot.toScreen(orbit[o][i][0], orbit[o][i][1]);
+        plot.ctx.fillRect(sc.x, sc.y, 1.1, 1.1);
+      }
+      // level sets of chosen invariant through seeds on p=q
+      var Kf = K[inv];
+      for (var s = 0; s < 9; s++) {
+        var r = 0.16 + s * 0.075, c = Kf(r, r);
+        plot.plotImplicit(function (x, y) { return Kf(x, y) - c; }, col[inv], 1.5);
+      }
+      // the specific test-amplitude level set, highlighted
+      var ct = Kf(amp, amp);
+      plot.plotImplicit(function (x, y) { return Kf(x, y) - ct; }, '#fff', 2);
+      plot.drawPoint(amp, amp, '#fff', 4);
+      plot.drawPoint(0, 0, '#64b5f6', 4);
+      plot.drawPoint(1, 1, '#e94560', 4);
+      plot.drawPoint(-1, -1, '#e94560', 4);
+
+      var name = { cs: 'Courant–Snyder (order 0)', k4a: 'K₄ₐ (order 2)', k4b: 'K₄ᵦ (order 2, refined)' }[inv];
+      document.getElementById('readout-inv').innerHTML =
+        'Showing ' + name + ' &nbsp;•&nbsp; white curve = level set through the test amplitude ' + amp.toFixed(2);
+
+      // residual bars for all three at current amplitude
+      var rs = { cs: meanResidual(K.cs, amp), k4a: meanResidual(K.k4a, amp), k4b: meanResidual(K.k4b, amp) };
+      var maxr = Math.max(rs.cs, rs.k4a, rs.k4b, 1e-9);
+      function bar(key, label) {
+        var v = rs[key], w = Math.max(2, (v / maxr) * 100);
+        return '<div class="resrow"><span>' + label + '</span>' +
+          '<span class="resbar" style="width:' + w + '%; background:' + col[key] + ';"></span>' +
+          '<span>' + (isFinite(v) ? v.toExponential(2) : 'escaped') + '</span></div>';
+      }
+      document.getElementById('resbox').innerHTML =
+        '<div style="font-size:0.8rem;color:var(--muted,#9aa);margin-bottom:2px;">mean residual |K[Tζ]−K[ζ]| at amplitude ' + amp.toFixed(2) + ' (smaller = better conserved):</div>' +
+        bar('cs', 'C.S.') + bar('k4a', 'K₄ₐ') + bar('k4b', 'K₄ᵦ');
+    }
+
+    document.querySelectorAll('[data-inv]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        inv = b.getAttribute('data-inv');
+        document.querySelectorAll('[data-inv]').forEach(function (x) { x.classList.toggle('active', x === b); });
+        draw();
+      });
+    });
+    UI.bindSlider('slider-amp', 'val-amp', function (v) { amp = v; draw(); }, function (v) { return parseFloat(v).toFixed(2); });
+    setTimeout(function () { UI.fitCanvas(cv, 0.72); draw(); }, 40);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.72); draw(); });
+  } catch (err) {
+    console.error('10.2 error', err);
+    var r = document.getElementById('readout-inv'); if (r) r.innerHTML = '<span style="color:var(--accent)">Error: ' + err.message + '</span>';
+  }
+});
+</script>
+</body>
+</html>

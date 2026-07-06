@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interlude: The McMillan Map Lab</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    #c-lab { cursor: crosshair; touch-action: none; }
+    .readout { font-family: var(--mono); font-size: 0.85rem; margin-top: 0.4rem; }
+    .readout b { color: var(--link); }
+    .seg-btn { background: var(--accent2); }
+    .seg-btn.active { background: var(--accent); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>The McMillan Map Lab</h1>
+
+  <p>A sandbox for everything in Modules 7–10. You are steering a reversible symplectic map in McMillan form,</p>
+
+  <div class="math-block">$$q' = p, \qquad p' = -q + f(p), \qquad f(p) = a\,p + b\,p^2 + c\,p^3.$$</div>
+
+  <p>Dial the force $f$, <strong>click to launch orbits</strong>, and read off the structure as it forms. The bare tune at the origin is $\nu_0 = \tfrac{1}{2\pi}\arccos(a/2)$ — stable only while $|a| < 2$. Turn on the <strong>symmetry lines</strong> $\ell_1: p=q$ and $\ell_2: p=f(q)/2$ (Module 9), or overlay the order-0 <strong>Courant–Snyder ellipses</strong> (Module 7) to see where the linear approximation still holds and where the nonlinearity has taken over.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>a (linear) =</label>
+      <input type="range" id="s-a" min="-2.2" max="2.2" step="0.01" value="1">
+      <span class="val" id="v-a">1.00</span>
+    </div>
+    <div class="control-group">
+      <label>b (quadratic) =</label>
+      <input type="range" id="s-b" min="-1.5" max="1.5" step="0.01" value="0">
+      <span class="val" id="v-b">0.00</span>
+    </div>
+    <div class="control-group">
+      <label>c (cubic) =</label>
+      <input type="range" id="s-c" min="-1.5" max="1.5" step="0.01" value="1">
+      <span class="val" id="v-c">1.00</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn seg-btn active" data-preset="cubic">Cubic Hénon</button>
+    <button class="btn seg-btn" data-preset="quad">Quadratic Hénon</button>
+    <button class="btn seg-btn" data-preset="linear">Linear (pure rotation)</button>
+    <button class="btn" id="b-lines">Symmetry lines: off</button>
+    <button class="btn" id="b-cs">C.S. ellipses: off</button>
+    <button class="btn" id="b-clear">Clear orbits</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-lab"></canvas>
+    <span class="canvas-label">McMillan map phase portrait — q horizontal, p vertical; click to seed</span>
+  </div>
+  <div class="readout" id="readout-lab">…</div>
+
+  <div class="note">
+    <strong>Things to try.</strong> Set $b=c=0$ and sweep $a$ through $\pm2$ — watch stable ellipses become escaping hyperbolae (Module 7). Add a little $c$ and find the KAM circles, then the island chains. Push $a$ toward $2$ (tune $\to 0$) to squeeze low-order resonances into view. Turn on the symmetry lines and confirm every fixed point sits on $\ell_1$. Add $b$ to break the up–down symmetry and watch the portrait tilt — the reversibility survives, but the picture is no longer its own vertical mirror.
+  </div>
+
+  <p>When you are done playing, the paper — arXiv:2505.07223 — is waiting. Every portrait you can draw here is one it has something precise to say about.</p>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="js/glossary.js"></script>
+<script src="../js/canvas3d.js"></script>
+<script src="../js/plot2d.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/dynamics.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var a = 1, b = 0, c = 1, showLines = false, showCS = false, seeds = [];
+    var cv = document.getElementById('c-lab');
+    UI.fitCanvas(cv, 0.74);
+    var plot = new Plot2D(cv, { xMin: -1.6, xMax: 1.6, yMin: -1.6, yMax: 1.6 });
+    var palette = ['#64b5f6', '#4caf50', '#ffb74d', '#ba68c8', '#4dd0e1', '#f06292', '#fff176', '#9ccc65'];
+
+    function f(p) { return a * p + b * p * p + c * p * p * p; }
+    function step(q, p) { return Dynamics.mcMillanMap(q, p, f); }
+
+    function seedLine() {
+      seeds = [];
+      for (var i = 0; i < 12; i++) { var r = 0.1 + i * 0.06; seeds.push({ q: r, p: r, c: palette[i % palette.length] }); }
+    }
+    function draw() {
+      plot.w = cv.width; plot.h = cv.height;
+      plot.clear(); plot.drawGrid();
+      if (showCS) {
+        var levels = [0.15, 0.4, 0.75, 1.2];
+        for (var L = 0; L < levels.length; L++)
+          plot.plotImplicit(function (x, y) { return (y * y - a * x * y + x * x) - levels[L]; }, 'rgba(186,104,200,0.5)', 1.2);
+      }
+      if (showLines) {
+        plot.drawLine(-1.6, -1.6, 1.6, 1.6, 'rgba(120,200,255,0.55)', 1.4);
+        plot.plotParametric(function (q) { return q; }, function (q) { return f(q) / 2; }, -1.5, 1.5, 220, 'rgba(120,255,180,0.5)', 1.4);
+      }
+      var iters = 650;
+      for (var s = 0; s < seeds.length; s++) {
+        var q = seeds[s].q, p = seeds[s].p;
+        plot.ctx.fillStyle = seeds[s].c;
+        for (var k = 0; k < iters; k++) {
+          var n = step(q, p); q = n[0]; p = n[1];
+          if (!isFinite(q) || Math.hypot(q, p) > 6) break;
+          var sc = plot.toScreen(q, p);
+          plot.ctx.fillRect(sc.x, sc.y, 1.3, 1.3);
+        }
+      }
+      plot.drawPoint(0, 0, '#fff', 3);
+      var stable = Math.abs(a) < 2;
+      var nu = stable ? (Math.acos(a / 2) / (2 * Math.PI)).toFixed(4) : '—';
+      document.getElementById('readout-lab').innerHTML =
+        'f(p) = ' + a.toFixed(2) + '·p ' + (b >= 0 ? '+ ' : '− ') + Math.abs(b).toFixed(2) + '·p² ' +
+        (c >= 0 ? '+ ' : '− ') + Math.abs(c).toFixed(2) + '·p³ &nbsp;•&nbsp; origin: <b>' +
+        (stable ? 'stable' : 'UNSTABLE') + '</b> &nbsp; ν₀ = <b>' + nu + '</b> &nbsp;•&nbsp; ' + seeds.length + ' orbits';
+    }
+    function seedAt(e) {
+      var pos = UI.canvasPos(cv, e), p = plot.fromScreen(pos.x, pos.y);
+      seeds.push({ q: p.x, p: p.y, c: '#fff176' }); draw();
+    }
+    cv.addEventListener('mousedown', seedAt);
+    cv.addEventListener('touchstart', function (e) { e.preventDefault(); seedAt(e); }, { passive: false });
+
+    function syncSliders() {
+      document.getElementById('s-a').value = a; document.getElementById('v-a').textContent = a.toFixed(2);
+      document.getElementById('s-b').value = b; document.getElementById('v-b').textContent = b.toFixed(2);
+      document.getElementById('s-c').value = c; document.getElementById('v-c').textContent = c.toFixed(2);
+    }
+    UI.bindSlider('s-a', 'v-a', function (v) { a = v; clearPreset(); draw(); }, function (v) { return parseFloat(v).toFixed(2); });
+    UI.bindSlider('s-b', 'v-b', function (v) { b = v; clearPreset(); draw(); }, function (v) { return parseFloat(v).toFixed(2); });
+    UI.bindSlider('s-c', 'v-c', function (v) { c = v; clearPreset(); draw(); }, function (v) { return parseFloat(v).toFixed(2); });
+
+    function clearPreset() { document.querySelectorAll('[data-preset]').forEach(function (x) { x.classList.remove('active'); }); }
+    var presets = { cubic: [1, 0, 1], quad: [1, 1, 0], linear: [1, 0, 0] };
+    document.querySelectorAll('[data-preset]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var pr = presets[btn.getAttribute('data-preset')]; a = pr[0]; b = pr[1]; c = pr[2];
+        document.querySelectorAll('[data-preset]').forEach(function (x) { x.classList.toggle('active', x === btn); });
+        syncSliders(); seedLine(); draw();
+      });
+    });
+    document.getElementById('b-lines').addEventListener('click', function () {
+      showLines = !showLines; this.textContent = 'Symmetry lines: ' + (showLines ? 'on' : 'off'); draw();
+    });
+    document.getElementById('b-cs').addEventListener('click', function () {
+      showCS = !showCS; this.textContent = 'C.S. ellipses: ' + (showCS ? 'on' : 'off'); draw();
+    });
+    document.getElementById('b-clear').addEventListener('click', function () { seeds = []; draw(); });
+
+    setTimeout(function () { UI.fitCanvas(cv, 0.74); seedLine(); draw(); }, 40);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.74); draw(); });
+  } catch (err) {
+    console.error('lab error', err);
+    var r = document.getElementById('readout-lab'); if (r) r.innerHTML = '<span style="color:var(--accent)">Error: ' + err.message + '</span>';
+  }
+});
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 // Our own files: network-first, fall back to cache.
 // CDN resources (KaTeX): cache-first (version-pinned, never change).
 
-const CACHE = 'math-v4';
+const CACHE = 'math-v5';
 
 const PRECACHE = [
   'index.html',
@@ -55,6 +55,11 @@ const PRECACHE = [
   'hamiltonian/module4.html',
   'hamiltonian/module5.html',
   'hamiltonian/module6.html',
+  'hamiltonian/module7.html',
+  'hamiltonian/module8.html',
+  'hamiltonian/module9.html',
+  'hamiltonian/module10.html',
+  'hamiltonian/module-10.1-mcmillan-lab.html',
 ];
 
 self.addEventListener('install', function (e) {
