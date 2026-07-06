@@ -43,6 +43,12 @@ navCore.init([
     desc:  'Action–angle variables wrap integrable motion onto tori — and the standard map shows them shatter into chaos.',
   },
   {
+    file:  'module-6.1-action-angle.html',
+    label: 'Interlude',
+    title: 'Action–Angle by Hand',
+    desc:  'A worked, draggable example: the action $J$ and frequency $\\omega(J)$ for the oscillator and the pendulum — the flow-side seed of the map twist.',
+  },
+  {
     file:  'module7.html',
     label: 'Module 7',
     title: 'From Flow to Map',

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interlude: Action–Angle by Hand</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    #c-ho, #c-pend, #c-omega { touch-action: none; }
+    .readout { font-family: var(--mono); font-size: 0.85rem; margin-top: 0.4rem; }
+    .readout b { color: var(--link); }
+    .seg-btn { background: var(--accent2); }
+    .seg-btn.active { background: var(--accent); }
+    .two-up { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .two-up { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>Action–Angle by Hand</h1>
+
+  <p>Module 6 stated the punchline — integrable motion is "just rigid rotation in disguise," uniform winding of an angle on a torus — and then rushed on to chaos. If that felt like a magic trick, this interlude slows it right down and does the trick twice, by hand, in one degree of freedom, where a "torus" is nothing scarier than a <strong>closed orbit</strong>. By the end the phrase <em>action–angle variables</em> should feel concrete, and you will have met — in the flesh — the single idea that the whole map half of the course (Modules 7–10) is built on.</p>
+
+  <h2>6.1.1 — What we are actually trying to do</h2>
+
+  <p>A one-degree-of-freedom system has a 2D phase space $(q,p)$ and, if it is bound, its orbits are <strong>closed loops</strong> — the level sets of the energy $H(q,p)=E$. The action–angle idea is a change of coordinates $(q,p)\to(J,\theta)$ chosen so that the messy motion along a loop becomes the simplest motion imaginable:</p>
+
+  <div class="math-block">$$\dot J = 0 \quad(\text{stay on your loop}), \qquad \dot\theta = \omega(J)=\text{const} \quad(\text{wind at a steady rate}).$$</div>
+
+  <p>Two questions have to be answered to make this real: <strong>which number labels the loop</strong> (that is $J$), and <strong>how fast does the angle wind</strong> (that is $\omega$). Here are the answers.</p>
+
+  <ul>
+    <li>The <strong>action</strong> is the area the loop encloses, divided by $2\pi$:
+      <div class="math-block">$$J = \frac{1}{2\pi}\oint p\,dq = \frac{\text{area enclosed by the orbit}}{2\pi}.$$</div>
+      It is constant along the motion for the same reason Liouville's theorem holds — the loop is fixed, so the area it bounds is fixed.</li>
+    <li>The <strong>frequency</strong> is how the energy changes as you inflate the loop:
+      <div class="math-block">$$\omega(J) = \frac{dH}{dJ}.$$</div></li>
+  </ul>
+
+  <p>Let's watch both come out of two concrete systems.</p>
+
+  <h3>Isn't $(q,p)$ already an action–angle pair?</h3>
+
+  <p>A fair objection: $q$ and $p$ are also a conjugate pair, $\{q,p\}=1$, so why isn't $q$ "the action" and $p$ "the angle"? Because action–angle is <em>not</em> just any relabelling of the plane. Two conditions make it special, and they are the whole content:</p>
+
+  <ul>
+    <li><strong>The change must be canonical</strong> — it must preserve the bracket, $\{\theta, J\} = 1$, so Hamilton's equations keep their form. That already excludes almost every coordinate change.</li>
+    <li><strong>The Hamiltonian must end up depending on $J$ alone</strong>, $H = H(J)$ with no $\theta$ in it. <em>This</em> is the non-trivial demand — and finding coordinates that pull it off is exactly what it means to have solved the system.</li>
+  </ul>
+
+  <p>Everything else follows from the second condition: $\dot J = -\partial H/\partial\theta = 0$ precisely <em>because</em> $H$ has no $\theta$, and $\dot\theta = \partial H/\partial J$ is then a constant. So the two variables are not interchangeable — <strong>one is conserved, the other winds uniformly</strong>. Check it against the oscillator below: along any orbit <em>both</em> $q$ and $p$ oscillate — neither is conserved — while $J = E$ sits still, and $H$ depends on $q$ and $p$ together but on $J$ by itself. That asymmetry is what earns the names "action" and "angle"; raw $(q,p)$ has neither property.</p>
+
+  <div class="note">
+    <strong>Key insight:</strong> Action–angle variables are a <em>canonical</em> change of coordinates picked so that $H$ sees only $J$ — which is the same thing as finding a conserved quantity. It is generally nonlinear, exists only locally (inside the separatrix), and for a chaotic system does not exist at all. $(q,p)$ is a conjugate pair, but not an action–angle pair, because neither $q$ nor $p$ is conserved.
+  </div>
+
+  <h2>6.1.2 — The harmonic oscillator: the loop is a circle</h2>
+
+  <p>Take $H = \tfrac12(p^2 + q^2)$. Its level sets $p^2+q^2 = 2E$ are <em>circles</em> of radius $\sqrt{2E}$. The enclosed area is $\pi(\sqrt{2E})^2 = 2\pi E$, so the action is simply</p>
+
+  <div class="math-block">$$J = \frac{2\pi E}{2\pi} = E, \qquad\text{and}\qquad \omega = \frac{dH}{dJ} = \frac{dE}{dE} = 1.$$</div>
+
+  <p>The change of variables is an exact polar substitution — $q = \sqrt{2J}\cos\theta$, $p = -\sqrt{2J}\sin\theta$ — and plugging in confirms $H = J$ and $\dot\theta = 1$. <strong>Drag the energy</strong>: the dot rides the circle at a <em>constant</em> angular speed no matter how big the loop is. The shaded disk is the area whose value (over $2\pi$) is $J$.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>energy E =</label>
+      <input type="range" id="s-ho-E" min="0.1" max="2.5" step="0.01" value="1">
+      <span class="val" id="v-ho-E">1.00</span>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-ho"></canvas>
+    <span class="canvas-label">harmonic oscillator — the dot winds at constant rate; shaded area / 2π = J</span>
+  </div>
+  <div class="readout" id="readout-ho">…</div>
+
+  <div class="note">
+    <strong>Key insight:</strong> For the harmonic oscillator the action is the energy and the frequency is the same on every orbit. It is the one system whose frequency does <em>not</em> care about amplitude — which is exactly why it is the boring "zeroth-order" case in everything that follows.
+  </div>
+
+  <h2>6.1.3 — The pendulum: frequency that remembers how hard you pushed</h2>
+
+  <p>Now let the restoring force bend: $H = \tfrac12 p^2 + (1-\cos q)$. Small swings look like the oscillator (circles), but larger swings fatten and distort, and at $E=2$ the orbit stretches into the <strong>separatrix</strong> — the pendulum balancing straight up. The action is still the enclosed area over $2\pi$, but now the loops are not circles and the integral must be done numerically. The consequence is the whole point of this interlude: <strong>the frequency drops as the amplitude grows.</strong> A big swing takes longer.</p>
+
+  <p><strong>Drag the amplitude.</strong> On the left the dot rides the real orbit — watch it <em>speed up at the bottom and dawdle near the turning points</em>, motion that is anything but uniform in the raw $(q,p)$ coordinates. On the right is the function $\omega(J)$: flat and equal to $1$ for the oscillator (grey), but a falling curve for the pendulum (orange), plunging to zero at the separatrix.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>swing amplitude q₀ =</label>
+      <input type="range" id="s-pend" min="0.2" max="3.05" step="0.01" value="1.6">
+      <span class="val" id="v-pend">1.60</span>
+    </div>
+  </div>
+
+  <div class="two-up">
+    <div class="canvas-wrap">
+      <canvas id="c-pend"></canvas>
+      <span class="canvas-label">pendulum phase space — real (non-uniform) motion on a level set of H</span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="c-omega"></canvas>
+      <span class="canvas-label">frequency ω vs action J — flat for the oscillator, falling for the pendulum</span>
+    </div>
+  </div>
+  <div class="readout" id="readout-pend">…</div>
+
+  <p>So the angle variable $\theta$ does not measure the geometric polar angle of the dot — that would run fast at the bottom and slow at the top. It is defined precisely so that it advances <em>uniformly</em>, $\theta = \omega t$, absorbing all the non-uniformity into the choice of coordinate. That is the magic of Module 6 made explicit: you trade a hard motion for a trivial one by measuring angle with the right clock.</p>
+
+  <h3>Is $\theta$ just rescaled time, then?</h3>
+
+  <p>Almost — and it is worth being exact about the "almost." Follow <em>one</em> orbit and $\theta = \omega t$ is literally the time elapsed since you passed $\theta=0$, rescaled so that the orbit's full period $T = 2\pi/\omega$ counts as $2\pi$. On a single trajectory, $\theta$ <em>is</em> the clock reading. Two things stop it from being merely a relabelling of time:</p>
+
+  <ul>
+    <li><strong>$\theta$ is a coordinate on the plane, not on the time axis.</strong> It is a function $\theta(q,p)$ defined at every point of the region filled by loops — you can read it off a point without running the dynamics. It says <em>where on the loop</em> you are, not <em>when</em> you got there. The two only coincide <em>along</em> a trajectory.</li>
+    <li><strong>Every orbit needs its own clock speed.</strong> A genuine reparametrisation of time is one global rescaling of $t$. But each loop winds at its own $\omega(J)$, so no single rescaling straightens them all at once — you divide each orbit's time-of-flight by <em>that loop's</em> period. That per-orbit normalisation is exactly what promotes "time" into a phase-space coordinate. (The harmonic oscillator, with $\omega=1$ on every orbit, is the degenerate case where $\theta$ really is just $t$ everywhere — which is why it looks too easy.)</li>
+  </ul>
+
+  <p>Put together: $\theta$ is time-of-flight rescaled so each orbit's period is $2\pi$, and $J$ says which orbit — which clock. And unlike a time relabelling, the pair is <em>canonical</em>, $\{\theta,J\}=1$, with $H$ depending on $J$ alone. When we cross to maps, this becomes discrete: one iterate advances $\theta$ by a fixed tick $2\pi\,\nu(J)$, so counting turns $n$ plays the role of time and $\theta \approx 2\pi\nu\, n$.</p>
+
+  <div class="note">
+    <strong>Key insight:</strong> For any system except the harmonic oscillator, the winding frequency $\omega$ depends on which loop you are on — that is, on the action $J$. Bigger orbits generally wind slower. The number $d\omega/dJ$ — how quickly the frequency drifts with amplitude — is the system's <strong>twist</strong>.
+  </div>
+
+  <h2>6.1.4 — Why this is the doorway to Modules 7–10</h2>
+
+  <p>Everything above was for a <em>flow</em> in continuous time. When we slice a flow with a Poincaré section (Module 6) or study a system that is naturally discrete — a kicked rotor, a beam getting one magnet kick per turn — the flow becomes a <strong>map</strong>, and each of today's objects has an exact twin waiting in the next four modules:</p>
+
+  <div class="math-block">
+  $$
+  \begin{array}{ccc}
+  \textbf{Flow (this interlude)} & \longleftrightarrow & \textbf{Map (Modules 7–10)}\\[4pt]
+  \text{action } J & \longleftrightarrow & \text{action } J \text{ (labels the invariant loop)}\\[2pt]
+  \text{frequency } \omega(J) & \longleftrightarrow & \text{rotation number } \nu(J)\\[2pt]
+  \text{twist } d\omega/dJ & \longleftrightarrow & \text{twist coefficient } \tau_0\\[2pt]
+  \text{closed orbit } H=E & \longleftrightarrow & \text{invariant curve } \mathcal K=\text{const}
+  \end{array}
+  $$
+  </div>
+
+  <p>When Module 8 says the normal form absorbs the nonlinearity into coordinates "exactly as action–angle variables did for flows," <em>this</em> is what it means: the map's <strong>rotation number</strong> $\nu(J)$ that varies with amplitude (Module 7 will also call it the <em>tune</em>) is the discrete echo of the pendulum's $\omega(J)$ you just dragged, and the twist $\tau_0$ is the discrete echo of the falling orange curve's slope. You have now built the intuition the rest of the course leans on. Onward to maps.</p>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="js/glossary.js"></script>
+<script src="../js/canvas3d.js"></script>
+<script src="../js/plot2d.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/dynamics.js"></script>
+<script>
+// ---- 6.1.2 Harmonic oscillator ---------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var E = 1, t = 0;
+    var cv = document.getElementById('c-ho');
+    UI.fitCanvas(cv, 0.62);
+    var plot = new Plot2D(cv, { xMin: -2.6, xMax: 2.6, yMin: -2.6, yMax: 2.6 });
+
+    function frame() {
+      plot.w = cv.width; plot.h = cv.height;
+      plot.clear(); plot.drawGrid();
+      var R = Math.sqrt(2 * E);
+      // shaded enclosed disk
+      var c = plot.toScreen(0, 0), edge = plot.toScreen(R, 0);
+      var rpix = Math.abs(edge.x - c.x);
+      plot.ctx.fillStyle = 'rgba(100,181,246,0.16)';
+      plot.ctx.beginPath(); plot.ctx.arc(c.x, c.y, rpix, 0, 7); plot.ctx.fill();
+      // orbit circle
+      plot.plotParametric(function (a) { return R * Math.cos(a); }, function (a) { return R * Math.sin(a); }, 0, 2 * Math.PI, 160, '#64b5f6', 1.8);
+      // moving dot at constant angular speed
+      t += 0.03;
+      var q = R * Math.cos(t), p = -R * Math.sin(t);
+      plot.drawPoint(q, p, '#fff176', 6);
+      plot.drawPoint(0, 0, '#e94560', 3);
+      document.getElementById('readout-ho').innerHTML =
+        'E = <b>' + E.toFixed(2) + '</b> &nbsp; radius √(2E) = <b>' + R.toFixed(2) +
+        '</b> &nbsp; J = area/2π = <b>' + E.toFixed(2) + '</b> &nbsp; ω = dE/dJ = <b>1.00</b> (same for every orbit)';
+      requestAnimationFrame(frame);
+    }
+    UI.bindSlider('s-ho-E', 'v-ho-E', function (v) { E = v; }, function (v) { return parseFloat(v).toFixed(2); });
+    setTimeout(function () { UI.fitCanvas(cv, 0.62); frame(); }, 40);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.62); });
+  } catch (err) { console.error('HO error', err); }
+});
+
+// ---- 6.1.3 Pendulum + omega(J) ---------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var q0 = 1.6;
+    var cvP = document.getElementById('c-pend');
+    var cvO = document.getElementById('c-omega');
+    UI.fitCanvas(cvP, 0.9); UI.fitCanvas(cvO, 0.9);
+    var plotP = new Plot2D(cvP, { xMin: -Math.PI - 0.3, xMax: Math.PI + 0.3, yMin: -2.6, yMax: 2.6 });
+    var plotO = new Plot2D(cvO, { xMin: 0, xMax: 2.6, yMin: 0, yMax: 1.15 });
+
+    function der(s) { return Dynamics.pendulumDeriv(s, 1, 1); } // g=L=1
+
+    // Full period of libration starting at rest at amplitude a (2nd velocity zero-crossing).
+    function periodFor(a) {
+      var s = [a, 0], dt = 0.004, t = 0, crossings = 0;
+      for (var i = 0; i < 200000; i++) {
+        var ns = Dynamics.rk4(der, s, dt); t += dt;
+        if (s[1] <= 0 && ns[1] > 0) { crossings++; if (crossings === 1) return 2 * t; } // half-period → full
+        s = ns; if (t > 300) break;
+      }
+      return NaN;
+    }
+    // action J(a) = (1/2π) ∮ p dq, p = √(2(E − (1−cos q))), E = 1−cos a
+    function actionFor(a) {
+      var E = 1 - Math.cos(a), N = 1500, sum = 0;
+      for (var k = 0; k < N; k++) {
+        var q = -a + 2 * a * (k + 0.5) / N;
+        var val = 2 * (E - (1 - Math.cos(q)));
+        if (val > 0) sum += Math.sqrt(val) * (2 * a / N);
+      }
+      return sum / Math.PI; // 2×half-loop integral over 2π
+    }
+
+    // Precompute the ω(J) curve for the pendulum.
+    var curve = [];
+    (function () {
+      for (var a = 0.15; a <= 3.08; a += 0.06) {
+        var T = periodFor(a); if (!isFinite(T)) continue;
+        curve.push({ a: a, J: actionFor(a), w: 2 * Math.PI / T });
+      }
+    })();
+    function nearest(a) {
+      var best = curve[0], bd = 1e9;
+      for (var i = 0; i < curve.length; i++) { var d = Math.abs(curve[i].a - a); if (d < bd) { bd = d; best = curve[i]; } }
+      return best;
+    }
+
+    // live pendulum dot
+    var s = [q0, 0];
+    function drawPortrait() {
+      plotP.w = cvP.width; plotP.h = cvP.height;
+      plotP.clear(); plotP.drawGrid();
+      // a few level sets of H for context
+      [0.3, 0.8, 1.4, 1.9, 2.0].forEach(function (Elv) {
+        plotP.plotImplicit(function (x, y) { return (0.5 * y * y + (1 - Math.cos(x))) - Elv; },
+          Elv >= 2 ? 'rgba(233,69,96,0.55)' : 'rgba(120,140,200,0.5)', Elv >= 2 ? 1.6 : 1.1);
+      });
+      // current orbit highlighted
+      var E = 1 - Math.cos(q0);
+      plotP.plotImplicit(function (x, y) { return (0.5 * y * y + (1 - Math.cos(x))) - E; }, '#ffb74d', 1.9);
+      plotP.drawPoint(s[0], s[1], '#fff176', 6);
+      plotP.drawPoint(0, 0, '#4dd0e1', 3);
+    }
+    function drawOmega() {
+      plotO.w = cvO.width; plotO.h = cvO.height;
+      plotO.clear(); plotO.drawGrid();
+      // oscillator reference ω = 1
+      plotO.drawLine(0, 1, 2.6, 1, 'rgba(150,160,200,0.7)', 1.4);
+      // pendulum curve
+      plotO.ctx.strokeStyle = '#ffb74d'; plotO.ctx.lineWidth = 2; plotO.ctx.beginPath();
+      for (var i = 0; i < curve.length; i++) {
+        var sc = plotO.toScreen(curve[i].J, curve[i].w);
+        if (i === 0) plotO.ctx.moveTo(sc.x, sc.y); else plotO.ctx.lineTo(sc.x, sc.y);
+      }
+      plotO.ctx.stroke();
+      var cur = nearest(q0);
+      plotO.drawPoint(cur.J, cur.w, '#fff176', 5);
+      // axis labels
+      plotO.ctx.fillStyle = 'rgba(255,255,255,0.6)'; plotO.ctx.font = '12px sans-serif';
+      plotO.ctx.fillText('J', plotO.w - 16, plotO.h - 6);
+      plotO.ctx.fillText('ω', 6, 14);
+      plotO.ctx.fillText('ω=1 (oscillator)', plotO.toScreen(0.05, 1).x + 4, plotO.toScreen(0.05, 1).y - 6);
+    }
+    function anim() {
+      var dt = 0.006;
+      for (var k = 0; k < 6; k++) s = Dynamics.rk4(der, s, dt);
+      // keep it on the chosen orbit (guard against drift/energy creep)
+      drawPortrait();
+      requestAnimationFrame(anim);
+    }
+    function setAmp(a) {
+      q0 = a; s = [q0, 0];
+      var cur = nearest(q0);
+      drawOmega();
+      document.getElementById('readout-pend').innerHTML =
+        'q₀ = <b>' + q0.toFixed(2) + '</b> rad &nbsp; E = <b>' + (1 - Math.cos(q0)).toFixed(3) +
+        '</b> &nbsp; J = <b>' + cur.J.toFixed(3) + '</b> &nbsp; ω = <b>' + cur.w.toFixed(3) +
+        '</b> &nbsp; (oscillator would give ω = 1.000)' + (q0 > 2.9 ? ' &nbsp;← near the separatrix, ω → 0' : '');
+    }
+    UI.bindSlider('s-pend', 'v-pend', function (v) { setAmp(v); }, function (v) { return parseFloat(v).toFixed(2); });
+    setTimeout(function () { UI.fitCanvas(cvP, 0.9); UI.fitCanvas(cvO, 0.9); setAmp(q0); anim(); }, 40);
+    UI.onResize(function () { UI.fitCanvas(cvP, 0.9); UI.fitCanvas(cvO, 0.9); drawOmega(); });
+  } catch (err) {
+    console.error('pendulum error', err);
+    var r = document.getElementById('readout-pend'); if (r) r.innerHTML = '<span style="color:var(--accent)">Error: ' + err.message + '</span>';
+  }
+});
+</script>
+</body>
+</html>
