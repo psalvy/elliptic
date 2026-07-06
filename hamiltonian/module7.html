@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 7: From Flow to Map</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    #c-area, #c-stab, #c-tune, #c-cs { cursor: crosshair; touch-action: none; }
+    .readout { font-family: var(--mono); font-size: 0.85rem; margin-top: 0.4rem; }
+    .readout b { color: var(--link); }
+    .seg-btn { background: var(--accent2); }
+    .seg-btn.active { background: var(--accent); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="nav-top"></nav>
+
+  <h1>From Flow to Map</h1>
+
+  <p>In Module 6 we sliced a continuous flow with a plane and marked a dot at each crossing. A smooth trajectory in time became a sequence of jumps — a <strong>map</strong> $T$ that sends the plane to itself, $\zeta \mapsto \zeta' = T[\zeta]$. That was a convenience for drawing. This module takes it seriously: the discrete map is a full-blooded dynamical system with its own rules, and almost everything we built for flows — conservation, stability, tori, the rotation of angles — has a sharper, more visible discrete twin. This is the world the frontier lives in.</p>
+
+  <div class="note">
+    <strong>Why bother leaving flows behind?</strong> A particle circulating a storage ring receives a kick from the same magnets on every turn; a periodically driven oscillator feels the same push each period. Nature itself hands us the strobe. The natural object is not "where is the state at time $t$" but "where is it after one more turn" — a map.
+  </div>
+
+  <h2>7.1 — A map that never loses area</h2>
+
+  <p>The simplest nonlinear-friendly map we can write keeps momentum and position on equal footing. Read the old momentum off as the new position, and reflect the old position with a linear kick:</p>
+
+  <div class="math-block">$$T:\qquad q' = p, \qquad p' = -q + a\,p.$$</div>
+
+  <p>One number $a$ controls everything. To iterate is to apply $T$ again and again, tracing an orbit $\zeta_0 \to \zeta_1 \to \zeta_2 \to \cdots$. Just as Liouville's theorem (Module 5) said the continuous flow never compresses phase space, a map earns the name <strong>symplectic</strong> (in the plane: <em>area-preserving</em>) when its Jacobian has unit determinant:</p>
+
+  <div class="math-block">$$\mathrm{d}T = \begin{bmatrix} \partial q'/\partial q & \partial q'/\partial p \\[2pt] \partial p'/\partial q & \partial p'/\partial p \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ -1 & a \end{bmatrix}, \qquad \det \mathrm{d}T = (0)(a) - (1)(-1) = 1.$$</div>
+
+  <p>The determinant is the local area-scaling factor, and here it is exactly $1$ for <em>every</em> value of $a$ — Liouville, made discrete. <strong>Drag $a$</strong> and watch the little blue tile get carried around by the map: it shears, rotates, stretches — but its area never changes.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>a =</label>
+      <input type="range" id="slider-a-area" min="-1.9" max="1.9" step="0.01" value="1">
+      <span class="val" id="val-a-area">1.00</span>
+    </div>
+    <button class="btn" id="btn-area-step">Apply T once</button>
+    <button class="btn" id="btn-area-reset">Reset tile</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-area"></canvas>
+    <span class="canvas-label">a unit tile of area, carried by successive applications of T</span>
+  </div>
+  <div class="readout" id="readout-area">…</div>
+
+  <div class="note">
+    <strong>Key insight:</strong> A symplectic map is the discrete face of Liouville's theorem — $\det \mathrm{d}T = 1$ means every application shuffles phase space without ever squeezing or expanding its area.
+  </div>
+
+  <h2>7.2 — Stable or doomed: the trace decides</h2>
+
+  <p>Because the map is <em>linear</em>, an orbit is completely governed by the eigenvalues of $\mathrm{d}T$. For a symplectic $2\times 2$ matrix $\det = 1$, so the eigenvalues multiply to one: $\lambda_1 \lambda_2 = 1$. The characteristic equation is</p>
+
+  <div class="math-block">$$\lambda^2 - (\operatorname{tr}\mathrm{d}T)\,\lambda + 1 = 0, \qquad \operatorname{tr}\mathrm{d}T = a.$$</div>
+
+  <p>Everything hinges on the single quantity $a = \operatorname{tr}\mathrm{d}T$:</p>
+  <ul>
+    <li><strong>$|a| < 2$</strong> — the roots are complex conjugates <em>on the unit circle</em>, $\lambda = e^{\pm i\mu}$. Neither grows. The fixed point at the origin is <strong>elliptic</strong> (stable): orbits circulate on closed loops.</li>
+    <li><strong>$|a| > 2$</strong> — the roots are real, $\lambda$ and $1/\lambda$, one bigger than $1$. That direction grows without bound. The fixed point is <strong>hyperbolic</strong> (unstable): orbits fly off along a hyperbola.</li>
+    <li><strong>$|a| = 2$</strong> — the borderline, $\lambda = \pm 1$ repeated: marginal.</li>
+  </ul>
+
+  <p><strong>Drag $a$ across the two danger walls at $\pm 2$</strong> and watch a seeded orbit switch from a bounded loop to an escaping hyperbola.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>a =</label>
+      <input type="range" id="slider-a-stab" min="-2.6" max="2.6" step="0.005" value="0.8">
+      <span class="val" id="val-a-stab">0.80</span>
+    </div>
+    <button class="btn seg-btn" data-astab="1.9">1.9 — barely stable</button>
+    <button class="btn seg-btn active" data-astab="0.8">0.8</button>
+    <button class="btn seg-btn" data-astab="2.05">2.05 — escaped</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-stab"></canvas>
+    <span class="canvas-label">orbits of the linear map, seeded on a small grid — q horizontal, p vertical</span>
+  </div>
+  <div class="readout" id="readout-stab">…</div>
+
+  <div class="note">
+    <strong>Key insight:</strong> For a symplectic map in the plane, linear stability is a single inequality, $|\operatorname{tr}\mathrm{d}T| < 2$. Cross the wall and a closed loop becomes an exponential escape — this is the discrete analogue of a stable centre turning into a saddle.
+  </div>
+
+  <h2>7.3 — How fast the angle turns: the rotation number</h2>
+
+  <p>In the stable regime the eigenvalues are $e^{\pm i\mu}$, so each application of $T$ is (in suitable coordinates) a <em>rotation by the angle $\mu$</em>. Reading $\mu$ off the trace:</p>
+
+  <div class="math-block">$$a = \operatorname{tr}\mathrm{d}T = \lambda + \lambda^{-1} = 2\cos\mu \quad\Longrightarrow\quad \mu = \arccos\!\frac{a}{2}.$$</div>
+
+  <p>Divide by a full turn to get the <strong>rotation number</strong> (accelerator physicists call it the <strong>tune</strong>) — the fraction of a circle advanced per iterate:</p>
+
+  <div class="math-block">$$\nu_0 = \frac{1}{2\pi}\arccos\frac{a}{2}.$$</div>
+
+  <p>This is the discrete cousin of the winding frequency $\omega$ on the tori of Module 6, and the same rational/irrational drama returns. When $\nu_0 = m/n$ is <em>rational</em>, the orbit closes after exactly $n$ steps — a period-$n$ cycle. When $\nu_0$ is <em>irrational</em>, the orbit never closes and sprinkles points densely around a single loop. <strong>Drag $a$</strong>; the points are drawn one at a time so you can see them hop around by the angle $\mu$.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>a =</label>
+      <input type="range" id="slider-a-tune" min="-1.98" max="1.98" step="0.001" value="0.618">
+      <span class="val" id="val-a-tune">0.618</span>
+    </div>
+    <button class="btn seg-btn" data-atune="1" data-lbl="ν₀ = 1/6">ν₀ = 1/6</button>
+    <button class="btn seg-btn" data-atune="0" data-lbl="ν₀ = 1/4">ν₀ = 1/4</button>
+    <button class="btn seg-btn" data-atune="-1" data-lbl="ν₀ = 1/3">ν₀ = 1/3</button>
+    <button class="btn seg-btn active" data-atune="0.618" data-lbl="irrational">irrational</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-tune"></canvas>
+    <span class="canvas-label">successive iterates hopping around the invariant loop by the rotation angle μ</span>
+  </div>
+  <div class="readout" id="readout-tune">…</div>
+
+  <div class="note">
+    <strong>Key insight:</strong> Near a stable fixed point every symplectic map is a rotation in disguise. Its angle per step, $\nu_0 = \tfrac{1}{2\pi}\arccos(a/2)$, is the bare tune — rational tunes lock into closed cycles, irrational tunes wind forever.
+  </div>
+
+  <h2>7.4 — The ellipse that is conserved: the Courant–Snyder invariant</h2>
+
+  <p>Those closed loops are not just any curves — they are level sets of one quadratic function, and we can pin it down exactly. Guess a general quadratic $\mathcal K = \alpha q^2 + \beta qp + \gamma p^2$ and demand it be unchanged by the map, $\mathcal K[q',p'] = \mathcal K[q,p]$. Substituting $q'=p,\ p'=-q+ap$ and matching coefficients forces $\alpha=\gamma$ and $\beta = -a\alpha$, so up to scale</p>
+
+  <div class="math-block">$$\boxed{\;\mathcal K_{\mathrm{CS}}[q,p] = p^2 - a\,p\,q + q^2\;}$$</div>
+
+  <p>is an <strong>exact invariant</strong>: $\mathcal K_{\mathrm{CS}}[T\zeta] = \mathcal K_{\mathrm{CS}}[\zeta]$ for every point. Let's check it directly — it takes one line:</p>
+
+  <div class="math-block">$$p'^2 - a\,p'q' + q'^2 = (-q+ap)^2 - a(-q+ap)p + p^2 = q^2 - apq + p^2. \checkmark$$</div>
+
+  <p>This is the <strong>Courant–Snyder invariant</strong> of accelerator physics — the ellipse a beam particle rides turn after turn, whose area is the beam's <em>emittance</em>. Every orbit of §7.2–7.3 is one of its level curves. <strong>Drag $a$</strong> to reshape the family of ellipses; click to drop an orbit and confirm it sits on a single level set.</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>a =</label>
+      <input type="range" id="slider-a-cs" min="-1.95" max="1.95" step="0.01" value="1">
+      <span class="val" id="val-a-cs">1.00</span>
+    </div>
+    <button class="btn" id="btn-cs-clear">Clear orbits</button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c-cs"></canvas>
+    <span class="canvas-label">level sets of the Courant–Snyder invariant (grey) with iterated orbits on top</span>
+  </div>
+  <div class="readout" id="readout-cs">…</div>
+
+  <p>One more observation will matter enormously later. If $\mathcal K_{\mathrm{CS}}$ is conserved, then so is <em>any</em> function of it — $\mathcal K_{\mathrm{CS}}^2$, $e^{\mathcal K_{\mathrm{CS}}}$, a whole power series $C_0\,\mathcal K_{\mathrm{CS}} + C_1\,\mathcal K_{\mathrm{CS}}^2 + \cdots$. The invariant of a map is never unique; it is only defined up to reparametrisation. That freedom is a nuisance now and a superpower later.</p>
+
+  <div class="note success">
+    <strong>Where the story must go next.</strong> All of this rests on the map being <em>linear</em>. The real maps — a kicked rotor, a beam through nonlinear magnets, the Hénon map — carry higher powers, $p' = -q + a p + (\text{cubic, quintic}, \dots)$. Then no exact quadratic invariant survives, orbits stop being clean ellipses, and chaos leaks in near resonances. Two escape routes open up, and we take both: <strong>build the nonlinear map from a generator</strong> using the Lie-algebra machinery of Poisson brackets (Module 8), and <strong>construct an invariant that is conserved <em>almost</em> exactly</strong> (Module 10). The bridge from Module 4's brackets to modern research runs straight through here.</p>
+
+  <nav class="nav-bottom"></nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="../js/nav-core.js"></script>
+<script src="js/nav.js"></script>
+<script src="../js/math-render.js"></script>
+<script src="js/glossary.js"></script>
+<script src="../js/canvas3d.js"></script>
+<script src="../js/plot2d.js"></script>
+<script src="../js/interactive.js"></script>
+<script src="js/dynamics.js"></script>
+<script>
+// ---- 7.1 Area preservation -------------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var a = 1;
+    var cv = document.getElementById('c-area');
+    UI.fitCanvas(cv, 0.62);
+    var plot = new Plot2D(cv, { xMin: -3, xMax: 3, yMin: -3, yMax: 3 });
+    // tile corners (a small square near the origin)
+    var base = [[0.3, 0.3], [1.1, 0.3], [1.1, 1.1], [0.3, 1.1]];
+    var tiles = [];
+
+    function reset() { tiles = [base.map(function (c) { return c.slice(); })]; draw(); }
+    function stepOnce() {
+      var last = tiles[tiles.length - 1];
+      var next = last.map(function (c) { return Dynamics.linearMap(c[0], c[1], a); });
+      tiles.push(next);
+      if (tiles.length > 8) tiles.shift();
+      draw();
+    }
+    function polyArea(poly) {
+      var s = 0;
+      for (var i = 0; i < poly.length; i++) {
+        var j = (i + 1) % poly.length;
+        s += poly[i][0] * poly[j][1] - poly[j][0] * poly[i][1];
+      }
+      return Math.abs(s) / 2;
+    }
+    function fillPoly(poly, fill, stroke) {
+      var ctx = plot.ctx;
+      ctx.beginPath();
+      for (var i = 0; i < poly.length; i++) {
+        var s = plot.toScreen(poly[i][0], poly[i][1]);
+        if (i === 0) ctx.moveTo(s.x, s.y); else ctx.lineTo(s.x, s.y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = fill; ctx.fill();
+      ctx.strokeStyle = stroke; ctx.lineWidth = 1.6; ctx.stroke();
+    }
+    function draw() {
+      plot.w = cv.width; plot.h = cv.height;
+      plot.clear(); plot.drawGrid();
+      for (var i = 0; i < tiles.length; i++) {
+        var age = (tiles.length - 1 - i);
+        var alpha = Math.max(0.12, 1 - age * 0.16);
+        var col = i === tiles.length - 1 ? 'rgba(100,181,246,' + alpha + ')' : 'rgba(120,140,200,' + (alpha * 0.5) + ')';
+        fillPoly(tiles[i], col, i === tiles.length - 1 ? '#64b5f6' : 'rgba(150,170,220,0.5)');
+      }
+      var A0 = polyArea(tiles[0]), An = polyArea(tiles[tiles.length - 1]);
+      document.getElementById('readout-area').innerHTML =
+        'a = <b>' + a.toFixed(2) + '</b> &nbsp; det dT = <b>1</b> (always) &nbsp;•&nbsp; original area = <b>' +
+        A0.toFixed(3) + '</b>, latest tile area = <b>' + An.toFixed(3) + '</b> &nbsp; (' + (tiles.length - 1) + ' applications)';
+    }
+
+    UI.bindSlider('slider-a-area', 'val-a-area', function (v) { a = v; }, function (v) { return parseFloat(v).toFixed(2); });
+    document.getElementById('btn-area-step').addEventListener('click', stepOnce);
+    document.getElementById('btn-area-reset').addEventListener('click', reset);
+    setTimeout(function () { UI.fitCanvas(cv, 0.62); reset(); }, 40);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.62); draw(); });
+  } catch (err) { console.error('7.1 error', err); }
+});
+
+// ---- 7.2 Stability ---------------------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var a = 0.8;
+    var cv = document.getElementById('c-stab');
+    UI.fitCanvas(cv, 0.62);
+    var plot = new Plot2D(cv, { xMin: -3, xMax: 3, yMin: -3, yMax: 3 });
+    var palette = ['#64b5f6', '#4caf50', '#ffb74d', '#ba68c8', '#4dd0e1', '#f06292'];
+
+    function draw() {
+      plot.w = cv.width; plot.h = cv.height;
+      plot.clear(); plot.drawGrid();
+      var seeds = [];
+      for (var i = 0; i < 6; i++) seeds.push([0.35 + i * 0.28, 0]);
+      var iters = 260;
+      for (var s = 0; s < seeds.length; s++) {
+        var q = seeds[s][0], p = seeds[s][1];
+        plot.ctx.fillStyle = palette[s % palette.length];
+        for (var k = 0; k < iters; k++) {
+          var n = Dynamics.linearMap(q, p, a); q = n[0]; p = n[1];
+          if (!isFinite(q) || Math.abs(q) > 12 || Math.abs(p) > 12) break;
+          var sc = plot.toScreen(q, p);
+          plot.ctx.fillRect(sc.x, sc.y, 1.6, 1.6);
+        }
+      }
+      plot.drawPoint(0, 0, '#e94560', 4);
+      var stable = Math.abs(a) < 2;
+      document.getElementById('readout-stab').innerHTML =
+        'tr dT = a = <b>' + a.toFixed(3) + '</b> &nbsp; ⇒ &nbsp;' +
+        (stable
+          ? 'elliptic — eigenvalues e<sup>±iμ</sup> on the unit circle, orbits <b>bounded</b>'
+          : 'hyperbolic — real eigenvalues λ, 1/λ, orbits <b>escape</b> (|a| ≥ 2)');
+    }
+    UI.bindSlider('slider-a-stab', 'val-a-stab', function (v) {
+      a = v; document.querySelectorAll('[data-astab]').forEach(function (b) { b.classList.remove('active'); });
+      draw();
+    }, function (v) { return parseFloat(v).toFixed(3); });
+    document.querySelectorAll('[data-astab]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        a = parseFloat(b.getAttribute('data-astab'));
+        document.getElementById('slider-a-stab').value = a;
+        document.getElementById('val-a-stab').textContent = a.toFixed(3);
+        document.querySelectorAll('[data-astab]').forEach(function (x) { x.classList.toggle('active', x === b); });
+        draw();
+      });
+    });
+    setTimeout(function () { UI.fitCanvas(cv, 0.62); draw(); }, 40);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.62); draw(); });
+  } catch (err) { console.error('7.2 error', err); }
+});
+
+// ---- 7.3 Rotation number ---------------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var a = 0.618;
+    var cv = document.getElementById('c-tune');
+    UI.fitCanvas(cv, 0.62);
+    var plot = new Plot2D(cv, { xMin: -2.4, xMax: 2.4, yMin: -2.4, yMax: 2.4 });
+    var pts = [], q = 1.6, p = 0, timer = null;
+
+    function rational(nu) {
+      for (var den = 1; den <= 12; den++)
+        for (var num = 0; num <= den; num++)
+          if (Math.abs(nu - num / den) < 0.0015) return num + '/' + den;
+      return null;
+    }
+    function restart() {
+      pts = []; q = 1.6; p = 0;
+      if (timer) clearInterval(timer);
+      var nu = Dynamics.bareTune(a), rat = rational(nu);
+      timer = setInterval(function () {
+        pts.push([q, p]);
+        var n = Dynamics.linearMap(q, p, a); q = n[0]; p = n[1];
+        if (pts.length > 400) pts.shift();
+        draw(nu, rat);
+      }, 60);
+    }
+    function draw(nu, rat) {
+      plot.w = cv.width; plot.h = cv.height;
+      plot.clear(); plot.drawGrid();
+      // faint invariant ellipse p^2 - a p q + q^2 = const through the seed
+      var C = 1.6 * 1.6;
+      plot.plotImplicit(function (x, y) { return (y * y - a * x * y + x * x) - C; }, 'rgba(120,140,200,0.5)', 1.4);
+      for (var i = 0; i < pts.length; i++) {
+        var sc = plot.toScreen(pts[i][0], pts[i][1]);
+        var age = (pts.length - i) / pts.length;
+        plot.ctx.fillStyle = 'rgba(233,69,96,' + Math.max(0.15, 1 - age) + ')';
+        plot.ctx.beginPath(); plot.ctx.arc(sc.x, sc.y, 2.6, 0, 7); plot.ctx.fill();
+      }
+      if (pts.length) plot.drawPoint(pts[pts.length - 1][0], pts[pts.length - 1][1], '#fff176', 4);
+      document.getElementById('readout-tune').innerHTML =
+        'a = <b>' + a.toFixed(3) + '</b> &nbsp; μ = arccos(a/2) = <b>' + Math.acos(a / 2).toFixed(3) +
+        '</b> rad &nbsp; ν₀ = <b>' + nu.toFixed(4) + '</b> turns/step &nbsp;•&nbsp; ' +
+        (rat ? 'rational <b>' + rat + '</b> → closes into a ' + rat.split('/')[1] + '-cycle' : '<b>irrational</b> → never closes, fills the loop');
+    }
+    function setA(val) { a = val; restart(); }
+    UI.bindSlider('slider-a-tune', 'val-a-tune', function (v) {
+      document.querySelectorAll('[data-atune]').forEach(function (b) { b.classList.remove('active'); });
+      setA(v);
+    }, function (v) { return parseFloat(v).toFixed(3); });
+    // preset buttons carry a target tune; convert to a = 2 cos(2π ν)
+    var presets = { '1': 1 / 6, '0': 1 / 4, '-1': 1 / 3 };
+    document.querySelectorAll('[data-atune]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var key = b.getAttribute('data-atune'), targetNu = presets[key];
+        var av = (targetNu !== undefined) ? 2 * Math.cos(2 * Math.PI * targetNu) : parseFloat(key);
+        document.getElementById('slider-a-tune').value = av.toFixed(3);
+        document.getElementById('val-a-tune').textContent = av.toFixed(3);
+        document.querySelectorAll('[data-atune]').forEach(function (x) { x.classList.toggle('active', x === b); });
+        setA(av);
+      });
+    });
+    setTimeout(function () { UI.fitCanvas(cv, 0.62); restart(); }, 40);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.62); });
+  } catch (err) { console.error('7.3 error', err); }
+});
+
+// ---- 7.4 Courant–Snyder invariant ------------------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+  try {
+    var a = 1, orbits = [];
+    var cv = document.getElementById('c-cs');
+    UI.fitCanvas(cv, 0.62);
+    var plot = new Plot2D(cv, { xMin: -3, xMax: 3, yMin: -3, yMax: 3 });
+
+    function draw() {
+      plot.w = cv.width; plot.h = cv.height;
+      plot.clear(); plot.drawGrid();
+      // several level sets of the CS invariant
+      var levels = [0.4, 1.2, 2.4, 4.2, 6.5];
+      for (var L = 0; L < levels.length; L++) {
+        plot.plotImplicit(function (x, y) { return (y * y - a * x * y + x * x) - levels[L]; }, 'rgba(150,160,200,0.55)', 1.3);
+      }
+      for (var o = 0; o < orbits.length; o++) {
+        var q = orbits[o][0], p = orbits[o][1];
+        plot.ctx.fillStyle = '#e94560';
+        for (var k = 0; k < 240; k++) {
+          var n = Dynamics.linearMap(q, p, a); q = n[0]; p = n[1];
+          if (!isFinite(q) || Math.abs(q) > 12) break;
+          var sc = plot.toScreen(q, p);
+          plot.ctx.fillRect(sc.x, sc.y, 2, 2);
+        }
+      }
+      plot.drawPoint(0, 0, '#4dd0e1', 4);
+      document.getElementById('readout-cs').innerHTML =
+        'K_CS = p² − <b>' + a.toFixed(2) + '</b>·pq + q² &nbsp;•&nbsp; ν₀ = <b>' + Dynamics.bareTune(a).toFixed(4) +
+        '</b> &nbsp;•&nbsp; ' + orbits.length + ' orbit(s) — each rides a single grey level set';
+    }
+    function seed(e) {
+      var pos = UI.canvasPos(cv, e), c = plot.fromScreen(pos.x, pos.y);
+      orbits.push([c.x, c.y]); draw();
+    }
+    cv.addEventListener('mousedown', seed);
+    cv.addEventListener('touchstart', function (e) { e.preventDefault(); seed(e); }, { passive: false });
+    UI.bindSlider('slider-a-cs', 'val-a-cs', function (v) { a = v; draw(); }, function (v) { return parseFloat(v).toFixed(2); });
+    document.getElementById('btn-cs-clear').addEventListener('click', function () { orbits = []; draw(); });
+    setTimeout(function () { UI.fitCanvas(cv, 0.62); orbits = [[1.4, 0], [2.1, 0.6]]; draw(); }, 40);
+    UI.onResize(function () { UI.fitCanvas(cv, 0.62); draw(); });
+  } catch (err) { console.error('7.4 error', err); }
+});
+</script>
+</body>
+</html>
